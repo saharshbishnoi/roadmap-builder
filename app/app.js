@@ -572,6 +572,24 @@ function keepGuide(){
 const guideVideo=(g,id,auto)=>{const f=g.clip+(isDark()?"-dark":"-light");
   return hasVideos?'<video id="'+id+'" controls playsinline preload="none"'+(auto?' autoplay':'')+' poster="'+f+'.jpg" aria-label="Video: '+esc(g.title)+'"><source src="'+f+'.mp4" type="video/mp4">'+(FROM_FOLDER?'':'<track kind="subtitles" srclang="en" label="English" src="'+g.clip+'.vtt" default>')+'</video>'
     :EMBED?'':'<p class="novid">The video for this step is made by a release build: <code>RELEASE=1 docker compose up -d --build</code></p>';};
+/* The product film. It is published only with the hosted site (GitHub Pages), so everything about it stays hidden
+   unless its poster picture is found next to the app. */
+const FILM="film/roadmap-builder-film";
+let hasFilm=false;
+function checkFilm(){
+  if(EMBED||FROM_FOLDER)return;
+  const probe=new Image();
+  probe.onload=()=>{hasFilm=true;$("#tourBtn").hidden=false;$("#tourPoster").src=probe.src;let off=false;try{off=localStorage.getItem("roadmap-tour-seen")==="1";}catch(e){}$("#tourBar").hidden=off;};
+  probe.src=FILM+"-poster.jpg";
+}
+function hideTour(){$("#tourBar").hidden=true;try{localStorage.setItem("roadmap-tour-seen","1");}catch(e){}}
+function openTour(){
+  if(!hasFilm)return;hideTour();
+  openSheet('<h2 id="sheetTitle">Roadmap Builder: the full tour</h2><video id="v-tour" controls autoplay playsinline poster="'+FILM+'-poster.jpg"><source src="'+FILM+'-1080p.mp4" type="video/mp4"><track kind="subtitles" srclang="en" label="English" src="'+FILM+'.vtt" default></video>'+
+    '<div class="tourchap" id="tourChap" aria-label="Chapters"></div><div class="acts" style="padding-top:12px"><a class="btn" href="'+FILM+'-4k.mp4" target="_blank" rel="noopener">Open in 4K</a><button type="button" class="btn primary" data-sheet="close">Close</button></div>',true);
+  fetch("film/chapters.txt").then(r=>r.ok?r.text():"").then(t=>{const box=$("#tourChap");if(!box)return;
+    box.innerHTML=t.split("\n").map(l=>/^(\d\d):(\d\d)\s+(.+)$/.exec(l.trim())).filter(Boolean).map(m=>'<button type="button" class="chipb" data-seek="'+(+m[1]*60+ +m[2])+'">'+m[1]+':'+m[2]+' '+esc(m[3])+'</button>').join("");}).catch(()=>{});
+}
 function enlarge(i){
   const g=(window.GUIDE||[])[i];if(!g)return;
   openSheet('<h2 id="sheetTitle">'+esc(g.title)+'</h2>'+guideVideo(g,"v-big",true)+'<div class="acts" style="padding-top:12px"><button type="button" class="btn primary" data-sheet="close">Close</button></div>',true);
@@ -828,7 +846,7 @@ const ACT={
   zin:()=>{ui.zoom="manual";mw=Math.min(60,mw*1.25);render();},zout:()=>{ui.zoom="manual";mw=Math.max(4,mw/1.25);render();},zfit:()=>{ui.zoom="fit";render();},
   today:()=>{const p=pos(todayIso()),c=$("#chart");if(p<0||p>months()){toast("Today, "+fmtD(todayIso())+", is outside this timeline. Change the start year in the banner, in Edit mode.");return;}c.scrollLeft=Math.max(0,p*mw-(c.clientWidth-leftW())/2);},
   import:()=>$("#file").click(),exJson:()=>saveFile(slug()+".json",JSON.stringify(S,null,2)),exCsv:()=>saveFile(slug()+".csv",toCSV()),
-  exHtml:exportHtml,exPng:()=>exportVisual("png"),exPdfA3:()=>exportVisual("pdfA3"),exPdf:()=>exportVisual("pdf"),deselect:()=>select(null),
+  exHtml:exportHtml,tour:openTour,tourHide:hideTour,exPng:()=>exportVisual("png"),exPdfA3:()=>exportVisual("pdfA3"),exPdf:()=>exportVisual("pdf"),deselect:()=>select(null),
   clear:()=>{mutate(()=>{S.activities=[];S.milestones=[];S.critical=[];S.cards=[];S.panel=[];});toast("Cleared all content",true);},
   sample:()=>{mutate(()=>{S=normalise(sample());});toast("Loaded the sample roadmap",true);}
 };
@@ -865,6 +883,7 @@ document.addEventListener("click",e=>{
   if((el=t.closest("[data-ptab]"))){ui.panelTab=el.dataset.ptab;saveUi();renderPanel();return;}
   if((el=t.closest("[data-dockx]"))){if(dock&&dock.extra)dock.extra[+el.dataset.dockx].fn();return;}
   if((el=t.closest("[data-enlarge]"))){enlarge(+el.dataset.enlarge);return;}
+  if((el=t.closest("[data-seek]"))){const v=$("#v-tour");if(v){v.currentTime=+el.dataset.seek;v.play();}return;}
   if((el=t.closest("[data-sheet]"))){const k=el.dataset.sheet;
     if(k==="close")closeSheet();
     else if(k==="copy"){const ta=$("#copyText");ta.select();try{navigator.clipboard.writeText(ta.value).then(()=>toast("Copied"),()=>toast("Select the text and copy it by hand."));}catch(x){toast("Select the text and copy it by hand.");}}
@@ -988,6 +1007,7 @@ function start(data){
   S=data&&Array.isArray(data.phases)?normalise(data):(load()||normalise(EMBED&&EMBED.roadmap?EMBED.roadmap:sample()));render();
 }
 if("serviceWorker" in navigator&&/^https?:$/.test(location.protocol)&&!window.claude&&!EMBED)navigator.serviceWorker.register("sw.js").catch(()=>{});
+checkFilm();
 const hot=window.claude&&window.claude.hot;
 if(hot&&typeof hot.snapshot==="function"){try{hot.snapshot(()=>S);}catch(e){}}
 if(hot&&typeof hot.ready==="function")hot.ready(start);else start((hot&&hot.data)||{});

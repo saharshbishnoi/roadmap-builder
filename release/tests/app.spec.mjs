@@ -343,3 +343,9 @@ test("Export > Standalone page makes one self-contained file that opens from a f
   await expect(copy.locator(".gstep")).toHaveCount(5);
   expect(problems).toEqual([]);
 });
+
+test("the product film headline stays hidden where the film is not published", async ({ page }) => {
+  await open(page);
+  await expect(page.locator("#tourBar")).toBeHidden();
+  await expect(page.locator("#tourBtn")).toBeHidden();
+});

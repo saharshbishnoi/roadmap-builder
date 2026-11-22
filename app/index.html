@@ -13,6 +13,13 @@
 <body>
 <div class="wrap">
 
+  <div class="tourbar" id="tourBar" hidden>
+    <button type="button" class="tourplay" data-act="tour" aria-label="Watch the full tour"><img id="tourPoster" alt=""><span aria-hidden="true">▶</span></button>
+    <div class="tourtxt"><b>New here? Watch the full tour.</b><span>Five minutes, six chapters, with subtitles.</span></div>
+    <button type="button" class="btn primary" data-act="tour">Watch the tour</button>
+    <button type="button" class="btn" data-act="tourHide" aria-label="Hide this">Not now</button>
+  </div>
+
   <div class="tools" role="toolbar" aria-label="Roadmap tools">
     <div class="seg" role="group" aria-label="Mode">
       <button type="button" class="segb" id="modeView" data-mode="view">View</button>
@@ -26,6 +33,7 @@
       <button type="button" class="btn" data-act="today">Today</button>
     </div>
     <span class="spacer"></span>
+    <button type="button" class="btn" id="tourBtn" data-act="tour" hidden>▶ Tour</button>
     <button type="button" class="btn" data-act="import">Import</button>
     <div class="menuwrap">
       <button type="button" class="btn primary" id="exBtn" data-menu="exMenu" aria-haspopup="true">Export ▾</button>

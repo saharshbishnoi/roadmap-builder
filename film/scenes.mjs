@@ -77,14 +77,14 @@ export const FILM = {
     { id: "03-item", title: "Everything on the item", mode: "edit",
       cards: [{ heading: "Everything on the item", line: "Settings open under the thing you click." }],
       steps: [
-        async f => { await f.click("#b-a2"); await f.waitFor("#istrip"); },
+        async f => { await f.click("#b-a2"); await f.waitFor("#istrip"); await f.hover("#istrip .ihead b"); await f.pause(500); },
         async f => { await f.hover("#f-color"); await f.ring(); await f.set("#f-color", "#f07c1f"); await f.pause(300); },
         async f => { await f.click("#f-hover"); await f.type("**Ready** by spring. Bring a spanner."); },
         async f => { await f.click("#dx-done"); await f.drag("#b-a3", 96, 0); },
         async f => { await f.drag("#b-a3", 72, 0, { fx: 0.985 }); },
         async f => { await f.click("#b-a5", { button: "right" }); await f.menu("Make it a milestone"); await f.pause(300); },
         async f => { await f.click("#undo"); await f.pause(300); },
-        async f => { await f.click("#km-k2"); await f.waitFor("#istrip"); }
+        async f => { await f.click("#km-k2"); await f.waitFor("#istrip"); await f.hover("#istrip .ihead b"); await f.pause(500); }
       ],
       lines: [
         "Chapter three. Everything on the item.",
@@ -153,7 +153,7 @@ export const FILM = {
         async f => { await f.open(await f.exported(".html")); await f.waitFor("#inner .row"); },
         async f => { await f.hover("#b-a4", { fx: 0.35 }); await f.waitFor("#hover"); },
         async f => { await f.open("app/index.html"); await f.waitFor("#inner .row"); await f.click("#exBtn"); await f.click('[data-act="exPng"]'); await f.waitFor("#toast", { text: ".png", frames: 900 }); },
-        async f => { await f.click("#pt-reqs"); await f.hover("#panel a[href*='roadmap-builder.zip']"); }
+        async f => { await f.click("#exBtn"); await f.click('[data-act="exPdfA3"]'); await f.waitFor("#toast", { text: ".pdf", frames: 900 }); }
       ],
       lines: [
         "Chapter six. Share it.",
@@ -163,7 +163,7 @@ export const FILM = {
         "Here is that file, opened on its own. No server.",
         "It is the same roadmap. Hover cards still work.",
         "Back in the app, export an image. It is saved for a slide.",
-        "The Features tab lists the offline copy and the install option."
+        "Export a PDF on one A3 page. It is saved too."
       ] }
   ],
 

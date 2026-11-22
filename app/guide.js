@@ -63,6 +63,7 @@ window.REQS=[
     ["Everything can be exported to and imported from files","Export, Roadmap file (.json); Import"],
     ["Export an image or a PDF for the final release","Export: PNG, PDF A3 landscape, PDF exact size"],
     ["Runs in a container with compose up and compose down","docker-compose.yml, Dockerfile and nginx.conf in the project"],
+    ["A product film on the hosted site","Watch the tour, at the top of the page and in the toolbar. Shown only where the film is published"],
     ["Installable, and works offline","Install from the address bar in Chrome or Edge; the app and the guide videos you have opened are kept for offline use"],
     ["Export a single standalone page","Export, Standalone page (.html): the app and the current roadmap in one file that opens with a double-click"],
     ["One zip with everything","Attached to each release: unzip and open index.html, no server needed"],

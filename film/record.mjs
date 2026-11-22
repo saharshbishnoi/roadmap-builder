@@ -169,13 +169,15 @@ async function record(scene, stills) {
     const f = {
       pause: hold,
       eval: (fn, ...args) => app().evaluate(fn, ...args),
-      async rect(sel) { return app().evaluate(sel => { const el = document.querySelector(sel); if (!el) return null; const r = el.getBoundingClientRect(); return r.width && r.height ? { x: r.x, y: r.y, w: r.width, h: r.height, vh: innerHeight } : null; }, sel).catch(() => null); },
+      async rect(sel) { return app().evaluate(sel => { const el = document.querySelector(sel); if (!el) return null; const r = el.getBoundingClientRect(); return r.width && r.height ? { x: r.x, y: r.y, w: r.width, h: r.height, vh: innerHeight, top: scrollY, pinned: !!el.closest(".tools,#ctx,#hover,#sheet,#toast,.menu") } : null; }, sel).catch(() => null); },
       // Find a thing on screen. If the page is redrawing, look again on the next frame; scroll it into view if needed.
       async at(sel, fx = 0.5, fy = 0.5) {
         for (let tries = 0; tries < 150; tries++) {
           const r = await f.rect(sel);
           if (!r) { await frame(); continue; }
-          if (r.y < 62 || r.y + r.h > r.vh - 24) { await f.scrollBy(r.y + r.h / 2 - r.vh / 2); continue; }
+          // Things in the toolbar, menus and dialogs do not scroll with the page. Otherwise bring it into view, once;
+          // if the page cannot scroll any further, use it where it is.
+          if (!r.pinned && (r.y < 62 || r.y + r.h > r.vh - 24)) { await f.scrollBy(r.y + r.h / 2 - r.vh / 2); const again = await f.rect(sel); if (again && Math.abs(again.top - r.top) > 1) continue; if (again) return { x: win.x + again.x + again.w * fx, y: win.y + again.y + again.h * fy }; continue; }
           return { x: win.x + r.x + r.w * fx, y: win.y + r.y + r.h * fy };
         }
         throw new Error("Nothing on screen matches " + sel);
@@ -187,7 +189,7 @@ async function record(scene, stills) {
       async top() { await f.scrollBy(-(await app().evaluate(() => scrollY)), 800); },
       async glide(p) {
         const ms = Math.round(Math.min(950, 380 + Math.hypot(p.x - cur.x, p.y - cur.y) * 0.75));
-        await pointer(p.x, p.y, ms); await hold(ms); await page.mouse.move(p.x, p.y, { steps: 4 }); cur = p; await hold(120);
+        await pointer(p.x, p.y, ms); await hold(ms); await page.mouse.move(p.x, p.y); cur = p; await hold(120);
       },
       async ring() { await page.evaluate(([x, y]) => { const d = document.createElement("div"); d.className = "ring"; d.style.left = x + "px"; d.style.top = y + "px"; document.body.appendChild(d); setTimeout(() => d.remove(), 650); }, [cur.x, cur.y]); },
       async hover(sel, o = {}) { await f.glide(await f.at(sel, o.fx, o.fy)); },
@@ -235,7 +237,7 @@ async function record(scene, stills) {
       while (n / FPS < end) { const now = n / FPS, c = mine.find(c => now >= c.start - 0.001 && now < c.end + 0.12), text = c ? c.text : ""; if (text !== shown) { await subs(text); shown = text; } await frame(); }
       await subs("");
     };
-    const card = async c => { await page.evaluate(c => { const el = document.getElementById("card"); el.querySelector("small").textContent = c.small || ""; el.querySelector("h1").textContent = c.heading; el.querySelector("p").textContent = c.line || ""; el.classList.add("on"); }, c); await hold(700); };
+    const card = async c => { await page.evaluate(c => { const el = document.getElementById("card"); el.querySelector("small").textContent = c.small || ""; el.querySelector("small").style.display = c.small ? "" : "none"; el.querySelector("h1").textContent = c.heading; el.querySelector("p").textContent = c.line || ""; el.classList.add("on"); }, c); await hold(700); };
     const cardOff = async () => { await page.evaluate(() => document.getElementById("card").classList.remove("on")); await hold(650); };
 
     await hold(200);
@@ -285,6 +287,8 @@ function join() {
   run("ffmpeg", ["-y", "-loglevel", "error", "-f", "concat", "-safe", "0", "-i", list, "-i", ffmeta, "-map", "0", "-map_metadata", "1", "-map_chapters", "1", "-c", "copy", "-movflags", "+faststart", k4]);
   run("ffmpeg", ["-y", "-loglevel", "error", "-i", k4, "-map", "0", "-map_chapters", "0", "-vf", "scale=1920:1080:flags=lanczos", "-c:v", "libx264", "-preset", "slow", "-crf", "20", "-pix_fmt", "yuv420p", "-c:a", "copy", "-movflags", "+faststart", hd]);
   fs.writeFileSync(path.join(OUT, NAME + ".srt"), srt); fs.writeFileSync(path.join(OUT, "chapters.txt"), chapters);
+  fs.writeFileSync(path.join(OUT, NAME + ".vtt"), "WEBVTT\n\n" + srt.replace(/(\d\d:\d\d:\d\d),(\d\d\d)/g, "$1.$2"));
+  run("ffmpeg", ["-y", "-loglevel", "error", "-ss", "2.5", "-i", k4, "-frames:v", "1", "-vf", "scale=1920:1080", "-q:v", "3", path.join(OUT, NAME + "-poster.jpg")]);
   const stream = (f, kind) => run("ffprobe", ["-v", "error", "-select_streams", kind, "-show_entries", "stream=codec_name,width,height,r_frame_rate,duration", "-of", "json", f]).toString();
   const v = JSON.parse(stream(k4, "v:0")).streams[0], a = JSON.parse(stream(k4, "a:0")).streams[0];
   let loud = ""; try { run("ffmpeg", ["-hide_banner", "-nostats", "-i", k4, "-vn", "-af", "ebur128=peak=true", "-f", "null", "-"]); } catch (e) { loud = String(e.stderr || ""); }

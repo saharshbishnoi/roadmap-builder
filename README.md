@@ -48,6 +48,10 @@ release build in Docker and then:
   Unzip it and open `index.html`; no server is needed. The newest one is always at
   `https://github.com/saharshbishnoi/roadmap-builder/releases/latest/download/roadmap-builder.zip`.
 
+The pipeline also records the **product film** (a five-minute narrated tour, see `film/README.md`)
+and adds it to the Pages site only. Where the film is present the app shows a "Watch the tour" bar;
+the zip, the container image and standalone pages do not include it.
+
 One-time setup: in the repository, Settings, Pages, set Source to "GitHub Actions". GitHub Pages
 on a private repository needs a paid GitHub plan, and a Pages site is public either way.
 
@@ -68,6 +72,7 @@ Everything that is not source is produced by the Docker build:
 |---|---|
 | Libraries in `app/vendor` and fonts in `app/fonts` | fetched from npm by the `assets` stage of every build; versions locked in `assets/package-lock.json` |
 | Guide videos, subtitles and posters in `app/guide` | rendered by a release build |
+| The product film in `film/out` | recorded by `docker compose -f film/compose.yml run --rm film` |
 | App icons (PNG), the offline file list and the zip | made by the `site` stage of every build |
 | Narration voice | Kokoro text-to-speech (Apache 2.0 licence), model files pinned by checksum in the `Dockerfile` |
 
@@ -156,6 +161,7 @@ app/manifest.webmanifest, app/icon.svg   what makes the app installable
 app/guide/           guide videos, subtitles and posters: made by a release build, not in git
 docs/                ideas, planned editions and the design language
 .github/workflows/   the pipeline that publishes to GitHub Pages and attaches the zip to a release
+film/                the product film: scenes, recorder and its own container (see film/README.md)
 release/             tests, the video builder and the narration script, used only by a release build
 app/vendor/          marked, DOMPurify, html-to-image, jsPDF: fetched by the build (see THIRD-PARTY.txt)
 assets/              the list of libraries and fonts the build fetches
