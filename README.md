@@ -39,23 +39,33 @@ cached by Docker after the first time); none of it ends up in the final image ex
 
 ### Publishing: GitHub Pages and the zip
 
-Pushing a version tag (for example `v1.1.0`) runs `.github/workflows/release.yml`, which does the
-release build in Docker and then:
+**The site** is published from a branch, by hand, so nothing goes live until you say so:
 
-- publishes the finished site to **GitHub Pages**, so the app can be shared as a link and installed
-  from the browser (Install, in the address bar of Chrome or Edge) to run in its own window, offline;
-- attaches **`roadmap-builder.zip`** to the GitHub Release: the whole app with its guide videos.
-  Unzip it and open `index.html`; no server is needed. The newest one is always at
-  `https://github.com/saharshbishnoi/roadmap-builder/releases/latest/download/roadmap-builder.zip`.
+```
+./publish-pages.sh
+```
 
-The pipeline also records the **product film** (a five-minute narrated tour, see `film/README.md`)
-and adds it to the Pages site only. Where the film is present the app shows a "Watch the tour" bar;
-the zip, the container image and standalone pages do not include it.
+That runs the release build in Docker, adds the product film if `film/out` has one, and pushes the
+finished site to the `gh-pages` branch as a single commit that replaces the previous one. So `main`
+stays free of binaries and the branch never grows. Options: `FILM=1` re-records the film first,
+`BUILD=0` publishes the `dist/site` folder that is already there.
 
-One-time setup: in the repository, Settings, Pages, set Source to "GitHub Actions". GitHub Pages
-on a private repository needs a paid GitHub plan, and a Pages site is public either way.
+One-time setup on GitHub: Settings, Pages, Source "Deploy from a branch", branch `gh-pages`, folder
+`/ (root)`. GitHub Pages on a private repository needs a paid GitHub plan, and a Pages site is public
+either way. To take the site down, delete the branch or switch Pages off.
 
-To make the same site folder and zip on your own machine:
+The hosted site can be shared as a link and installed from the browser (Install, in the address bar
+of Chrome or Edge) to run in its own window, offline. It is also the only place the **product film**
+appears (a five-minute narrated tour, see `film/README.md`), behind a "Watch the tour" bar. GitHub
+refuses files over 100 MB, so the site plays the film's 1080p copy; the 4K master stays in `film/out`.
+
+**The zip** is still attached by the pipeline: pushing a version tag (for example `v1.3.0`) runs
+`.github/workflows/release.yml`, which does the release build and attaches `roadmap-builder.zip`, the
+whole app with its guide videos, to the GitHub Release. Unzip it and open `index.html`; no server is
+needed. The newest one is always at
+`https://github.com/saharshbishnoi/roadmap-builder/releases/latest/download/roadmap-builder.zip`.
+
+To make the same site folder and zip on your own machine without publishing:
 
 ```
 docker buildx build --build-arg RELEASE=1 --target dist --output type=local,dest=dist .
@@ -160,7 +170,8 @@ app/sw.js            offline support for the installed web app
 app/manifest.webmanifest, app/icon.svg   what makes the app installable
 app/guide/           guide videos, subtitles and posters: made by a release build, not in git
 docs/                ideas, planned editions and the design language
-.github/workflows/   the pipeline that publishes to GitHub Pages and attaches the zip to a release
+.github/workflows/   the pipeline that tests a tagged release and attaches the zip to it
+publish-pages.sh     builds the site and pushes it to the gh-pages branch for GitHub Pages
 film/                the product film: scenes, recorder and its own container (see film/README.md)
 release/             tests, the video builder and the narration script, used only by a release build
 app/vendor/          marked, DOMPurify, html-to-image, jsPDF: fetched by the build (see THIRD-PARTY.txt)

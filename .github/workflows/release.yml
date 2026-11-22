@@ -1,6 +1,6 @@
-# On every version tag (v*): run the release build in Docker (all tests, guide videos, site, zip), record the
-# product film, publish the site with the film to GitHub Pages and attach the zip to a GitHub Release.
-# One-time setup: repository Settings > Pages > Build and deployment > Source: "GitHub Actions".
+# On every version tag (v*): run the release build in Docker (all tests, guide videos, site, zip) and attach the
+# zip to a GitHub Release. The Pages site is NOT published from here: it is pushed to the gh-pages branch with
+# ./publish-pages.sh, so publishing stays a deliberate step.
 name: Release
 
 on:
@@ -17,26 +17,13 @@ concurrency:
 
 jobs:
   build:
-    name: Test, render videos, build site and zip
+    name: Test, render videos, build the zip
     runs-on: ubuntu-latest
     timeout-minutes: 120
     steps:
       - uses: actions/checkout@v4
       - name: Release build in Docker
         run: docker buildx build --build-arg RELEASE=1 --target dist --output type=local,dest=dist .
-      # The product film is published with the Pages site only. It is recorded after the zip is made, so it is
-      # not in the zip, the container image or the standalone page.
-      - name: Record the product film
-        run: FILM_UID=$(id -u) FILM_GID=$(id -g) docker compose -f film/compose.yml run --rm film
-      - name: Add the film to the Pages site
-        run: |
-          mkdir -p dist/site/film
-          cp film/out/roadmap-builder-film-1080p.mp4 film/out/roadmap-builder-film-4k.mp4 film/out/roadmap-builder-film.vtt \
-             film/out/roadmap-builder-film.srt film/out/roadmap-builder-film-poster.jpg film/out/chapters.txt dist/site/film/
-      - name: Site for GitHub Pages
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: dist/site
       - name: Zip for the release
         uses: actions/upload-artifact@v4
         with:
@@ -62,16 +49,3 @@ jobs:
           TAG: ${{ github.ref_name }}
         run: gh release create "$TAG" roadmap-builder.zip --title "$TAG" --generate-notes --verify-tag || gh release upload "$TAG" roadmap-builder.zip --clobber
 
-  pages:
-    name: Publish to GitHub Pages
-    needs: build
-    runs-on: ubuntu-latest
-    permissions:
-      pages: write
-      id-token: write
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - id: deployment
-        uses: actions/deploy-pages@v4

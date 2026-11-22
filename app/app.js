@@ -586,7 +586,8 @@ function hideTour(){$("#tourBar").hidden=true;try{localStorage.setItem("roadmap-
 function openTour(){
   if(!hasFilm)return;hideTour();
   openSheet('<h2 id="sheetTitle">Roadmap Builder: the full tour</h2><video id="v-tour" controls autoplay playsinline poster="'+FILM+'-poster.jpg"><source src="'+FILM+'-1080p.mp4" type="video/mp4"><track kind="subtitles" srclang="en" label="English" src="'+FILM+'.vtt" default></video>'+
-    '<div class="tourchap" id="tourChap" aria-label="Chapters"></div><div class="acts" style="padding-top:12px"><a class="btn" href="'+FILM+'-4k.mp4" target="_blank" rel="noopener">Open in 4K</a><button type="button" class="btn primary" data-sheet="close">Close</button></div>',true);
+    '<div class="tourchap" id="tourChap" aria-label="Chapters"></div><div class="acts" style="padding-top:12px"><a class="btn" id="tour4k" href="'+FILM+'-4k.mp4" target="_blank" rel="noopener" hidden>Open in 4K</a><button type="button" class="btn primary" data-sheet="close">Close</button></div>',true);
+  fetch(FILM+"-4k.mp4",{method:"HEAD"}).then(r=>{const k=$("#tour4k");if(k&&r.ok&&/video/.test(r.headers.get("content-type")||""))k.hidden=false;}).catch(()=>{});
   fetch("film/chapters.txt").then(r=>r.ok?r.text():"").then(t=>{const box=$("#tourChap");if(!box)return;
     box.innerHTML=t.split("\n").map(l=>/^(\d\d):(\d\d)\s+(.+)$/.exec(l.trim())).filter(Boolean).map(m=>'<button type="button" class="chipb" data-seek="'+(+m[1]*60+ +m[2])+'">'+m[1]+':'+m[2]+' '+esc(m[3])+'</button>').join("");}).catch(()=>{});
 }

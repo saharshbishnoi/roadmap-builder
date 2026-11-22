@@ -89,6 +89,7 @@ which is usual inside a container; it only ever opens the app served from inside
 
 ## Where the film is shown
 
-Only on the hosted site. The release pipeline records the film and adds it to the GitHub Pages site
-after the zip has been made, so it is not in the zip, the container image or a standalone page. The
-app shows its "Watch the tour" bar only when it finds the film beside it.
+Only on the hosted site. `./publish-pages.sh` (in the repository root) copies the film from `film/out`
+into the site it pushes to the `gh-pages` branch, so the film is not in the zip, the container image
+or a standalone page. The app shows its "Watch the tour" bar only when it finds the film beside it.
+GitHub refuses files over 100 MB, so the site plays the 1080p copy and the 4K master stays here.

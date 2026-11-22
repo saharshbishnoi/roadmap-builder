@@ -13,3 +13,4 @@ docs
 app/standalone-template.js
 film/out
 film/cache
+publish-pages.sh
