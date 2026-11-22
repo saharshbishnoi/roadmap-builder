@@ -2,8 +2,8 @@
 
 A single-page roadmap app in the style of a BigPicture Gantt: collapsible workstreams on the left, a
 month-scaled timeline on the right, a critical path and key milestones across the top, floating
-cards over the chart, a live editor on the left and a resizable panel of cards, guide clips and
-requirements on the right. It runs entirely in the browser and is served
+cards over the chart, editing controls on the elements themselves, and a resizable panel of cards,
+guide clips, requirements and a JSON live editor on the right. It runs entirely in the browser and is served
 as static files from one small nginx container.
 
 ## Run it
@@ -25,30 +25,38 @@ that image. Nothing is fetched at runtime: the libraries and fonts are in `app/v
 
 ## Using it
 
-The Guide tab in the right-hand panel has seven short clips that show each of these steps, and the
-Requirements tab lists what the app was asked to do and where to find it.
+The Guide tab in the right-hand panel has seven short clips (recorded in an earlier layout; the
+steps under each clip are current), and the Requirements tab lists what the app was asked to do and where to find it.
 
 **View mode** is for reading and presenting. Hover over a bar, milestone or critical path stage to
 see its hover card; click it to open its dialog card. Collapse a workstream with its arrow.
 
-**Edit mode** docks a live editor on the left:
+**Edit mode** puts every control on the element it changes. There are no menus or side editors:
 
-- Click a bar, milestone, stage, workstream or card and edit it under Selected item. The roadmap
-  updates as you type; there is no Save button. Each burst of typing is one Undo step.
-- Each bar, milestone and stage has two Markdown cards: one shown on hover and one shown on click.
-- The Roadmap tab holds the title, timeline, banner and line colours, and custom font names.
-- The Source tab is the whole roadmap as JSON and is also live.
+- Type straight into a workstream or activity name, a start or end date, a card title, or a lane or
+  column heading. There is no Save button. Each burst of typing is one Undo step.
+- Each row and card has a colour square, an eye to hide or show it, a pencil and (where it applies)
+  a cross to delete. Hidden things stay dimmed in Edit mode and disappear in View mode and exports.
+- The pencil, or a click on a bar, milestone or stage, opens all of that item's settings directly
+  under it (inside the card, for cards), including its two Markdown cards: hover and click.
+- The eyes in the chart header show or hide the critical path, the milestone lines, the Start and
+  End columns, and the activity name, start date and end date beside each bar.
+- The start year, number of years, banner colours and today line are edited in the banner.
 - Drag a bar to move it and drag either end to resize it. Bars snap to whole months.
 - Drag the dotted handle to reorder rows or move a row to another workstream.
-- Add menu: workstream, key milestone, critical path stage, floating card, panel card.
+- The Add bar adds a workstream, key milestone, critical path stage, floating card or panel card.
 
-**Visualisation menu** (both modes): show or hide the critical path, milestone lines, today line,
-date labels, floating cards, right panel and 3D card effect; light or dark theme; heading font, text
-font, text size and capitals. Barlow, Barlow Condensed, Inter, IBM Plex Sans and Source Sans 3 are
-bundled. Arial, Segoe UI, Verdana, Calibri and the system font are used if the computer has them.
+**JSON tab** (right panel, Edit mode) is a live editor with one line per activity: change a name or
+a date and the chart follows. Copy a line to add an activity, delete a line to remove one. Switch
+Show to Whole roadmap to edit the complete file.
 
-**Panels.** Drag the divider beside the live editor or the right panel to change its width, or focus
-the divider and use the arrow keys. Double-click it to reset.
+**Display bar** (both modes): light or dark theme, heading font, text font, text size, capitals
+(off by default), 3D card effect, floating cards and the right panel. Barlow, Barlow Condensed,
+Inter, IBM Plex Sans and Source Sans 3 are bundled. Arial, Segoe UI, Verdana, Calibri and the system
+font are used if the computer has them.
+
+**Panel.** Drag the divider beside the right panel to change its width, or focus the divider and use
+the arrow keys. Double-click it to reset.
 
 ## Files in and out
 
