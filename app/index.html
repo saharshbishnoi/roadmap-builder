@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Roadmap Builder</title>
+<link rel="icon" href="data:,">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div class="wrap">
+
+  <div class="tools" role="toolbar" aria-label="Roadmap tools">
+    <div class="seg" role="group" aria-label="Mode">
+      <button type="button" class="segb" id="modeView" data-mode="view">View</button>
+      <button type="button" class="segb" id="modeEdit" data-mode="edit">Edit</button>
+    </div>
+    <button type="button" class="btn eo" id="undo" data-act="undo">Undo</button>
+    <div class="menuwrap eo">
+      <button type="button" class="btn" id="addBtn" data-menu="addMenu" aria-haspopup="true">Add ▾</button>
+      <div class="menu" id="addMenu" hidden>
+        <button type="button" data-act="addPhase">Workstream</button>
+        <button type="button" data-act="addKm">Key milestone</button>
+        <button type="button" data-act="addCp">Critical path stage</button>
+        <button type="button" data-act="addCard">Floating card</button>
+        <button type="button" data-act="addPanel">Panel card</button>
+      </div>
+    </div>
+    <div class="menuwrap">
+      <button type="button" class="btn" id="viewBtn" data-menu="viewMenu" aria-haspopup="true">Visualisation ▾</button>
+      <div class="menu wide" id="viewMenu" hidden>
+        <label class="chk" for="t-showCritical"><input type="checkbox" id="t-showCritical" data-toggle="showCritical"> Critical path</label>
+        <label class="chk" for="t-showLines"><input type="checkbox" id="t-showLines" data-toggle="showLines"> Milestone lines</label>
+        <label class="chk" for="t-showToday"><input type="checkbox" id="t-showToday" data-toggle="showToday"> Today line</label>
+        <label class="chk" for="t-showLabels"><input type="checkbox" id="t-showLabels" data-toggle="showLabels"> Date labels on bars</label>
+        <label class="chk" for="t-showCards"><input type="checkbox" id="t-showCards" data-toggle="showCards"> Floating cards</label>
+        <label class="chk" for="t-showPanel"><input type="checkbox" id="t-showPanel" data-toggle="showPanel"> Right panel</label>
+        <label class="chk" for="t-float3d"><input type="checkbox" id="t-float3d" data-toggle="float3d"> 3D card effect</label>
+        <div class="mhead">Theme and fonts</div>
+        <div class="mrow"><label for="t-theme">Theme</label>
+          <select id="t-theme" data-set="theme"><option value="auto">Match system</option><option value="light">Light</option><option value="dark">Dark</option></select></div>
+        <div class="mrow"><label for="t-fontHead">Heading font</label><select id="t-fontHead" data-set="fontHead"></select></div>
+        <div class="mrow"><label for="t-fontBody">Text font</label><select id="t-fontBody" data-set="fontBody"></select></div>
+        <div class="mrow"><label for="t-fontScale">Text size</label>
+          <select id="t-fontScale" data-set="fontScale"><option value="90">Small</option><option value="100">Standard</option><option value="110">Large</option><option value="120">Extra large</option></select></div>
+        <label class="chk" for="t-upper"><input type="checkbox" id="t-upper" data-toggle="upper"> Headings in capitals</label>
+      </div>
+    </div>
+    <div class="grp" aria-label="Zoom">
+      <button type="button" class="btn sq" data-act="zout" aria-label="Zoom out">−</button>
+      <button type="button" class="btn" data-act="zfit">Fit</button>
+      <button type="button" class="btn sq" data-act="zin" aria-label="Zoom in">+</button>
+      <button type="button" class="btn" data-act="today">Today</button>
+    </div>
+    <span class="spacer"></span>
+    <button type="button" class="btn" data-act="import">Import</button>
+    <div class="menuwrap">
+      <button type="button" class="btn primary" id="exBtn" data-menu="exMenu" aria-haspopup="true">Export ▾</button>
+      <div class="menu right" id="exMenu" hidden>
+        <button type="button" data-act="exJson">Roadmap file (.json)</button>
+        <button type="button" data-act="exCsv">Activity list (.csv)</button>
+        <button type="button" data-act="exPng">Image (.png)</button>
+        <button type="button" data-act="exPdfA3">PDF, A3 landscape</button>
+        <button type="button" data-act="exPdf">PDF, exact size</button>
+      </div>
+    </div>
+    <div class="menuwrap eo">
+      <button type="button" class="btn" id="moreBtn" data-menu="moreMenu" aria-haspopup="true">Settings ▾</button>
+      <div class="menu right" id="moreMenu" hidden>
+        <button type="button" data-act="settings">Timeline, colours and custom fonts</button>
+        <button type="button" data-act="clear">Clear all content</button>
+        <button type="button" data-act="sample">Load sample roadmap</button>
+      </div>
+    </div>
+    <input id="file" type="file" accept=".json,.csv,application/json,text/csv" hidden>
+  </div>
+
+  <div class="work" id="work">
+    <aside class="dock" id="dock" aria-label="Live editor" hidden></aside>
+    <div class="resizer" id="rzDock" role="separator" aria-orientation="vertical" aria-label="Resize the editor" tabindex="0" hidden></div>
+    <div id="capture">
+      <header class="banner">
+        <div class="btitle">
+          <h1 id="title" spellcheck="false"></h1>
+          <p class="sub" id="subtitle"></p>
+        </div>
+        <div class="bside">
+          <div class="tag" id="tagline" spellcheck="false"></div>
+          <div class="todaychip" id="todaychip"></div>
+        </div>
+      </header>
+      <div class="stage" id="stage">
+        <div class="chart" id="chart"><div class="inner" id="inner"></div></div>
+        <div class="resizer" id="rzPanel" role="separator" aria-orientation="vertical" aria-label="Resize the right panel" tabindex="0"></div>
+        <aside class="panel" id="panel" aria-label="Cards, guide and requirements"></aside>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="sheet" id="sheet" hidden><div class="card" role="dialog" aria-modal="true" aria-labelledby="sheetTitle" id="card"></div></div>
+<div id="hover" hidden></div>
+<div id="toast" role="status" hidden></div>
+
+<script src="vendor/marked.min.js"></script>
+<script src="vendor/purify.min.js"></script>
+<script src="vendor/html-to-image.js"></script>
+<script src="vendor/jspdf.umd.min.js"></script>
+<script src="guide.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
