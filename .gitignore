@@ -1,0 +1,6 @@
+node_modules/
+release/test-results/
+# Built or fetched by the Docker build (see Dockerfile); not kept in git
+app/guide/
+app/vendor/*.js
+app/fonts/*.woff2

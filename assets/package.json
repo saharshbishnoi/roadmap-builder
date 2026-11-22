@@ -1,0 +1,16 @@
+{
+  "name": "roadmap-builder-assets",
+  "private": true,
+  "description": "Third-party libraries and fonts the app serves. Fetched by the Docker build (assets stage) and copied into app/vendor and app/fonts; not kept in git.",
+  "dependencies": {
+    "@fontsource/barlow": "5.3.0",
+    "@fontsource/barlow-condensed": "5.3.0",
+    "@fontsource/ibm-plex-sans": "5.3.0",
+    "@fontsource/inter": "5.3.0",
+    "@fontsource/source-sans-3": "5.3.1",
+    "dompurify": "3.5.0",
+    "html-to-image": "1.11.11",
+    "jspdf": "2.5.1",
+    "marked": "12.0.2"
+  }
+}
