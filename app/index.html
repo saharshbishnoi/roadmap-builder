@@ -47,6 +47,7 @@
     <label for="t-fontScale">Text size <select id="t-fontScale" data-set="fontScale"><option value="90">Small</option><option value="100">Standard</option><option value="110">Large</option><option value="120">Extra large</option></select></label>
     <label for="t-upper"><input type="checkbox" id="t-upper" data-toggle="upper"> Capitals</label>
     <label for="t-float3d"><input type="checkbox" id="t-float3d" data-toggle="float3d"> 3D cards</label>
+    <label for="t-roundCards"><input type="checkbox" id="t-roundCards" data-toggle="roundCards"> Rounded cards</label>
     <label for="t-showCards"><input type="checkbox" id="t-showCards" data-toggle="showCards"> Floating cards</label>
     <label for="t-showPanel"><input type="checkbox" id="t-showPanel" data-toggle="showPanel"> Right panel</label>
     <label class="eo" for="r-accent">Highlight <input type="color" id="r-accent" data-road="accent"></label>
@@ -82,7 +83,7 @@
       <div class="stage" id="stage">
         <div class="chart" id="chart"><div class="inner" id="inner"></div></div>
         <div class="resizer" id="rzPanel" role="separator" aria-orientation="vertical" aria-label="Resize the right panel" tabindex="0"></div>
-        <aside class="panel" id="panel" aria-label="Cards, guide, requirements and JSON editor"></aside>
+        <aside class="panel" id="panel" aria-label="Cards, guide, features and JSON editor"></aside>
       </div>
     </div>
   </div>
@@ -90,6 +91,8 @@
 
 <div class="sheet" id="sheet" hidden><div class="card" role="dialog" aria-modal="true" aria-labelledby="sheetTitle" id="card"></div></div>
 <div id="hover" hidden></div>
+<div id="xline" hidden><span></span></div>
+<div class="menu" id="ctx" role="menu" aria-label="Actions for this item" hidden></div>
 <div id="toast" role="status" hidden></div>
 
 <script src="vendor/marked.min.js"></script>

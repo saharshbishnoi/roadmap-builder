@@ -1,3 +1,9 @@
 README.md
 docker-compose.yml
 .git
+**/node_modules
+release/test-results
+# built by Docker, never copied from the working folder
+app/guide
+app/vendor/*.js
+app/fonts/*.woff2

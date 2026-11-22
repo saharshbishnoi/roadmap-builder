@@ -1,9 +1,13 @@
 # Start:  docker compose up -d --build     then open http://localhost:8080
+# Release build (runs all tests and rebuilds the guide videos):  RELEASE=1 docker compose up -d --build
 # Stop:   docker compose down
 # Change the port with ROADMAP_PORT, for example:  ROADMAP_PORT=9000 docker compose up -d
 services:
   roadmap:
-    build: .
+    build:
+      context: .
+      args:
+        RELEASE: ${RELEASE:-0}
     image: roadmap-builder:1.0
     container_name: roadmap-builder
     ports:

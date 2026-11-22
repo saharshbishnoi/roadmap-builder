@@ -110,7 +110,7 @@ body.edit .vo{display:none!important}
 .corner{position:sticky;left:0;z-index:5;flex:none;width:var(--leftw);background:var(--surface);display:flex;flex-direction:column;justify-content:flex-end}
 .lane-l{display:flex;align-items:center;justify-content:flex-end;gap:4px;padding:0 8px;font:600 calc(12px * var(--fz))/1 var(--display);letter-spacing:.1em;text-transform:var(--tt);color:var(--muted)}
 .lane-l.cpl{height:32px}.lane-l.kml{height:46px;flex-wrap:wrap;align-content:center;row-gap:0;overflow:hidden}
-.chead{height:42px;display:flex;align-items:center;background:var(--banner);color:var(--banner-ink);font:600 calc(12px * var(--fz))/1 var(--display);letter-spacing:.1em;text-transform:var(--tt)}
+.chead{position:relative;height:42px;display:flex;align-items:center;background:var(--banner);color:var(--banner-ink);font:600 calc(12px * var(--fz))/1 var(--display);letter-spacing:.1em;text-transform:var(--tt)}
 .chead .c-name{flex:1;min-width:0;padding:0 12px}
 .dcol{flex:none;text-align:right;padding-right:8px;font-size:calc(11px * var(--fz));color:var(--muted);white-space:nowrap;overflow:hidden}
 .dcol.min{width:26px;padding:0}
@@ -227,12 +227,12 @@ body:not(.float3d) .fx3d{box-shadow:0 1px 3px rgba(var(--shadow),.18)}
 .muted{color:var(--muted)}
 
 /* hover card, dialog, toast */
-#hover{position:fixed;z-index:45;max-width:300px;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:9px 11px;pointer-events:none;box-shadow:0 2px 4px rgba(var(--shadow),.12),0 16px 32px -8px rgba(var(--shadow),.4)}
+#hover{position:fixed;z-index:45;max-width:300px;background:var(--surface);border:1px solid var(--line);border-radius:0;padding:9px 11px;cursor:move;touch-action:none;user-select:none;box-shadow:0 2px 4px rgba(var(--shadow),.12),0 16px 32px -8px rgba(var(--shadow),.4)}
 #hover b{font-weight:700;display:block}
 #hover .tmeta{color:var(--muted);font-size:calc(11.5px * var(--fz));margin:1px 0 5px}
 #hover .thint{color:var(--muted);font-size:calc(11px * var(--fz));margin-top:6px;border-top:1px solid var(--line);padding-top:5px}
 .sheet{position:fixed;inset:0;z-index:50;background:rgba(8,12,22,.55);display:flex;align-items:center;justify-content:center;padding:16px}
-.card{background:var(--surface);border-radius:10px;width:min(520px,100%);max-height:100%;overflow:auto;display:flex;flex-direction:column;box-shadow:0 2px 6px rgba(0,0,0,.2),0 30px 60px -12px rgba(0,0,0,.55)}
+.card{background:var(--surface);border-radius:0;width:min(520px,100%);max-height:100%;overflow:auto;display:flex;flex-direction:column;box-shadow:0 2px 6px rgba(0,0,0,.2),0 30px 60px -12px rgba(0,0,0,.55)}
 .card>h2{margin:0;background:var(--banner);color:var(--banner-ink);font:600 calc(16px * var(--fz))/1.1 var(--display);letter-spacing:.1em;text-transform:var(--tt);padding:13px 16px;border-top:5px solid var(--c,var(--banner))}
 .card .meta{padding:10px 16px 0;color:var(--muted)}
 .card .body{padding:12px 16px 4px}
@@ -340,3 +340,80 @@ body.exporting .fx3d{transform:none!important}
 .srcbar{display:flex;gap:8px;align-items:center;font-weight:600}
 .srcbar select{background:var(--surface);border:1px solid var(--line);border-radius:4px;padding:4px 6px}
 .panel .dbody{background:var(--surface);border:1px solid var(--line)}
+
+/* Rounded cards (Display bar): floating, panel, hover and dialog cards. Off means square corners everywhere. */
+body.round .fcard,body.round .pcard,body.round .tile,body.round #hover{border-radius:8px}
+body.round .badge{border-radius:17px}
+body.round .card{border-radius:10px}
+#hover #tipReset{background:transparent;border:1px solid var(--line);border-radius:3px;padding:1px 6px;cursor:pointer;margin-left:4px}
+#hover #tipFoot .thint{border-top:0;padding-top:0;margin-top:4px}
+
+/* "Show beside bars" chips: filled when on, outlined when off */
+.lane-l.brow{height:30px;justify-content:flex-start;gap:6px;letter-spacing:0;text-transform:none;overflow:hidden}
+.browsp{height:30px}
+.chipb{flex:none;height:20px;padding:0 9px;border-radius:10px;border:1px solid var(--muted);background:transparent;color:var(--muted);font:600 calc(11px * var(--fz))/1 var(--body);cursor:pointer;white-space:nowrap}
+.chipb.on{background:var(--accent);border-color:var(--accent);color:#fff}
+.chipb:hover{border-color:var(--ink)}
+.lcap{white-space:nowrap}
+
+/* add rows and row highlight (Edit mode) */
+body.edit .row:not(.addrow):hover .rleft{box-shadow:inset 3px 0 0 var(--accent)}
+.addrow .rleft{background:color-mix(in srgb,var(--pc) 4%,var(--surface));color:var(--muted)}
+.addrow .track{background-color:color-mix(in srgb,var(--pc) 3%,var(--surface))}
+.addrow .plus{flex:none;width:16px;margin-left:-18px;text-align:center;font-weight:700}
+.addrow.ws .rleft{padding-left:22px}
+.addrow .nm.add{color:var(--ink)}
+.addrow .nm.add::placeholder{color:var(--muted);opacity:.85}
+.addrow:hover .rleft,.addrow:focus-within .rleft{background:color-mix(in srgb,var(--accent) 14%,var(--surface));box-shadow:inset 3px 0 0 var(--accent);color:var(--accent)}
+.addrow:hover .track,.addrow:focus-within .track{background-color:color-mix(in srgb,var(--accent) 7%,var(--surface))}
+.addrow:hover .nm.add,.addrow:focus-within .nm.add{border-color:var(--accent);background:var(--surface)}
+
+/* bars with a missing date fade towards the open side; rows with no dates wait to be placed */
+.bar.fout{background:linear-gradient(to right,var(--bc) 25%,transparent);box-shadow:none;border-radius:9px 0 0 9px}
+.bar.fin{background:linear-gradient(to left,var(--bc) 25%,transparent);box-shadow:none;border-radius:0 9px 9px 0}
+.place{position:absolute;inset:0;width:100%;border:0;background:transparent;color:var(--muted);font:inherit;font-size:calc(11px * var(--fz));text-align:left;padding:0 8px;cursor:copy;opacity:.75}
+.place:hover{opacity:1;background:color-mix(in srgb,var(--accent) 8%,transparent)}
+
+/* resize handle for the workstream / activity column */
+.colrz{position:absolute;right:0;top:0;bottom:0;width:9px;cursor:col-resize;touch-action:none;z-index:2}
+.colrz::after{content:"";position:absolute;right:0;top:6px;bottom:6px;width:3px;border-radius:2px;background:currentColor;opacity:.45}
+.colrz:hover::after,.colrz.on::after,.colrz:focus-visible::after{opacity:1;top:0;bottom:0}
+
+
+/* pointer line on the timeline */
+#xline{position:fixed;width:0;border-left:1px solid var(--muted);opacity:.5;pointer-events:none;z-index:8}
+#xline span{position:absolute;top:3px;left:5px;background:var(--surface);color:var(--muted);border:1px solid var(--line);border-radius:3px;padding:0 5px;font-size:calc(10.5px * var(--fz));white-space:nowrap}
+
+/* smooth movement everywhere (skipped when the computer asks for reduced motion, while dragging and while exporting) */
+@media (prefers-reduced-motion:no-preference){
+  .bar,.cp,.sum{transition:left .32s cubic-bezier(.2,.8,.2,1),width .32s cubic-bezier(.2,.8,.2,1),filter .12s,opacity .25s,background-color .25s}
+  .dia,.km,.kline,.tline,.blabel{transition:left .32s cubic-bezier(.2,.8,.2,1),right .32s cubic-bezier(.2,.8,.2,1),opacity .25s}
+  .fcard{transition:left .32s cubic-bezier(.2,.8,.2,1),top .32s cubic-bezier(.2,.8,.2,1),width .2s,transform .16s ease-out,box-shadow .2s,opacity .25s,border-radius .2s}
+  .pcard,.badge,.tile,.card,#hover{transition:border-radius .2s,transform .16s ease-out,box-shadow .2s,opacity .25s}
+  .year,.q,.htrack,.track{transition:width .32s cubic-bezier(.2,.8,.2,1),background-color .2s}
+  .rleft,.corner{transition:width .2s,background-color .2s,box-shadow .15s}
+  .row,.lane-l,.nm,.aname,.dcol,.todaychip{transition:opacity .25s}
+  .chipb,.eye,.mini,.btn,.tab,.segb,.nm,.din,.caret,.sw{transition:background-color .15s,color .15s,border-color .15s,opacity .15s,box-shadow .15s}
+  body,.banner,.chart,.vbar,.tools{transition:background-color .25s,color .25s}
+  .row{animation:rowin .24s ease-out}
+  .istrip{animation:stripin .26s cubic-bezier(.2,.8,.2,1)}
+  #hover:not([hidden]),.menu:not([hidden]),#xline:not([hidden]){animation:fadein .14s ease-out}
+  .sheet:not([hidden]){animation:fadein .18s ease-out}
+  .sheet .card{animation:pop .24s cubic-bezier(.2,.8,.2,1)}
+  #toast:not([hidden]){animation:toastin .22s cubic-bezier(.2,.8,.2,1)}
+  .gstep,.rgroup,.pcard{animation:fadein .2s ease-out}
+  body.dragging *,body.noanim *{transition:none!important;animation:none!important}
+}
+@keyframes rowin{from{opacity:0}to{opacity:1}}
+@keyframes stripin{from{opacity:0;clip-path:inset(0 0 100% 0)}to{opacity:1;clip-path:inset(0 0 0 0)}}
+@keyframes fadein{from{opacity:0}to{opacity:1}}
+@keyframes pop{from{opacity:0;transform:scale(.96) translateY(8px)}to{opacity:1;transform:none}}
+@keyframes toastin{from{opacity:0;transform:translate(-50%,10px)}to{opacity:1;transform:translate(-50%,0)}}
+
+/* right-click menu */
+#ctx{position:fixed;left:0;top:0;z-index:70;min-width:220px;max-height:calc(100vh - 12px);overflow:auto}
+.menu hr{border:0;border-top:1px solid var(--line);margin:4px 0;width:100%}
+.menu>button.danger{color:var(--today)}
+
+.novid{margin:0;padding:10px;border:1px dashed var(--line);color:var(--muted);font-size:calc(12px * var(--fz))}
+.novid code{display:block;margin-top:4px;color:var(--ink);font:calc(11.5px * var(--fz)) ui-monospace,Consolas,monospace;overflow-wrap:anywhere}

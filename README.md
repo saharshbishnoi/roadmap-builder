@@ -1,9 +1,9 @@
 # Roadmap Builder
 
-A single-page roadmap app in the style of a BigPicture Gantt: collapsible workstreams on the left, a
+An intuitive, interactive roadmap view: collapsible workstreams on the left, a
 month-scaled timeline on the right, a critical path and key milestones across the top, floating
 cards over the chart, editing controls on the elements themselves, and a resizable panel of cards,
-guide clips, requirements and a JSON live editor on the right. It runs entirely in the browser and is served
+a guide, a features list and a JSON live editor on the right. It runs entirely in the browser and is served
 as static files from one small nginx container.
 
 ## Run it
@@ -20,13 +20,44 @@ docker compose down
 
 To use another port: `ROADMAP_PORT=9000 docker compose up -d --build`.
 
-The image is built from `nginx:1.27-alpine`, so the first build needs access to a registry that has
-that image. Nothing is fetched at runtime: the libraries and fonts are in `app/vendor` and `app/fonts`.
+### Release build
+
+```
+RELEASE=1 docker compose up -d --build
+```
+
+The same command with `RELEASE=1` also:
+
+1. runs every browser test in `release/tests` (Playwright, headless Chromium); the build stops if one fails;
+2. renders the guide videos from the app as it is now: five chapters, each in a light and a dark
+   version, in 4K (3840 x 2160). It drives the real app, renders it frame by frame, narrates each
+   scene with a natural female voice and writes subtitles and poster images.
+
+Without `RELEASE=1` the Guide tab shows the steps and says how to make the videos. A release build
+takes several minutes and its tooling is large (a browser image and a speech model, about 2.5 GB,
+cached by Docker after the first time); none of it ends up in the final image except the videos.
+
+### Nothing binary is kept in git
+
+Everything that is not source is produced by the Docker build:
+
+| What | Where it comes from |
+|---|---|
+| Libraries in `app/vendor` and fonts in `app/fonts` | fetched from npm by the `assets` stage of every build; versions locked in `assets/package-lock.json` |
+| Guide videos, subtitles and posters in `app/guide` | rendered by a release build |
+| Narration voice | Kokoro text-to-speech (Apache 2.0 licence), model files pinned by checksum in the `Dockerfile` |
+
+So every build needs internet access (npm, the nginx image; a release build also the Playwright
+image, ffmpeg and the voice model). Nothing is fetched at runtime.
+
+What is said and shown in each video is in `release/videos.mjs`; the steps under each video are in
+`app/guide.js`. Change both whenever the app changes.
 
 ## Using it
 
-The Guide tab in the right-hand panel has seven short clips (recorded in an earlier layout; the
-steps under each clip are current), and the Requirements tab lists what the app was asked to do and where to find it.
+The Guide tab in the right-hand panel has five short narrated videos with subtitles and the steps for
+each,
+and the Features tab lists what the app does and where to find it.
 
 **View mode** is for reading and presenting. Hover over a bar, milestone or critical path stage to
 see its hover card; click it to open its dialog card. Collapse a workstream with its arrow.
@@ -44,14 +75,21 @@ see its hover card; click it to open its dialog card. Collapse a workstream with
 - The start year, number of years, banner colours and today line are edited in the banner.
 - Drag a bar to move it and drag either end to resize it. Bars snap to whole months.
 - Drag the dotted handle to reorder rows or move a row to another workstream.
-- The Add bar adds a workstream, key milestone, critical path stage, floating card or panel card.
+- Type a name in the highlighted "Add an activity" row at the end of a workstream and press Enter
+  to add a row; the last row adds a workstream. New rows have no dates: type them, or click on the
+  row's timeline to place it. A bar with only one date fades towards the open side.
+- The chips above the table choose what is written beside each bar: Activity, Start, End.
+- Drag the right edge of the Workstream / activity heading to resize that column (both modes).
+- Right-click a row, bar, milestone, stage, card or the empty timeline for a menu that fits what
+  is under the pointer. A faint line follows the pointer across the timeline and shows its date.
+- The Add bar also adds a workstream, key milestone, critical path stage, floating card or panel card.
 
 **JSON tab** (right panel, Edit mode) is a live editor with one line per activity: change a name or
 a date and the chart follows. Copy a line to add an activity, delete a line to remove one. Switch
 Show to Whole roadmap to edit the complete file.
 
 **Display bar** (both modes): light or dark theme, heading font, text font, text size, capitals
-(off by default), 3D card effect, floating cards and the right panel. Barlow, Barlow Condensed,
+(off by default), 3D card effect, rounded or square cards, floating cards and the right panel. Barlow, Barlow Condensed,
 Inter, IBM Plex Sans and Source Sans 3 are bundled. Arial, Segoe UI, Verdana, Calibri and the system
 font are used if the computer has them.
 
@@ -88,8 +126,10 @@ nginx.conf           static hosting and a content security policy
 app/index.html       page shell
 app/styles.css       layout, themes, fonts, 3D card effect
 app/app.js           all behaviour
-app/guide.js         text for the Guide and Requirements tabs (edit it here)
-app/guide/           the guide clips (MP4, no sound) and their poster images
-app/vendor/          marked, DOMPurify, html-to-image, jsPDF (see THIRD-PARTY.txt)
-app/fonts/           bundled sans-serif fonts (SIL Open Font License)
+app/guide.js         text for the Guide and Features tabs (edit it here)
+app/guide/           guide videos, subtitles and posters: made by a release build, not in git
+release/             tests, the video builder and the narration script, used only by a release build
+app/vendor/          marked, DOMPurify, html-to-image, jsPDF: fetched by the build (see THIRD-PARTY.txt)
+assets/              the list of libraries and fonts the build fetches
+app/fonts/           sans-serif fonts (SIL Open Font License): fetched by the build
 ```

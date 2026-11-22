@@ -1,0 +1,13 @@
+{
+  "name": "roadmap-builder-release",
+  "private": true,
+  "type": "module",
+  "description": "Release tooling: browser tests and the narrated guide videos. Runs inside the release stage of the Dockerfile.",
+  "scripts": {
+    "test": "playwright test",
+    "videos": "node videos.mjs"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.49.1"
+  }
+}
