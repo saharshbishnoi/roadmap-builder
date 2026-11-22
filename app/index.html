@@ -16,36 +16,6 @@
       <button type="button" class="segb" id="modeEdit" data-mode="edit">Edit</button>
     </div>
     <button type="button" class="btn eo" id="undo" data-act="undo">Undo</button>
-    <div class="menuwrap eo">
-      <button type="button" class="btn" id="addBtn" data-menu="addMenu" aria-haspopup="true">Add ▾</button>
-      <div class="menu" id="addMenu" hidden>
-        <button type="button" data-act="addPhase">Workstream</button>
-        <button type="button" data-act="addKm">Key milestone</button>
-        <button type="button" data-act="addCp">Critical path stage</button>
-        <button type="button" data-act="addCard">Floating card</button>
-        <button type="button" data-act="addPanel">Panel card</button>
-      </div>
-    </div>
-    <div class="menuwrap">
-      <button type="button" class="btn" id="viewBtn" data-menu="viewMenu" aria-haspopup="true">Visualisation ▾</button>
-      <div class="menu wide" id="viewMenu" hidden>
-        <label class="chk" for="t-showCritical"><input type="checkbox" id="t-showCritical" data-toggle="showCritical"> Critical path</label>
-        <label class="chk" for="t-showLines"><input type="checkbox" id="t-showLines" data-toggle="showLines"> Milestone lines</label>
-        <label class="chk" for="t-showToday"><input type="checkbox" id="t-showToday" data-toggle="showToday"> Today line</label>
-        <label class="chk" for="t-showLabels"><input type="checkbox" id="t-showLabels" data-toggle="showLabels"> Date labels on bars</label>
-        <label class="chk" for="t-showCards"><input type="checkbox" id="t-showCards" data-toggle="showCards"> Floating cards</label>
-        <label class="chk" for="t-showPanel"><input type="checkbox" id="t-showPanel" data-toggle="showPanel"> Right panel</label>
-        <label class="chk" for="t-float3d"><input type="checkbox" id="t-float3d" data-toggle="float3d"> 3D card effect</label>
-        <div class="mhead">Theme and fonts</div>
-        <div class="mrow"><label for="t-theme">Theme</label>
-          <select id="t-theme" data-set="theme"><option value="auto">Match system</option><option value="light">Light</option><option value="dark">Dark</option></select></div>
-        <div class="mrow"><label for="t-fontHead">Heading font</label><select id="t-fontHead" data-set="fontHead"></select></div>
-        <div class="mrow"><label for="t-fontBody">Text font</label><select id="t-fontBody" data-set="fontBody"></select></div>
-        <div class="mrow"><label for="t-fontScale">Text size</label>
-          <select id="t-fontScale" data-set="fontScale"><option value="90">Small</option><option value="100">Standard</option><option value="110">Large</option><option value="120">Extra large</option></select></div>
-        <label class="chk" for="t-upper"><input type="checkbox" id="t-upper" data-toggle="upper"> Headings in capitals</label>
-      </div>
-    </div>
     <div class="grp" aria-label="Zoom">
       <button type="button" class="btn sq" data-act="zout" aria-label="Zoom out">−</button>
       <button type="button" class="btn" data-act="zfit">Fit</button>
@@ -64,35 +34,55 @@
         <button type="button" data-act="exPdf">PDF, exact size</button>
       </div>
     </div>
-    <div class="menuwrap eo">
-      <button type="button" class="btn" id="moreBtn" data-menu="moreMenu" aria-haspopup="true">Settings ▾</button>
-      <div class="menu right" id="moreMenu" hidden>
-        <button type="button" data-act="settings">Timeline, colours and custom fonts</button>
-        <button type="button" data-act="clear">Clear all content</button>
-        <button type="button" data-act="sample">Load sample roadmap</button>
-      </div>
-    </div>
     <input id="file" type="file" accept=".json,.csv,application/json,text/csv" hidden>
   </div>
 
+  <div class="vbar" role="group" aria-label="Display">
+    <span class="vcap">Display</span>
+    <label for="t-theme">Theme <select id="t-theme" data-set="theme"><option value="auto">Match system</option><option value="light">Light</option><option value="dark">Dark</option></select></label>
+    <label for="t-fontHead">Heading font <select id="t-fontHead" data-set="fontHead"></select></label>
+    <input class="eo" type="text" id="r-fontHeadCustom" data-road="fontHeadCustom" placeholder="or an installed font" aria-label="Custom heading font, the name of a font installed on this computer">
+    <label for="t-fontBody">Text font <select id="t-fontBody" data-set="fontBody"></select></label>
+    <input class="eo" type="text" id="r-fontBodyCustom" data-road="fontBodyCustom" placeholder="or an installed font" aria-label="Custom text font, the name of a font installed on this computer">
+    <label for="t-fontScale">Text size <select id="t-fontScale" data-set="fontScale"><option value="90">Small</option><option value="100">Standard</option><option value="110">Large</option><option value="120">Extra large</option></select></label>
+    <label for="t-upper"><input type="checkbox" id="t-upper" data-toggle="upper"> Capitals</label>
+    <label for="t-float3d"><input type="checkbox" id="t-float3d" data-toggle="float3d"> 3D cards</label>
+    <label for="t-showCards"><input type="checkbox" id="t-showCards" data-toggle="showCards"> Floating cards</label>
+    <label for="t-showPanel"><input type="checkbox" id="t-showPanel" data-toggle="showPanel"> Right panel</label>
+    <label class="eo" for="r-accent">Highlight <input type="color" id="r-accent" data-road="accent"></label>
+  </div>
+  <div class="vbar eo" role="group" aria-label="Add and reset">
+    <span class="vcap">Add</span>
+    <button type="button" class="btn sm" data-act="addPhase">+ Workstream</button>
+    <button type="button" class="btn sm" data-act="addKm">+ Key milestone</button>
+    <button type="button" class="btn sm" data-act="addCp">+ Critical path stage</button>
+    <button type="button" class="btn sm" data-act="addCard">+ Floating card</button>
+    <button type="button" class="btn sm" data-act="addPanel">+ Panel card</button>
+    <span class="spacer"></span>
+    <button type="button" class="btn sm" data-act="sample">Load sample roadmap</button>
+    <button type="button" class="btn sm danger" data-act="clear">Clear all content</button>
+  </div>
+
   <div class="work" id="work">
-    <aside class="dock" id="dock" aria-label="Live editor" hidden></aside>
-    <div class="resizer" id="rzDock" role="separator" aria-orientation="vertical" aria-label="Resize the editor" tabindex="0" hidden></div>
     <div id="capture">
       <header class="banner">
         <div class="btitle">
           <h1 id="title" spellcheck="false"></h1>
-          <p class="sub" id="subtitle"></p>
+          <p class="sub"><span id="subtitle"></span><span class="yrs eo">from <input type="number" id="r-startYear" data-road="startYear" min="1990" max="2100" aria-label="Start year"> for <input type="number" id="r-years" data-road="years" min="1" max="15" aria-label="Years shown, 1 to 15"> years</span></p>
         </div>
         <div class="bside">
           <div class="tag" id="tagline" spellcheck="false"></div>
-          <div class="todaychip" id="todaychip"></div>
+          <div class="todayrow">
+            <span class="bcol eo"><label for="r-banner">Banner <input type="color" id="r-banner" data-road="banner"></label><label for="r-bannerInk">Text <input type="color" id="r-bannerInk" data-road="bannerInk"></label><label for="r-today">Today line <input type="color" id="r-today" data-road="today"></label></span>
+            <span id="todayeye"></span>
+            <div class="todaychip" id="todaychip"></div>
+          </div>
         </div>
       </header>
       <div class="stage" id="stage">
         <div class="chart" id="chart"><div class="inner" id="inner"></div></div>
         <div class="resizer" id="rzPanel" role="separator" aria-orientation="vertical" aria-label="Resize the right panel" tabindex="0"></div>
-        <aside class="panel" id="panel" aria-label="Cards, guide and requirements"></aside>
+        <aside class="panel" id="panel" aria-label="Cards, guide, requirements and JSON editor"></aside>
       </div>
     </div>
   </div>
