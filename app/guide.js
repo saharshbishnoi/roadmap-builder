@@ -28,6 +28,7 @@ window.GUIDE=[
     "In Edit mode, open the JSON tab of the right panel. There is one line per activity with its start and end.",
     "Change a name or a date and the chart follows. Copy a line to add an activity, delete a line to remove one.",
     "Export, then Roadmap file (.json), saves everything. Import loads a .json roadmap file or a .csv activity list.",
+    "Export, then Standalone page (.html), makes one file with the app and this roadmap inside. Send it to anyone; it opens in their browser with nothing to install.",
     "For a release copy, export an image or a PDF. The export shows the roadmap as it looks in View mode."]}
 ];
 window.REQS=[
@@ -62,6 +63,9 @@ window.REQS=[
     ["Everything can be exported to and imported from files","Export, Roadmap file (.json); Import"],
     ["Export an image or a PDF for the final release","Export: PNG, PDF A3 landscape, PDF exact size"],
     ["Runs in a container with compose up and compose down","docker-compose.yml, Dockerfile and nginx.conf in the project"],
+    ["Installable, and works offline","Install from the address bar in Chrome or Edge; the app and the guide videos you have opened are kept for offline use"],
+    ["Export a single standalone page","Export, Standalone page (.html): the app and the current roadmap in one file that opens with a double-click"],
+    ["One zip with everything","Attached to each release: unzip and open index.html, no server needed"],
     ["One build command, with a release flag","RELEASE=1 docker compose up -d --build also runs every test and renders the guide videos"]]},
   {group:"Help",items:[
     ["A features list and a guide with narrated, subtitled 4K videos in light and dark","This panel: Guide and Features tabs. The videos are made by a release build"],
@@ -75,3 +79,5 @@ window.RUNREQS=[
   ["A current desktop browser","Tested in Chrome. Edge uses the same engine. Firefox and Safari have not been tested"],
   ["No internet connection at runtime","Libraries, fonts and guide videos are served from the container"]
 ];
+/* Where the offline copy of the latest release can be downloaded. */
+window.DOWNLOAD_URL="https://github.com/saharshbishnoi/roadmap-builder/releases/latest/download/roadmap-builder.zip";

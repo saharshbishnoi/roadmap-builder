@@ -37,6 +37,29 @@ Without `RELEASE=1` the Guide tab shows the steps and says how to make the video
 takes several minutes and its tooling is large (a browser image and a speech model, about 2.5 GB,
 cached by Docker after the first time); none of it ends up in the final image except the videos.
 
+### Publishing: GitHub Pages and the zip
+
+Pushing a version tag (for example `v1.1.0`) runs `.github/workflows/release.yml`, which does the
+release build in Docker and then:
+
+- publishes the finished site to **GitHub Pages**, so the app can be shared as a link and installed
+  from the browser (Install, in the address bar of Chrome or Edge) to run in its own window, offline;
+- attaches **`roadmap-builder.zip`** to the GitHub Release: the whole app with its guide videos.
+  Unzip it and open `index.html`; no server is needed. The newest one is always at
+  `https://github.com/saharshbishnoi/roadmap-builder/releases/latest/download/roadmap-builder.zip`.
+
+One-time setup: in the repository, Settings, Pages, set Source to "GitHub Actions". GitHub Pages
+on a private repository needs a paid GitHub plan, and a Pages site is public either way.
+
+To make the same site folder and zip on your own machine:
+
+```
+docker buildx build --build-arg RELEASE=1 --target dist --output type=local,dest=dist .
+```
+
+Publishing shares the app, not your roadmaps: each person's roadmap stays in their own browser.
+To pass a roadmap to someone, export the roadmap file and send it.
+
 ### Nothing binary is kept in git
 
 Everything that is not source is produced by the Docker build:
@@ -45,6 +68,7 @@ Everything that is not source is produced by the Docker build:
 |---|---|
 | Libraries in `app/vendor` and fonts in `app/fonts` | fetched from npm by the `assets` stage of every build; versions locked in `assets/package-lock.json` |
 | Guide videos, subtitles and posters in `app/guide` | rendered by a release build |
+| App icons (PNG), the offline file list and the zip | made by the `site` stage of every build |
 | Narration voice | Kokoro text-to-speech (Apache 2.0 licence), model files pinned by checksum in the `Dockerfile` |
 
 So every build needs internet access (npm, the nginx image; a release build also the Playwright
@@ -127,7 +151,11 @@ app/index.html       page shell
 app/styles.css       layout, themes, fonts, 3D card effect
 app/app.js           all behaviour
 app/guide.js         text for the Guide and Features tabs (edit it here)
+app/sw.js            offline support for the installed web app
+app/manifest.webmanifest, app/icon.svg   what makes the app installable
 app/guide/           guide videos, subtitles and posters: made by a release build, not in git
+docs/                ideas, planned editions and the design language
+.github/workflows/   the pipeline that publishes to GitHub Pages and attaches the zip to a release
 release/             tests, the video builder and the narration script, used only by a release build
 app/vendor/          marked, DOMPurify, html-to-image, jsPDF: fetched by the build (see THIRD-PARTY.txt)
 assets/              the list of libraries and fonts the build fetches

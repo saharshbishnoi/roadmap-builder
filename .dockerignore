@@ -7,3 +7,9 @@ release/test-results
 app/guide
 app/vendor/*.js
 app/fonts/*.woff2
+dist
+docs
+.github
+app/standalone-template.js
+film/out
+film/cache

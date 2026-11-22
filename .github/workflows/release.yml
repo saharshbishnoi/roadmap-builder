@@ -1,0 +1,68 @@
+# On every version tag (v*): run the release build in Docker (all tests, guide videos, site, zip),
+# publish the site to GitHub Pages and attach the zip to a GitHub Release.
+# One-time setup: repository Settings > Pages > Build and deployment > Source: "GitHub Actions".
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: Test, render videos, build site and zip
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+      - name: Release build in Docker
+        run: docker buildx build --build-arg RELEASE=1 --target dist --output type=local,dest=dist .
+      - name: Site for GitHub Pages
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist/site
+      - name: Zip for the release
+        uses: actions/upload-artifact@v4
+        with:
+          name: roadmap-builder-zip
+          path: dist/roadmap-builder.zip
+          if-no-files-found: error
+
+  release:
+    name: Attach the zip to the release
+    needs: build
+    if: startsWith(github.ref, 'refs/tags/')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: roadmap-builder-zip
+      - name: Create the release, or add the zip to it
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          TAG: ${{ github.ref_name }}
+        run: gh release create "$TAG" roadmap-builder.zip --title "$TAG" --generate-notes --verify-tag || gh release upload "$TAG" roadmap-builder.zip --clobber
+
+  pages:
+    name: Publish to GitHub Pages
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

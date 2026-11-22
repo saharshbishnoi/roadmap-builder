@@ -1,0 +1,27 @@
+# The product film. One command records it and writes it to film/out on your machine:
+#
+#   docker compose -f film/compose.yml run --rm film
+#
+# Sign-off pack first (script, voice sample, stills):   docker compose -f film/compose.yml run --rm film approval
+# Re-record one chapter and re-join:                     FILM_CHAPTERS=3 docker compose -f film/compose.yml run --rm film
+# Settings below can be passed on the command line; nothing needs editing.
+services:
+  film:
+    build:
+      context: ..
+      dockerfile: film/Dockerfile
+    image: roadmap-builder-film:1.0
+    user: "${FILM_UID:-1000}:${FILM_GID:-1000}"
+    shm_size: 2gb
+    environment:
+      FILM_VOICE: ${FILM_VOICE:-af_heart}        # Kokoro voice
+      FILM_SPEED: ${FILM_SPEED:-1.05}            # speaking speed
+      FILM_WIDTH: ${FILM_WIDTH:-1920}            # page size ...
+      FILM_HEIGHT: ${FILM_HEIGHT:-1080}
+      FILM_SCALE: ${FILM_SCALE:-2}               # ... times pixel density = 3840x2160
+      FILM_FPS: ${FILM_FPS:-30}
+      FILM_CHAPTERS: ${FILM_CHAPTERS:-all}       # all, opening, closing, a chapter number, or a scene id; comma-separated
+      FILM_JOBS: ${FILM_JOBS:-}                  # scenes recorded at once (default: half the CPU cores)
+    volumes:
+      - ./out:/out          # the film, copies, subtitles, chapter list, report
+      - ./cache:/cache      # spoken lines, kept so re-recording does not speak them again

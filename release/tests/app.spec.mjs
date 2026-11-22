@@ -289,3 +289,57 @@ test("the Guide has narrated videos with subtitles and the list is called Featur
   await expect(page.locator("#panel")).toContainText("Intuitive interactive view");
   await expect(page.locator("#panel")).not.toContainText("Jira");
 });
+
+test("the app is installable: it has a manifest, an icon and an offline helper", async ({ page, request }) => {
+  await open(page);
+  await expect(page.locator('link[rel="manifest"]')).toHaveAttribute("href", "manifest.webmanifest");
+  const manifest = await (await request.get("/manifest.webmanifest")).json();
+  expect(manifest.display).toBe("standalone");
+  expect(manifest.start_url).toBe("./");
+  expect((await request.get("/icon.svg")).ok()).toBe(true);
+  expect(await page.evaluate(() => navigator.serviceWorker.ready.then(r => !!r.active))).toBe(true);
+});
+
+test("the app works when opened straight from a folder", async ({ page }) => {
+  await page.goto(new URL("../../app/index.html", import.meta.url).href);
+  await expect(page.locator("#inner .row")).toHaveCount(43);
+  await page.click("#modeEdit");
+  await page.click("#an-p1");
+  await page.keyboard.type("From a folder");
+  await page.keyboard.press("Enter");
+  expect((await state(page)).activities).toHaveLength(37);
+  await page.click("#pt-reqs");
+  await expect(page.locator("#panel")).toContainText("Download the offline copy");
+});
+
+test("Export > Standalone page makes one self-contained file that opens from a folder", async ({ page, context }, info) => {
+  await open(page, "edit");
+  await page.fill("#an-p1", "Only in the export");
+  await page.keyboard.press("Enter");
+  await page.click("#exBtn");
+  const [download] = await Promise.all([page.waitForEvent("download"), page.click('[data-act="exHtml"]')]);
+  expect(download.suggestedFilename()).toMatch(/\.html$/);
+  const file = info.outputPath("standalone.html");
+  await download.saveAs(file);
+  const text = (await import("node:fs")).readFileSync(file, "utf8");
+  expect(text.length).toBeGreaterThan(400000);
+  expect(text.length).toBeLessThan(3000000);
+  expect(text.replace(/<script[^>]*>[\s\S]*?<\/script>/g, "")).not.toMatch(/<(script|link|img)[^>]+(src|href)="(?!data:)/);
+  expect(text).not.toMatch(/@@ROADMAP_(TITLE|FONTS|DATA)@@/);
+
+  const copy = await context.newPage(), problems = [];
+  copy.on("pageerror", e => problems.push(String(e)));
+  copy.on("console", m => { if (m.type() === "error") problems.push(m.text()); });
+  await copy.goto("file://" + file);
+  await expect(copy.locator("#inner .row")).toHaveCount(44);
+  await expect(copy.locator("#title")).toContainText("Project Wombat");
+  await expect(copy.locator(".aname", { hasText: "Only in the export" })).toBeVisible();
+  await expect(copy.locator("#modeView")).toHaveClass(/on/);
+  await expect(copy.locator(".gname").first()).toHaveCSS("font-family", /Barlow/);
+  expect(await copy.evaluate(() => document.fonts.check('600 14px "Barlow"'))).toBe(true);
+  await copy.click("#exBtn");
+  await expect(copy.locator('[data-act="exHtml"]')).toBeHidden();
+  await copy.click("#pt-guide");
+  await expect(copy.locator(".gstep")).toHaveCount(5);
+  expect(problems).toEqual([]);
+});

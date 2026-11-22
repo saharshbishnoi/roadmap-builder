@@ -4,7 +4,10 @@
 (function(){
 "use strict";
 const PALETTE=["#1E88E5","#2E8B2E","#7E57C2","#F07C1F","#D49B00","#12909A","#4A5568","#C2185B","#6D4C41","#3949AB"];
-const KEY="roadmap-app-v2",UIKEY="roadmap-app-ui";
+/* A standalone page (Export > Standalone page) carries its roadmap inside the file and keeps its own working copy. */
+const EMBED=(()=>{try{const e=document.getElementById("roadmap-data");return e?JSON.parse(e.textContent):null;}catch(x){return null;}})();
+const TAIL=EMBED&&EMBED.id?":"+String(EMBED.id).replace(/[^\w-]/g,""):"";
+const KEY="roadmap-app-v2"+TAIL,UIKEY="roadmap-app-ui"+TAIL;
 const COLL={a:"activities",k:"milestones",c:"critical",p:"phases",f:"cards",n:"panel"};
 const MONTHS=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 const FONTS={barlow:["Barlow",'"Barlow","Segoe UI",system-ui,Arial,sans-serif'],barlowc:["Barlow Condensed",'"Barlow Condensed","Arial Narrow",Arial,sans-serif'],inter:["Inter",'"Inter","Segoe UI",system-ui,Arial,sans-serif'],
@@ -503,7 +506,7 @@ function renderPanel(soft){
   const st=S.settings,edit=editing(),p=$("#panel"),rz=$("#rzPanel"),show=st.showPanel&&(!exporting||S.panel.some(c=>!c.hidden));
   p.hidden=!show;rz.hidden=!show||exporting;if(!show){p.innerHTML="";p.dataset.key="";return;}
   let tab=exporting?"cards":ui.panelTab;if(tab==="source"&&!edit)tab="cards";
-  if(tab==="guide")checkVideos();
+  if(tab==="guide"){checkVideos();keepGuide();}
   const key=tab==="cards"?"":tab+(tab==="source"?ui.srcScope:"")+(edit?"-e":"-v")+(tab==="guide"?(isDark()?"-d":"-l")+(hasVideos?"-y":"-n"):"");
   if(key&&p.dataset.key===key){if(tab==="source"&&document.activeElement.id!=="src")$("#src").value=srcText();return;}
   const fresh=p.dataset.key!==key;p.dataset.key=key;
@@ -526,30 +529,53 @@ function renderPanel(soft){
         :'One line per activity. Change a name or a date and the chart follows as you type. Copy a line to add an activity, delete a line to remove one, or move a line to another workstream. Leave "start" or "end" as "" for an open-ended bar. A line with "milestone" instead of "start" and "end" is a milestone.')+'</p>'+
       '<textarea id="src" spellcheck="false" aria-label="Roadmap JSON"></textarea><p class="status" id="srcStatus">In step with the roadmap.</p></div>';
   }else if(tab==="guide"){
-    h+='<p class="gintro">Five short narrated videos with subtitles, each followed by the steps to follow. Select Enlarge to watch one at full size.</p>';
+    h+='<p class="gintro">'+(EMBED?'The steps for each part of the app.':'Five short narrated videos with subtitles, each followed by the steps to follow. Select Enlarge to watch one at full size.')+'</p>';
     (window.GUIDE||[]).forEach((g,i)=>{h+='<section class="gstep"><h3>'+(i+1)+'. '+esc(g.title)+'</h3>'+guideVideo(g,"v-"+g.id,false)+
       (hasVideos?'<div class="gact"><span>Narrated, with subtitles, in 4K</span><button type="button" class="btn" data-enlarge="'+i+'">Enlarge</button></div>':'')+'<ol>'+g.steps.map(x=>'<li>'+esc(x)+'</li>').join("")+'</ol></section>';});
   }else{
     h+='<p class="gintro">What this app does, and where to find each thing.</p>';
     (window.REQS||[]).forEach(g=>{h+='<section class="rgroup"><h3>'+esc(g.group)+'</h3><ul>'+g.items.map(r=>'<li><span class="tick" aria-label="Included">✓</span><span>'+esc(r[0])+'<small>'+esc(r[1])+'</small></span></li>').join("")+'</ul></section>';});
+    if(window.DOWNLOAD_URL&&!EMBED)h+='<section class="rgroup"><h3>Take it with you</h3><ul><li><span class="tick info" aria-hidden="true">i</span><span>Install it: use Install in the address bar of Chrome or Edge to run it in its own window, offline<small>Available when the app is opened from a web address</small></span></li>'+
+      '<li><span class="tick info" aria-hidden="true">i</span><span><a href="'+esc(window.DOWNLOAD_URL)+'" target="_blank" rel="noopener noreferrer">Download the offline copy (.zip)</a><small>The whole app with its guide videos. Unzip it and open index.html</small></span></li></ul></section>';
     h+='<section class="rgroup"><h3>To run it</h3><ul>'+(window.RUNREQS||[]).map(r=>'<li><span class="tick info" aria-hidden="true">i</span><span>'+esc(r[0])+'<small>'+esc(r[1])+'</small></span></li>').join("")+'</ul></section>';
   }
   setHtml(p,h,!exporting&&tab==="cards"&&!fresh);
   if(tab==="source")$("#src").value=srcText();
+  if(tab==="guide")(window.GUIDE||[]).forEach(g=>{const v=document.getElementById("v-"+g.id);if(v)folderSubs(v,g);});
 }
 /* Guide videos come in a light and a dark version (made by a release build); show the one that matches the theme. */
 const isDark=()=>{const t=document.documentElement.getAttribute("data-theme");return t?t==="dark":!!(window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches);};
 let hasVideos=null;
+/* Opened straight from a folder, the browser will not read subtitle files, so the same subtitles are loaded as a script. */
+const FROM_FOLDER=location.protocol==="file:";
+function folderSubs(video,g){
+  if(!FROM_FOLDER||!window.VTTCue||video.dataset.subs)return;video.dataset.subs="1";
+  const add=()=>{const list=(window.GUIDE_SUBS||{})[g.clip.split("/").pop()];if(!list)return;const t=video.addTextTrack("subtitles","English","en");t.mode="showing";
+    list.forEach(c=>{const cue=new VTTCue(c[0],c[1],c[2]);cue.line=88;cue.snapToLines=false;t.addCue(cue);});};
+  if((window.GUIDE_SUBS||{})[g.clip.split("/").pop()]){add();return;}
+  const s=document.createElement("script");s.src=g.clip+".subs.js";s.onload=add;document.head.appendChild(s);
+}
 function checkVideos(){
-  if(hasVideos!==null||!window.GUIDE||!window.GUIDE.length)return;hasVideos=false;
-  fetch(window.GUIDE[0].clip+"-light.mp4",{method:"HEAD"}).then(r=>{hasVideos=r.ok&&/video/.test(r.headers.get("content-type")||"");if(hasVideos&&S){$("#panel").dataset.key="";renderPanel();}}).catch(()=>{});
+  if(hasVideos!==null||!window.GUIDE||!window.GUIDE.length)return;hasVideos=false;if(EMBED)return;
+  // Probe with a poster picture: this also works when the app is opened straight from a folder.
+  const probe=new Image();
+  probe.onload=()=>{hasVideos=true;if(S){$("#panel").dataset.key="";renderPanel();}};
+  probe.src=window.GUIDE[0].clip+"-light.jpg";
+}
+/* Installed web app: once the Guide is open, ask the offline helper to keep this theme's videos. */
+function keepGuide(){
+  const sw=navigator.serviceWorker&&navigator.serviceWorker.controller;if(!sw||!hasVideos)return;
+  const t=isDark()?"-dark":"-light",urls=[];
+  (window.GUIDE||[]).forEach(g=>{["-x.mp4","-x.jpg",".vtt"].forEach(e=>urls.push(new URL(g.clip+e.replace("-x",t),location.href).href));});
+  sw.postMessage({type:"keepGuide",urls:urls});
 }
 const guideVideo=(g,id,auto)=>{const f=g.clip+(isDark()?"-dark":"-light");
-  return hasVideos?'<video id="'+id+'" controls playsinline preload="none"'+(auto?' autoplay':'')+' poster="'+f+'.jpg" aria-label="Video: '+esc(g.title)+'"><source src="'+f+'.mp4" type="video/mp4"><track kind="subtitles" srclang="en" label="English" src="'+g.clip+'.vtt" default></video>'
-    :'<p class="novid">The video for this step is made by a release build: <code>RELEASE=1 docker compose up -d --build</code></p>';};
+  return hasVideos?'<video id="'+id+'" controls playsinline preload="none"'+(auto?' autoplay':'')+' poster="'+f+'.jpg" aria-label="Video: '+esc(g.title)+'"><source src="'+f+'.mp4" type="video/mp4">'+(FROM_FOLDER?'':'<track kind="subtitles" srclang="en" label="English" src="'+g.clip+'.vtt" default>')+'</video>'
+    :EMBED?'':'<p class="novid">The video for this step is made by a release build: <code>RELEASE=1 docker compose up -d --build</code></p>';};
 function enlarge(i){
   const g=(window.GUIDE||[])[i];if(!g)return;
   openSheet('<h2 id="sheetTitle">'+esc(g.title)+'</h2>'+guideVideo(g,"v-big",true)+'<div class="acts" style="padding-top:12px"><button type="button" class="btn primary" data-sheet="close">Close</button></div>',true);
+  const big=document.getElementById("v-big");if(big)folderSubs(big,g);
 }
 
 /* ---------- adding ---------- */
@@ -638,6 +664,22 @@ function importText(name,text){
   }catch(e){toast("Could not import "+name+". "+(e instanceof SyntaxError?"The file is not valid JSON.":e.message));}
 }
 function importFile(f){if(!f)return;const r=new FileReader();r.onload=()=>importText(f.name,String(r.result));r.onerror=()=>toast("Could not read "+f.name+".");r.readAsText(f);}
+/* Export > Standalone page: one html file with the app and this roadmap inside it. The template is made by the Docker
+   build (assets/standalone.mjs) and is only loaded when this export is used. */
+function exportHtml(){
+  const build=()=>{
+    const T=window.STANDALONE_TEMPLATE,st=S.settings,used=["Barlow",FONTS[st.fontHead][0],FONTS[st.fontBody][0]];
+    const fonts=Object.keys(T.fonts).filter(f=>used.indexOf(f)>=0).map(f=>T.fonts[f]).join("");
+    const data=JSON.stringify({id:uid()+uid(),exported:todayIso(),roadmap:S}).replace(/</g,"\\u003c");
+    const page=T.html.replace("@@ROADMAP_"+"TITLE@@",()=>esc(S.title)).replace("@@ROADMAP_"+"FONTS@@",()=>fonts).replace("@@ROADMAP_"+"DATA@@",()=>data);
+    saveFile(slug()+".html",new Blob([page],{type:"text/html"}));
+  };
+  if(window.STANDALONE_TEMPLATE){build();return;}
+  toast("Preparing the standalone page…");
+  const s=document.createElement("script");s.src="standalone-template.js";s.onload=build;
+  s.onerror=()=>toast("This copy of the app has no standalone page template. It is made by the Docker build.");
+  document.head.appendChild(s);
+}
 const frame=()=>new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));
 async function exportVisual(kind){
   if(!window.htmlToImage){toast("The export library did not load. Reload the page and try again.");return;}
@@ -786,7 +828,7 @@ const ACT={
   zin:()=>{ui.zoom="manual";mw=Math.min(60,mw*1.25);render();},zout:()=>{ui.zoom="manual";mw=Math.max(4,mw/1.25);render();},zfit:()=>{ui.zoom="fit";render();},
   today:()=>{const p=pos(todayIso()),c=$("#chart");if(p<0||p>months()){toast("Today, "+fmtD(todayIso())+", is outside this timeline. Change the start year in the banner, in Edit mode.");return;}c.scrollLeft=Math.max(0,p*mw-(c.clientWidth-leftW())/2);},
   import:()=>$("#file").click(),exJson:()=>saveFile(slug()+".json",JSON.stringify(S,null,2)),exCsv:()=>saveFile(slug()+".csv",toCSV()),
-  exPng:()=>exportVisual("png"),exPdfA3:()=>exportVisual("pdfA3"),exPdf:()=>exportVisual("pdf"),deselect:()=>select(null),
+  exHtml:exportHtml,exPng:()=>exportVisual("png"),exPdfA3:()=>exportVisual("pdfA3"),exPdf:()=>exportVisual("pdf"),deselect:()=>select(null),
   clear:()=>{mutate(()=>{S.activities=[];S.milestones=[];S.critical=[];S.cards=[];S.panel=[];});toast("Cleared all content",true);},
   sample:()=>{mutate(()=>{S=normalise(sample());});toast("Loaded the sample roadmap",true);}
 };
@@ -943,8 +985,9 @@ if(window.ResizeObserver){let raf=0;new ResizeObserver(()=>{if(ui.zoom!=="fit"||
 function start(data){
   try{const u=JSON.parse(localStorage.getItem(UIKEY)||"{}");if(u.mode==="edit"||u.mode==="view")ui.mode=u.mode;
     if(["cards","guide","reqs","source"].indexOf(u.panelTab)>=0)ui.panelTab=u.panelTab;if(u.srcScope==="all")ui.srcScope="all";if(u.tipPos&&isFinite(u.tipPos.x)&&isFinite(u.tipPos.y))ui.tipPos={x:+u.tipPos.x,y:+u.tipPos.y};}catch(e){}
-  S=data&&Array.isArray(data.phases)?normalise(data):(load()||normalise(sample()));render();
+  S=data&&Array.isArray(data.phases)?normalise(data):(load()||normalise(EMBED&&EMBED.roadmap?EMBED.roadmap:sample()));render();
 }
+if("serviceWorker" in navigator&&/^https?:$/.test(location.protocol)&&!window.claude&&!EMBED)navigator.serviceWorker.register("sw.js").catch(()=>{});
 const hot=window.claude&&window.claude.hot;
 if(hot&&typeof hot.snapshot==="function"){try{hot.snapshot(()=>S);}catch(e){}}
 if(hot&&typeof hot.ready==="function")hot.ready(start);else start((hot&&hot.data)||{});

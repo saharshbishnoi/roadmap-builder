@@ -417,3 +417,8 @@ body.edit .row:not(.addrow):hover .rleft{box-shadow:inset 3px 0 0 var(--accent)}
 
 .novid{margin:0;padding:10px;border:1px dashed var(--line);color:var(--muted);font-size:calc(12px * var(--fz))}
 .novid code{display:block;margin-top:4px;color:var(--ink);font:calc(11.5px * var(--fz)) ui-monospace,Consolas,monospace;overflow-wrap:anywhere}
+
+.rgroup a{color:var(--accent);font-weight:600}
+
+/* a standalone page cannot make another standalone page; it exports the roadmap file instead */
+body.standalone [data-act="exHtml"]{display:none}

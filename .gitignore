@@ -4,3 +4,10 @@ release/test-results/
 app/guide/
 app/vendor/*.js
 app/fonts/*.woff2
+app/icon-*.png
+dist/
+app/standalone-template.js
+film/out/*
+!film/out/.gitkeep
+film/cache/*
+!film/cache/.gitkeep

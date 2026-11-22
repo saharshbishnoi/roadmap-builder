@@ -22,6 +22,9 @@ file format. They differ only in where the roadmap is kept and who else can see 
 What exists now: view and edit modes, editing on the elements, the JSON live editor, import and
 export (JSON, CSV, PNG, PDF), light and dark themes, the guide and its videos. No server state.
 
+The browser build can already be shared as a link (GitHub Pages), installed from the browser to run
+offline in its own window, and downloaded as one zip that opens from a folder.
+
 ### App build: local workspace with files and version control
 
 The same roadmap screen inside a desktop window, with a workspace beside it.
@@ -117,7 +120,8 @@ Ranked roughly by value.
 
 - **Excel import and export**, alongside CSV.
 - **Several roadmaps** in the browser build, with a simple list to switch between them.
-- **Shareable read-only link** that carries the roadmap in the address (browser build).
+- **Shareable read-only link** that carries the roadmap in the address (browser build). The app
+  itself is already shareable as a link; this is about sharing a particular roadmap.
 - **PowerPoint export**: one slide per saved view.
 
 ### Quality and delivery
@@ -125,7 +129,7 @@ Ranked roughly by value.
 - **Purge old binaries from Git history.** Fonts and early video clips were removed from the
   repository but remain in its first two commits. Removing them means rewriting history and a
   forced push.
-- **Run the tests on every push** with a hosted pipeline, not only in a release build.
+- **Run the tests on every push** with a hosted pipeline. Today the pipeline runs on version tags only.
 - **Firefox and Safari.** Only Chrome has been checked so far.
 - **Faster release builds.** Reuse narration and skip re-rendering a video when neither its script
   nor the app has changed.

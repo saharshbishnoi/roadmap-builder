@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Film stage</title>
+<style>
+/* The film's stage: a quiet backdrop, the app in a window at 86% size, chapter cards, a drawn pointer and subtitles. */
+@font-face{font-family:"Inter";font-weight:300;src:url(fonts/inter-latin-300-normal.woff2) format("woff2")}
+@font-face{font-family:"Inter";font-weight:400;src:url(fonts/inter-latin-400-normal.woff2) format("woff2")}
+@font-face{font-family:"Inter";font-weight:500;src:url(fonts/inter-latin-500-normal.woff2) format("woff2")}
+html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#f3f4f7;font-family:"Inter",system-ui,sans-serif}
+#backdrop{position:fixed;inset:0;background:radial-gradient(130% 110% at 50% 0%,#ffffff 0%,#f5f6f9 42%,#e7eaf0 100%)}
+#win{position:fixed;left:7%;top:6.4%;width:86%;height:86%;border-radius:14px;overflow:hidden;background:#fff;
+  box-shadow:0 0 0 1px rgba(20,30,60,.07),0 2px 4px rgba(20,30,60,.06),0 12px 24px -4px rgba(20,30,60,.10),0 36px 72px -16px rgba(20,30,60,.22),0 72px 120px -40px rgba(20,30,60,.20);
+  transform-origin:50% 62%;transition:transform .85s cubic-bezier(.33,.02,.18,1),opacity .6s ease}
+#win.down{transform:translateY(7%) scale(.93);opacity:0}
+#win iframe{display:block;width:100%;height:100%;border:0;background:#fff}
+#card{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:26px;padding-bottom:3%;opacity:0;transition:opacity .6s ease;pointer-events:none;color:#131a2a}
+#card.on{opacity:1}
+#card small{font:500 19px/1 "Inter",sans-serif;letter-spacing:.3em;text-transform:uppercase;color:#8891a5;min-height:19px}
+#card h1{margin:0;font:300 104px/1.04 "Inter",sans-serif;letter-spacing:-.035em;text-align:center;max-width:80%}
+#card p{margin:0;font:400 31px/1.35 "Inter",sans-serif;color:#566074;text-align:center;max-width:62%}
+#ptr{position:fixed;left:0;top:0;z-index:20;width:28px;height:28px;margin:-3px 0 0 -4px;pointer-events:none;filter:drop-shadow(0 3px 5px rgba(10,20,40,.35));transition:opacity .4s ease}
+#win.down~#ptr{opacity:0}
+.ring{position:fixed;z-index:19;width:16px;height:16px;margin:-8px 0 0 -8px;border-radius:50%;border:2.5px solid #2f6fed;pointer-events:none;animation:ring .55s ease-out forwards}
+@keyframes ring{from{transform:scale(.5);opacity:1}to{transform:scale(3.6);opacity:0}}
+#subs{position:fixed;left:0;right:0;bottom:2.6%;z-index:30;text-align:center;font:500 21px/1.3 "Inter",sans-serif;color:#28324a;letter-spacing:.005em;pointer-events:none}
+</style>
+</head>
+<body>
+<div id="backdrop"></div>
+<div id="win" class="down"><iframe id="app" title="Roadmap Builder"></iframe></div>
+<div id="card"><small></small><h1></h1><p></p></div>
+<div id="ptr"><svg viewBox="0 0 28 28" width="28" height="28"><path d="M5 3.5l17 9.8-7.7 1.7L10.2 22.6z" fill="#fff" stroke="#0b1020" stroke-width="1.7" stroke-linejoin="round"/></svg></div>
+<div id="subs"></div>
+</body>
+</html>

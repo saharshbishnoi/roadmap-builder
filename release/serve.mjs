@@ -5,7 +5,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 const TYPES = { ".html": "text/html; charset=utf-8", ".js": "text/javascript; charset=utf-8", ".css": "text/css; charset=utf-8", ".json": "application/json",
-  ".woff2": "font/woff2", ".jpg": "image/jpeg", ".png": "image/png", ".mp4": "video/mp4", ".vtt": "text/vtt; charset=utf-8", ".txt": "text/plain; charset=utf-8" };
+  ".woff2": "font/woff2", ".jpg": "image/jpeg", ".png": "image/png", ".mp4": "video/mp4", ".vtt": "text/vtt; charset=utf-8", ".txt": "text/plain; charset=utf-8", ".svg": "image/svg+xml", ".webmanifest": "application/manifest+json" };
 
 export function serve(root, port) {
   root = path.resolve(root);

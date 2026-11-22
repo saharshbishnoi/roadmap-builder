@@ -1,0 +1,17 @@
+# Pinned for Python 3.11 (Debian bookworm). The whole resolved set, so the same build gives the same voice later.
+attrs==26.1.0
+cffi==2.1.1
+cloudpickle==3.1.3
+dlinfo==2.0.0
+espeakng-loader==0.2.4
+flatbuffers==25.12.19
+joblib==1.6.0
+kokoro-onnx==0.6.1
+numpy==2.4.6
+onnxruntime==1.32.0
+packaging==26.3
+phonemizer==3.6.0
+protobuf==7.36.2
+pycparser==3.12
+soundfile==0.13.1
+typing_extensions==4.16.0

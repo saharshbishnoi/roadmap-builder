@@ -1,0 +1,9 @@
+{
+  "name": "roadmap-builder-film",
+  "private": true,
+  "type": "module",
+  "description": "Records the Roadmap Builder product film. Runs inside the film container; see film/README.md.",
+  "dependencies": {
+    "puppeteer": "23.11.1"
+  }
+}

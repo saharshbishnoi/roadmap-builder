@@ -176,12 +176,15 @@ function chunks(text) {
   });
   return out;
 }
-function vtt(marks) {
-  let s = "WEBVTT\n\n", n = 1;
+function cues(marks) {
+  const out = [];
   marks.forEach(m => { const parts = chunks(m.text), total = parts.reduce((a, p) => a + p.length, 0); let t = m.start;
-    parts.forEach(p => { const d = m.dur * p.length / total; s += n++ + "\n" + stamp(t + 0.05) + " --> " + stamp(t + d) + " line:88% align:center\n" + p + "\n\n"; t += d; }); });
-  return s;
+    parts.forEach(p => { const d = m.dur * p.length / total; out.push([+(t + 0.05).toFixed(3), +(t + d).toFixed(3), p]); t += d; }); });
+  return out;
 }
+const vtt = list => "WEBVTT\n\n" + list.map((c, i) => (i + 1) + "\n" + stamp(c[0]) + " --> " + stamp(c[1]) + " line:88% align:center\n" + c[2] + "\n\n").join("");
+// The same subtitles as a script: a page opened straight from a folder is not allowed to read the .vtt file.
+const subsJs = (id, list) => '(window.GUIDE_SUBS=window.GUIDE_SUBS||{})[' + JSON.stringify(id) + ']=' + JSON.stringify(list) + ';\n';
 
 /* ---------- build one chapter in one theme ---------- */
 async function build(ch, theme) {
@@ -243,7 +246,9 @@ async function build(ch, theme) {
     args.push("-filter_complex", filter, "-map", "[v]", "-map", "[a]", "-t", total.toFixed(3), "-c:v", "libx264", "-preset", "medium", "-crf", "20", "-tune", "animation", "-g", "60",
       "-c:a", "aac", "-b:a", "192k", "-ac", "2", "-movflags", "+faststart", mp4);
     await runAsync("ffmpeg", args, { maxBuffer: 1 << 28 });
-    fs.writeFileSync(path.join(OUT, ch.id + ".vtt"), vtt(marks));
+    const list = cues(marks);
+    fs.writeFileSync(path.join(OUT, ch.id + ".vtt"), vtt(list));
+    fs.writeFileSync(path.join(OUT, ch.id + ".subs.js"), subsJs(ch.id, list));
     const still = ch.scenes.length > 2 ? marks[2].start - 0.3 : total / 2;
     await runAsync("ffmpeg", ["-y", "-loglevel", "error", "-ss", still.toFixed(2), "-i", mp4, "-frames:v", "1", "-vf", "scale=1920:-2", "-q:v", "3", path.join(OUT, name + ".jpg")]);
     fs.rmSync(dir, { recursive: true, force: true });

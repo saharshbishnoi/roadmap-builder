@@ -4,7 +4,10 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Roadmap Builder</title>
-<link rel="icon" href="data:,">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self' data: blob:; media-src 'self' blob:; object-src 'none'; base-uri 'self'">
+<meta name="theme-color" content="#14275A">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -28,6 +31,7 @@
       <button type="button" class="btn primary" id="exBtn" data-menu="exMenu" aria-haspopup="true">Export ▾</button>
       <div class="menu right" id="exMenu" hidden>
         <button type="button" data-act="exJson">Roadmap file (.json)</button>
+        <button type="button" data-act="exHtml">Standalone page (.html)</button>
         <button type="button" data-act="exCsv">Activity list (.csv)</button>
         <button type="button" data-act="exPng">Image (.png)</button>
         <button type="button" data-act="exPdfA3">PDF, A3 landscape</button>

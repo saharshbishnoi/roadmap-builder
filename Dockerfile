@@ -15,6 +15,13 @@ WORKDIR /assets
 COPY assets/ ./
 RUN npm ci --ignore-scripts --no-audit --no-fund && sh ./collect.sh
 
+# ---- the template behind Export > Standalone page: the whole app inlined into one html file -----------------
+FROM node:22-alpine AS standalone
+COPY app/ /site/
+COPY --from=assets /out/ /site/
+COPY assets/standalone.mjs /standalone.mjs
+RUN mkdir -p /out && node /standalone.mjs /site /out/standalone-template.js
+
 # ---- release tooling: browser, test runner, ffmpeg and the narration voice ---------------------------------
 FROM mcr.microsoft.com/playwright:v1.49.1-noble AS tools
 ENV DEBIAN_FRONTEND=noninteractive
@@ -35,6 +42,7 @@ RUN npm install --no-audit --no-fund
 FROM tools AS release-1
 COPY app/ /work/app/
 COPY --from=assets /out/ /work/app/
+COPY --from=standalone /out/ /work/app/
 COPY release/ ./
 # 1. Every test must pass.
 RUN npx playwright test
@@ -47,11 +55,25 @@ RUN mkdir -p /out/guide
 
 FROM release-${RELEASE} AS release
 
+# ---- the finished site: app + fetched assets + guide media, with icons, offline list and the zip ------------
+FROM alpine:3.20 AS site
+RUN apk add --no-cache rsvg-convert zip
+COPY app/ /site/
+COPY --from=assets /out/ /site/
+COPY --from=standalone /out/ /site/
+COPY --from=release /out/guide/ /site/guide/
+COPY assets/finish.sh /finish.sh
+RUN sh /finish.sh
+
+# ---- export target: the site folder (for GitHub Pages) and the zip (for the release download) ----------------
+#   RELEASE=1 docker buildx build --build-arg RELEASE=1 --target dist --output type=local,dest=dist .
+FROM scratch AS dist
+COPY --from=site /site/ /site/
+COPY --from=site /dist/roadmap-builder.zip /roadmap-builder.zip
+
 # ---- the image that runs -----------------------------------------------------------------------------------
 FROM nginx:1.27-alpine
 COPY nginx.conf /etc/nginx/conf.d/default.conf
-COPY app/ /usr/share/nginx/html/
-COPY --from=assets /out/ /usr/share/nginx/html/
-COPY --from=release /out/guide/ /usr/share/nginx/html/guide/
+COPY --from=site /site/ /usr/share/nginx/html/
 EXPOSE 80
 HEALTHCHECK --interval=30s --timeout=3s --retries=3 CMD wget -q -O /dev/null http://127.0.0.1/ || exit 1
