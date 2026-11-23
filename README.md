@@ -2,6 +2,10 @@
 
 **Try it in your browser: <https://saharshbishnoi.github.io/roadmap-builder/>** (nothing to install; your roadmap stays in your browser).
 
+| Light | Dark |
+|---|---|
+| [![Roadmap Builder in the light theme](https://saharshbishnoi.github.io/roadmap-builder/guide/01-read-light.jpg)](https://saharshbishnoi.github.io/roadmap-builder/guide/01-read-light.jpg) | [![Roadmap Builder in the dark theme](https://saharshbishnoi.github.io/roadmap-builder/guide/01-read-dark.jpg)](https://saharshbishnoi.github.io/roadmap-builder/guide/01-read-dark.jpg) |
+
 An intuitive, interactive roadmap view: collapsible workstreams on the left, a
 month-scaled timeline on the right, a critical path and key milestones across the top, floating
 cards over the chart, editing controls on the elements themselves, and a resizable panel of cards,
