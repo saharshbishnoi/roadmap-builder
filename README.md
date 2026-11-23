@@ -142,6 +142,8 @@ the Format button, or leaving the editor applies the text and lays it out again,
 | Export | What it holds |
 |---|---|
 | Roadmap file (.json) | Everything: content, Markdown cards, colours, fonts, positions and display settings |
+| Standalone page (.html) | The app and this roadmap in one file that opens with a double-click; the recipient can edit their copy |
+| Standalone page, view only (.html) | The same single file, locked to View mode, opening exactly as the roadmap looks at export: zoom, place on the timeline, collapsed workstreams, theme and panel |
 | Activity list (.csv) | Activities, milestones and critical path stages, for a spreadsheet |
 | Image of this view (.png) | The timeline as it is on screen: same zoom, starting where it is scrolled to, every row |
 | Image, whole timeline (.png) | The whole roadmap at full width |

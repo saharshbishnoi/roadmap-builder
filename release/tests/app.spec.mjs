@@ -494,3 +494,49 @@ test("the JSON editor numbers its lines, names the line of a mistake, and format
   await page.click("#srcFmt");
   expect(await page.inputValue("#src")).toBe(broken.join("\n"));
 });
+
+test("Export > Standalone page, view only opens exactly as exported and cannot be edited", async ({ page, context }, info) => {
+  await open(page);
+  await page.click("#ct-p2");                                                   // collapse a workstream
+  await page.selectOption("#t-theme", "dark");
+  await page.click("#pt-cards");
+  await page.locator("#r-a11 .aname").click({ button: "right" });
+  await page.locator("#ctx button", { hasText: "Fit the timeline to this row" }).click();
+  await settle(page);
+  const look = () => ({ year: document.querySelector(".year").getBoundingClientRect().width, left: document.querySelector("#chart").scrollLeft, rows: document.querySelectorAll("#inner .row").length,
+    theme: document.documentElement.getAttribute("data-theme"), cards: !document.querySelector("#tabCards").hidden });
+  const before = await page.evaluate(look);
+  await page.click("#exBtn");
+  const [download] = await Promise.all([page.waitForEvent("download"), page.click('[data-act="exHtmlView"]')]);
+  expect(download.suggestedFilename()).toMatch(/-view\.html$/);
+  const file = info.outputPath("view-only.html");
+  await download.saveAs(file);
+
+  const copy = await context.newPage(), problems = [];
+  copy.on("pageerror", e => problems.push(String(e)));
+  copy.on("console", m => { if (m.type() === "error") problems.push(m.text()); });
+  await copy.setViewportSize(page.viewportSize());
+  await copy.goto("file://" + file);
+  await settle(copy);
+  const after = await copy.evaluate(look);
+  expect(after.rows).toBe(before.rows);
+  expect(after.theme).toBe("dark");
+  expect(after.cards).toBe(true);
+  expect(after.year).toBeCloseTo(before.year, 0);
+  expect(Math.abs(after.left - before.left)).toBeLessThan(3);
+  // Nothing that changes the roadmap is offered.
+  for (const sel of ["#modeEdit", "#undo", "#jsonBtn", "#propBtn", "#pt-props", '[data-act="import"]']) await expect(copy.locator(sel)).toBeHidden();
+  await copy.locator("#r-a11 .aname").click({ button: "right" });
+  await expect(copy.locator("#ctx")).toContainText("Zoom in");
+  await expect(copy.locator("#ctx")).not.toContainText("Switch to Edit");
+  await copy.keyboard.press("Escape");
+  expect(await copy.evaluate(() => document.body.classList.contains("edit"))).toBe(false);
+  // It still reads like the app: hover cards work, and a reload shows it as exported again.
+  await copy.hover("#b-a11");
+  await expect(copy.locator("#hover")).toBeVisible();
+  await copy.click("#ct-p1");
+  await copy.reload();
+  await settle(copy);
+  expect((await copy.evaluate(look)).rows).toBe(before.rows);
+  expect(problems).toEqual([]);
+});

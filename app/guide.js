@@ -35,6 +35,7 @@ window.GUIDE=[
     "Floating cards and panel cards are listed there too, one line each: change a title, a date or the Markdown text, copy a line to add a card, delete a line to remove one.",
     "Export, then Roadmap file (.json), saves everything. Import loads a .json roadmap file or a .csv activity list.",
     "Export, then Standalone page (.html), makes one file with the app and this roadmap inside. Send it to anyone; it opens in their browser with nothing to install.",
+    "Standalone page, view only, makes the same single file but locked to View mode. It opens exactly as the roadmap looks when you export it: the same zoom, place on the timeline, collapsed workstreams, theme and panel.",
     "Export, then Image of this view, saves a picture of the timeline as it is on screen: the same zoom, starting where it is scrolled to, with every row. Image, whole timeline and the two PDF exports show the full timeline. Exports always look like View mode."]}
 ];
 /* Where the offline copy of the latest release can be downloaded. */

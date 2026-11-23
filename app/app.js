@@ -8,6 +8,7 @@ const PALETTE=["#1E88E5","#2E8B2E","#7E57C2","#F07C1F","#D49B00","#12909A","#4A5
 const EMBED=(()=>{try{const e=document.getElementById("roadmap-data");return e?JSON.parse(e.textContent):null;}catch(x){return null;}})();
 const TAIL=EMBED&&EMBED.id?":"+String(EMBED.id).replace(/[^\w-]/g,""):"";
 const KEY="roadmap-app-v2"+TAIL,UIKEY="roadmap-app-ui"+TAIL;
+const VIEWONLY=!!(EMBED&&EMBED.viewOnly);   // a page exported as "view only"
 const COLL={a:"activities",k:"milestones",c:"critical",p:"phases",f:"cards",n:"panel"};
 const MONTHS=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
 const FONTS={barlow:["Barlow",'"Barlow","Segoe UI",system-ui,Arial,sans-serif'],barlowc:["Barlow Condensed",'"Barlow Condensed","Arial Narrow",Arial,sans-serif'],inter:["Inter",'"Inter","Segoe UI",system-ui,Arial,sans-serif'],
@@ -109,9 +110,9 @@ function normalise(d){
   arr(d.panel).forEach((c,i)=>{o.panel.push({id:nid(c.id),eyebrow:str(c.eyebrow),title:str(c.title)||"Card",badge:str(c.badge).slice(0,4),color:hex(c.color,PALETTE[i%PALETTE.length]),md:str(c.md),hidden:!!c.hidden});});
   return o;
 }
-function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
+function save(){if(VIEWONLY)return;try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
 function load(){try{const t=localStorage.getItem(KEY);return t?normalise(JSON.parse(t)):null;}catch(e){return null;}}
-function saveUi(){try{localStorage.setItem(UIKEY,JSON.stringify({mode:ui.mode,panelTab:ui.panelTab,srcScope:ui.srcScope,tipPos:ui.tipPos,json:ui.json,jsonW:ui.jsonW}));}catch(e){}}
+function saveUi(){if(VIEWONLY)return;try{localStorage.setItem(UIKEY,JSON.stringify({mode:ui.mode,panelTab:ui.panelTab,srcScope:ui.srcScope,tipPos:ui.tipPos,json:ui.json,jsonW:ui.jsonW}));}catch(e){}}
 function snap(){hist.push(JSON.stringify(S));if(hist.length>100)hist.shift();}
 function mutate(fn,soft){snap();liveKey="";fn();save();render(soft);}
 /* Live edits from inline fields: one undo step per burst of typing, and a soft render so the caret stays put. */
@@ -690,13 +691,20 @@ function importText(name,text){
 function importFile(f){if(!f)return;const r=new FileReader();r.onload=()=>importText(f.name,String(r.result));r.onerror=()=>toast("Could not read "+f.name+".");r.readAsText(f);}
 /* Export > Standalone page: one html file with the app and this roadmap inside it. The template is made by the Docker
    build (assets/standalone.mjs) and is only loaded when this export is used. */
-function exportHtml(){
+function exportHtml(viewOnly){
   const build=()=>{
     const T=window.STANDALONE_TEMPLATE,st=S.settings,used=["Barlow",FONTS[st.fontHead][0],FONTS[st.fontBody][0]];
     const fonts=Object.keys(T.fonts).filter(f=>used.indexOf(f)>=0).map(f=>T.fonts[f]).join("");
-    const data=JSON.stringify({id:uid()+uid(),exported:todayIso(),roadmap:S}).replace(/</g,"\\u003c");
+    const pack={id:uid()+uid(),exported:todayIso(),roadmap:S};
+    if(viewOnly){
+      // A view-only page opens exactly as the roadmap looks now, and offers nothing that changes it.
+      const c=$("#chart"),dark=(()=>{const t=document.documentElement.getAttribute("data-theme");return t?t==="dark":!!(window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches);})();
+      pack.roadmap=JSON.parse(JSON.stringify(S));pack.roadmap.settings.theme=dark?"dark":"light";
+      pack.viewOnly=true;pack.view={zoom:ui.zoom,mw:mw,from:c.scrollLeft/mw,top:c.scrollTop,tipPos:ui.tipPos};
+    }
+    const data=JSON.stringify(pack).replace(/</g,"\\u003c");
     const page=T.html.replace("@@ROADMAP_"+"TITLE@@",()=>esc(S.title)).replace("@@ROADMAP_"+"FONTS@@",()=>fonts).replace("@@ROADMAP_"+"DATA@@",()=>data);
-    saveFile(slug()+".html",new Blob([page],{type:"text/html"}));
+    saveFile(slug()+(viewOnly?"-view":"")+".html",new Blob([page],{type:"text/html"}));
   };
   if(window.STANDALONE_TEMPLATE){build();return;}
   toast("Preparing the standalone page…");
@@ -857,7 +865,7 @@ function ctxFor(e){
     if(o&&"apck".indexOf(kind)>=0&&rowSpan(kind,o))it.push({label:kind==="k"?"Centre the timeline on this milestone":"Fit the timeline to this row",fn:()=>fitRow(kind,id)});
     it.push({label:"Zoom in",fn:ACT.zin},{label:"Zoom out",fn:ACT.zout},{label:"Fit the timeline to the window",fn:ACT.zfit},{label:"Go to today",fn:ACT.today});
   }
-  if(it.length)it.push("-",edit?{label:"Switch to View",fn:()=>setMode("view")}:{label:"Switch to Edit",fn:()=>setMode("edit")});
+  if(it.length&&!VIEWONLY)it.push("-",edit?{label:"Switch to View",fn:()=>setMode("view")}:{label:"Switch to Edit",fn:()=>setMode("edit")});
   if(edit&&hist.length)it.push({label:"Undo",fn:undo});
   return it;
 }
@@ -870,14 +878,14 @@ document.addEventListener("contextmenu",e=>{
 
 /* ---------- events ---------- */
 function closeMenus(except){document.querySelectorAll(".menu").forEach(m=>{if(m!==except)m.hidden=true;});}
-function setMode(m){ui.mode=m;saveUi();closeSheet();render();}
+function setMode(m){ui.mode=VIEWONLY?"view":m;saveUi();closeSheet();render();}
 (function(){const o=Object.keys(FONTS).map(k=>'<option value="'+k+'">'+FONTS[k][0]+(/^(barlow|barlowc|inter|plex|source)$/.test(k)?'':' (if installed)')+'</option>').join("");$("#t-fontHead").innerHTML=o;$("#t-fontBody").innerHTML=o;})();
 const ACT={
   undo:undo,addPhase:()=>addThing("p"),addKm:()=>addThing("k"),addCp:()=>addThing("c"),addCard:()=>addThing("f"),addPanel:()=>addThing("n"),
   zin:()=>{ui.zoom="manual";mw=Math.min(60,mw*1.25);render();},zout:()=>{ui.zoom="manual";mw=Math.max(4,mw/1.25);render();},zfit:()=>{ui.zoom="fit";render();},
   today:()=>{const p=pos(todayIso()),c=$("#chart");if(p<0||p>months()){toast("Today, "+fmtD(todayIso())+", is outside this timeline. Change the start year in the banner, in Edit mode.");return;}c.scrollLeft=Math.max(0,p*mw-(c.clientWidth-leftW())/2);},
   import:()=>$("#file").click(),exJson:()=>saveFile(slug()+".json",JSON.stringify(S,null,2)),exCsv:()=>saveFile(slug()+".csv",toCSV()),
-  exHtml:exportHtml,exPngAll:()=>exportVisual("png",true),tour:openTour,tourHide:hideTour,
+  exHtml:()=>exportHtml(false),exHtmlView:()=>exportHtml(true),exPngAll:()=>exportVisual("png",true),tour:openTour,tourHide:hideTour,
   json:()=>{ui.json=!ui.json;saveUi();render();},srcFormat:srcFormat,props:()=>setView(()=>{S.settings.showPanel=!S.settings.showPanel;}),
   help:()=>{const w=window.open("help.html","roadmap-help");if(!w)toast("The browser blocked the Help window. Allow pop-ups for this page, or open help.html yourself.");},exPng:()=>exportVisual("png"),exPdfA3:()=>exportVisual("pdfA3",true),exPdf:()=>exportVisual("pdf",true),deselect:()=>select(null),
   clear:()=>{mutate(()=>{S.activities=[];S.milestones=[];S.critical=[];S.cards=[];S.panel=[];});toast("Cleared all content",true);},
@@ -1041,6 +1049,16 @@ if(window.ResizeObserver){let raf=0;new ResizeObserver(()=>{if(ui.zoom!=="fit"||
 
 /* ---------- boot ---------- */
 function start(data){
+  if(VIEWONLY){
+    // Open exactly as it was exported: the same zoom, place on the timeline and panel, in View mode, with nothing kept between visits.
+    document.body.classList.add("viewonly");
+    const v=EMBED.view||{};S=normalise(EMBED.roadmap);ui.mode="view";ui.panelTab="cards";
+    if(v.tipPos&&isFinite(v.tipPos.x)&&isFinite(v.tipPos.y))ui.tipPos={x:+v.tipPos.x,y:+v.tipPos.y};
+    if(v.zoom==="manual"&&v.mw>=3&&v.mw<=400){ui.zoom="manual";mw=+v.mw;}
+    render();
+    const c=$("#chart");c.scrollLeft=Math.max(0,(+v.from||0)*mw);c.scrollTop=Math.max(0,+v.top||0);
+    return;
+  }
   try{const u=JSON.parse(localStorage.getItem(UIKEY)||"{}");if(u.mode==="edit"||u.mode==="view")ui.mode=u.mode;
     if(u.panelTab==="cards"||u.panelTab==="props")ui.panelTab=u.panelTab;ui.json=!!u.json;if(u.jsonW>=280&&u.jsonW<=900)ui.jsonW=u.jsonW;if(u.srcScope==="all")ui.srcScope="all";if(u.tipPos&&isFinite(u.tipPos.x)&&isFinite(u.tipPos.y))ui.tipPos={x:+u.tipPos.x,y:+u.tipPos.y};}catch(e){}
   S=data&&Array.isArray(data.phases)?normalise(data):(load()||normalise(EMBED&&EMBED.roadmap?EMBED.roadmap:sample()));render();
