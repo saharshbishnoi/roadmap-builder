@@ -24,7 +24,7 @@ swap(/<link rel="manifest"[^>]*>\n?/, "", "the manifest link");
 swap(/<link rel="icon"[^>]*>/, () => '<link rel="icon" href="data:image/svg+xml,' + encodeURIComponent(read("icon.svg")) + '">', "the icon link");
 swap(/<title>[^<]*<\/title>/, () => "<title>@@ROADMAP_TITLE@@</title>", "the title");
 swap('<link rel="stylesheet" href="styles.css">', () => "<style>@@ROADMAP_FONTS@@\n" + css + "</style>", "the stylesheet link");
-swap("<body>", '<body class="standalone">', "the body tag");
+swap('<body class="rb">', '<body class="rb standalone">', "the body tag");
 html = html.replace(/<script src="([^"]+)"><\/script>/g, (m, src) => { n++;
   return (n === 1 ? '<script type="application/json" id="roadmap-data">@@ROADMAP_DATA@@</script>\n' : "") + "<script>" + read(src).replace(/<\/script/gi, "<\\/script").replace(/<!--/g, "<\\!--") + "</script>"; });
 must(html, n === 6, "the six script tags (found " + n + ")");

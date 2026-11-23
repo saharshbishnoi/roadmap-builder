@@ -94,46 +94,45 @@ What is said and shown in each video is in `release/videos.mjs`; the steps under
 
 ## Using it
 
-The Guide tab in the right-hand panel has five short narrated videos with subtitles and the steps for
-each,
-and the Features tab lists what the app does and where to find it.
+The schedule fills the window and scrolls on its own. A floating toolbar sits above it; two
+full-height panels open beside it: Properties on the right (both modes) and the JSON editor on the
+left (Edit mode). Help opens in its own window, with the steps for each part of the app and, after a
+release build, a short narrated video for each. The list of requirements is in
+[docs/REQUIREMENTS.md](docs/REQUIREMENTS.md).
 
 **View mode** is for reading and presenting. Hover over a bar, milestone or critical path stage to
-see its hover card; click it to open its dialog card. Collapse a workstream with its arrow.
+see its hover card; click it to open its dialog card. Collapse a workstream with its arrow. Drag the
+year scale to squeeze or stretch the timeline; double-click it to fit the window.
 
-**Edit mode** puts every control on the element it changes. There are no menus or side editors:
+**Edit mode** keeps the quick edits on the roadmap itself and everything else in Properties:
 
 - Type straight into a workstream or activity name, a start or end date, a card title, or a lane or
   column heading. There is no Save button. Each burst of typing is one Undo step.
 - Each row and card has a colour square, an eye to hide or show it, a pencil and (where it applies)
   a cross to delete. Hidden things stay dimmed in Edit mode and disappear in View mode and exports.
-- The pencil, or a click on a bar, milestone or stage, opens all of that item's settings directly
-  under it (inside the card, for cards), including its two Markdown cards: hover and click.
-- The eyes in the chart header show or hide the critical path, the milestone lines, the Start and
-  End columns, and the activity name, start date and end date beside each bar.
-- The start year, number of years, banner colours and today line are edited in the banner.
-- Drag a bar to move it and drag either end to resize it. Bars snap to whole months.
-- Drag the dotted handle to reorder rows or move a row to another workstream.
+- The pencil, or a click on a bar, milestone or stage, opens all of that item's settings at the top
+  of the Properties panel, including its two Markdown cards: hover and click.
 - Type a name in the highlighted "Add an activity" row at the end of a workstream and press Enter
   to add a row; the last row adds a workstream. New rows have no dates: type them, or click on the
   row's timeline to place it. A bar with only one date fades towards the open side.
-- The chips above the table choose what is written beside each bar: Activity, Start, End.
-- Drag the right edge of the Workstream / activity heading to resize that column (both modes).
+- The chips above the table choose what is written beside each bar: Activity, Start, End. The eyes
+  in the chart header show or hide the critical path, the milestone lines and the date columns.
+- Drag a bar to move it and drag either end to resize it. Bars snap to whole months. Drag the
+  dotted handle to reorder rows or move a row to another workstream.
 - Right-click a row, bar, milestone, stage, card or the empty timeline for a menu that fits what
-  is under the pointer. A faint line follows the pointer across the timeline and shows its date.
-- The Add bar also adds a workstream, key milestone, critical path stage, floating card or panel card.
+  is under the pointer.
+- **Floating cards** can be pinned to the row they sit on (the pin on the card). A pinned card moves
+  with its row, so it is still in the right place when rows are hidden in View mode. Unpinned, it
+  stays a fixed distance from the top.
 
-**JSON tab** (right panel, Edit mode) is a live editor with one line per activity: change a name or
-a date and the chart follows. Copy a line to add an activity, delete a line to remove one. Switch
-Show to Whole roadmap to edit the complete file.
+**Properties panel** (right): the selected item, Add (workstream, key milestone, critical path
+stage, floating card, panel card), Text (fonts, text size, and separate sizes for labels and for
+dates), Display (theme, floating cards, rounded cards, 3D effect) and, on its Cards tab, the panel
+cards. Drag its edge to resize it.
 
-**Display bar** (both modes): light or dark theme, heading font, text font, text size, capitals
-(off by default), 3D card effect, rounded or square cards, floating cards and the right panel. Barlow, Barlow Condensed,
-Inter, IBM Plex Sans and Source Sans 3 are bundled. Arial, Segoe UI, Verdana, Calibri and the system
-font are used if the computer has them.
-
-**Panel.** Drag the divider beside the right panel to change its width, or focus the divider and use
-the arrow keys. Double-click it to reset.
+**JSON editor** (left, Edit mode): one line per activity; change a name or a date and the chart
+follows. Copy a line to add an activity, delete a line to remove one. Switch Show to Whole roadmap
+to edit the complete file.
 
 ## Files in and out
 
@@ -165,11 +164,12 @@ nginx.conf           static hosting and a content security policy
 app/index.html       page shell
 app/styles.css       layout, themes, fonts, 3D card effect
 app/app.js           all behaviour
-app/guide.js         text for the Guide and Features tabs (edit it here)
+app/guide.js         the steps shown on the Help page (edit them here)
+app/help.html, app/help.js   the Help page, opened in its own window
 app/sw.js            offline support for the installed web app
 app/manifest.webmanifest, app/icon.svg   what makes the app installable
 app/guide/           guide videos, subtitles and posters: made by a release build, not in git
-docs/                ideas, planned editions and the design language
+docs/                requirements, ideas, planned editions and the design language
 .github/workflows/   the pipeline that tests a tagged release and attaches the zip to it
 publish-pages.sh     builds the site and pushes it to the gh-pages branch for GitHub Pages
 film/                the product film: scenes, recorder and its own container (see film/README.md)

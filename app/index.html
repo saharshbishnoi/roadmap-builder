@@ -10,73 +10,59 @@
 <link rel="icon" href="icon.svg" type="image/svg+xml">
 <link rel="stylesheet" href="styles.css">
 </head>
-<body>
-<div class="wrap">
+<body class="rb">
+<div class="app" id="work">
 
-  <div class="tourbar" id="tourBar" hidden>
-    <button type="button" class="tourplay" data-act="tour" aria-label="Watch the full tour"><img id="tourPoster" alt=""><span aria-hidden="true">▶</span></button>
-    <div class="tourtxt"><b>New here? Watch the full tour.</b><span>Five minutes, six chapters, with subtitles.</span></div>
-    <button type="button" class="btn primary" data-act="tour">Watch the tour</button>
-    <button type="button" class="btn" data-act="tourHide" aria-label="Hide this">Not now</button>
-  </div>
+  <aside class="side left" id="jsonPanel" aria-label="JSON live editor" hidden>
+    <div class="shead"><b>JSON live editor</b><button type="button" class="mini" data-act="json" aria-label="Close the JSON editor">×</button></div>
+    <div class="srcbar"><label for="srcScope">Show</label><select id="srcScope"><option value="dates">Dates and activities</option><option value="all">Whole roadmap</option></select></div>
+    <p class="phint" id="srcHelp"></p>
+    <textarea id="src" spellcheck="false" aria-label="Roadmap JSON"></textarea>
+    <p class="status" id="srcStatus">In step with the roadmap.</p>
+  </aside>
+  <div class="resizer" id="rzJson" role="separator" aria-orientation="vertical" aria-label="Resize the JSON editor" tabindex="0" hidden></div>
 
-  <div class="tools" role="toolbar" aria-label="Roadmap tools">
-    <div class="seg" role="group" aria-label="Mode">
-      <button type="button" class="segb" id="modeView" data-mode="view">View</button>
-      <button type="button" class="segb" id="modeEdit" data-mode="edit">Edit</button>
-    </div>
-    <button type="button" class="btn eo" id="undo" data-act="undo">Undo</button>
-    <div class="grp" aria-label="Zoom">
-      <button type="button" class="btn sq" data-act="zout" aria-label="Zoom out">−</button>
-      <button type="button" class="btn" data-act="zfit">Fit</button>
-      <button type="button" class="btn sq" data-act="zin" aria-label="Zoom in">+</button>
-      <button type="button" class="btn" data-act="today">Today</button>
-    </div>
-    <span class="spacer"></span>
-    <button type="button" class="btn" id="tourBtn" data-act="tour" hidden>▶ Tour</button>
-    <button type="button" class="btn" data-act="import">Import</button>
-    <div class="menuwrap">
-      <button type="button" class="btn primary" id="exBtn" data-menu="exMenu" aria-haspopup="true">Export ▾</button>
-      <div class="menu right" id="exMenu" hidden>
-        <button type="button" data-act="exJson">Roadmap file (.json)</button>
-        <button type="button" data-act="exHtml">Standalone page (.html)</button>
-        <button type="button" data-act="exCsv">Activity list (.csv)</button>
-        <button type="button" data-act="exPng">Image (.png)</button>
-        <button type="button" data-act="exPdfA3">PDF, A3 landscape</button>
-        <button type="button" data-act="exPdf">PDF, exact size</button>
+  <main class="centre">
+    <div class="tools" role="toolbar" aria-label="Roadmap tools">
+      <div class="seg" role="group" aria-label="Mode">
+        <button type="button" class="segb" id="modeView" data-mode="view">View</button>
+        <button type="button" class="segb" id="modeEdit" data-mode="edit">Edit</button>
       </div>
+      <button type="button" class="btn eo" id="undo" data-act="undo">Undo</button>
+      <div class="grp" aria-label="Zoom">
+        <button type="button" class="btn sq" data-act="zout" aria-label="Zoom out">−</button>
+        <button type="button" class="btn" data-act="zfit">Fit</button>
+        <button type="button" class="btn sq" data-act="zin" aria-label="Zoom in">+</button>
+        <button type="button" class="btn" data-act="today">Today</button>
+      </div>
+      <span class="tsep"></span>
+      <button type="button" class="btn eo" id="jsonBtn" data-act="json" aria-pressed="false">JSON</button>
+      <button type="button" class="btn" id="propBtn" data-act="props" aria-pressed="false">Properties</button>
+      <button type="button" class="btn" id="helpBtn" data-act="help">Help</button>
+      <button type="button" class="btn" id="tourBtn" data-act="tour" hidden>▶ Tour</button>
+      <span class="tsep"></span>
+      <button type="button" class="btn" data-act="import">Import</button>
+      <div class="menuwrap">
+        <button type="button" class="btn primary" id="exBtn" data-menu="exMenu" aria-haspopup="true">Export ▾</button>
+        <div class="menu right" id="exMenu" hidden>
+          <button type="button" data-act="exJson">Roadmap file (.json)</button>
+          <button type="button" data-act="exHtml">Standalone page (.html)</button>
+          <button type="button" data-act="exCsv">Activity list (.csv)</button>
+          <button type="button" data-act="exPng">Image (.png)</button>
+          <button type="button" data-act="exPdfA3">PDF, A3 landscape</button>
+          <button type="button" data-act="exPdf">PDF, exact size</button>
+        </div>
+      </div>
+      <input id="file" type="file" accept=".json,.csv,application/json,text/csv" hidden>
     </div>
-    <input id="file" type="file" accept=".json,.csv,application/json,text/csv" hidden>
-  </div>
 
-  <div class="vbar" role="group" aria-label="Display">
-    <span class="vcap">Display</span>
-    <label for="t-theme">Theme <select id="t-theme" data-set="theme"><option value="auto">Match system</option><option value="light">Light</option><option value="dark">Dark</option></select></label>
-    <label for="t-fontHead">Heading font <select id="t-fontHead" data-set="fontHead"></select></label>
-    <input class="eo" type="text" id="r-fontHeadCustom" data-road="fontHeadCustom" placeholder="or an installed font" aria-label="Custom heading font, the name of a font installed on this computer">
-    <label for="t-fontBody">Text font <select id="t-fontBody" data-set="fontBody"></select></label>
-    <input class="eo" type="text" id="r-fontBodyCustom" data-road="fontBodyCustom" placeholder="or an installed font" aria-label="Custom text font, the name of a font installed on this computer">
-    <label for="t-fontScale">Text size <select id="t-fontScale" data-set="fontScale"><option value="90">Small</option><option value="100">Standard</option><option value="110">Large</option><option value="120">Extra large</option></select></label>
-    <label for="t-upper"><input type="checkbox" id="t-upper" data-toggle="upper"> Capitals</label>
-    <label for="t-float3d"><input type="checkbox" id="t-float3d" data-toggle="float3d"> 3D cards</label>
-    <label for="t-roundCards"><input type="checkbox" id="t-roundCards" data-toggle="roundCards"> Rounded cards</label>
-    <label for="t-showCards"><input type="checkbox" id="t-showCards" data-toggle="showCards"> Floating cards</label>
-    <label for="t-showPanel"><input type="checkbox" id="t-showPanel" data-toggle="showPanel"> Right panel</label>
-    <label class="eo" for="r-accent">Highlight <input type="color" id="r-accent" data-road="accent"></label>
-  </div>
-  <div class="vbar eo" role="group" aria-label="Add and reset">
-    <span class="vcap">Add</span>
-    <button type="button" class="btn sm" data-act="addPhase">+ Workstream</button>
-    <button type="button" class="btn sm" data-act="addKm">+ Key milestone</button>
-    <button type="button" class="btn sm" data-act="addCp">+ Critical path stage</button>
-    <button type="button" class="btn sm" data-act="addCard">+ Floating card</button>
-    <button type="button" class="btn sm" data-act="addPanel">+ Panel card</button>
-    <span class="spacer"></span>
-    <button type="button" class="btn sm" data-act="sample">Load sample roadmap</button>
-    <button type="button" class="btn sm danger" data-act="clear">Clear all content</button>
-  </div>
+    <div class="tourbar" id="tourBar" hidden>
+      <button type="button" class="tourplay" data-act="tour" aria-label="Watch the full tour"><img id="tourPoster" alt=""><span aria-hidden="true">▶</span></button>
+      <div class="tourtxt"><b>New here? Watch the full tour.</b><span>Five minutes, six chapters, with subtitles.</span></div>
+      <button type="button" class="btn primary" data-act="tour">Watch the tour</button>
+      <button type="button" class="btn" data-act="tourHide" aria-label="Hide this">Not now</button>
+    </div>
 
-  <div class="work" id="work">
     <div id="capture">
       <header class="banner">
         <div class="btitle">
@@ -94,11 +80,63 @@
       </header>
       <div class="stage" id="stage">
         <div class="chart" id="chart"><div class="inner" id="inner"></div></div>
-        <div class="resizer" id="rzPanel" role="separator" aria-orientation="vertical" aria-label="Resize the right panel" tabindex="0"></div>
-        <aside class="panel" id="panel" aria-label="Cards, guide, features and JSON editor"></aside>
+        <aside class="panel" id="xpanel" hidden></aside>
       </div>
     </div>
-  </div>
+  </main>
+
+  <div class="resizer" id="rzPanel" role="separator" aria-orientation="vertical" aria-label="Resize the properties panel" tabindex="0"></div>
+  <aside class="side right" id="panel" aria-label="Properties and cards">
+    <div class="tabs" role="tablist" aria-label="Right panel">
+      <button type="button" role="tab" class="tab" id="pt-props" data-ptab="props">Properties</button>
+      <button type="button" role="tab" class="tab" id="pt-cards" data-ptab="cards">Cards</button>
+      <button type="button" class="mini" data-act="props" aria-label="Hide this panel">×</button>
+    </div>
+    <div class="pbody" id="tabProps">
+      <section class="psec" id="propsItem"></section>
+      <section class="psec eo">
+        <h3>Add</h3>
+        <div class="pbtns">
+          <button type="button" class="btn sm" data-act="addPhase">+ Workstream</button>
+          <button type="button" class="btn sm" data-act="addKm">+ Key milestone</button>
+          <button type="button" class="btn sm" data-act="addCp">+ Critical path stage</button>
+          <button type="button" class="btn sm" data-act="addCard">+ Floating card</button>
+          <button type="button" class="btn sm" data-act="addPanel">+ Panel card</button>
+        </div>
+      </section>
+      <section class="psec">
+        <h3>Text</h3>
+        <div class="pgrid">
+          <label for="t-fontHead">Heading font</label><select id="t-fontHead" data-set="fontHead"></select>
+          <label class="eo" for="r-fontHeadCustom">or installed</label><input class="eo" type="text" id="r-fontHeadCustom" data-road="fontHeadCustom" placeholder="font name">
+          <label for="t-fontBody">Text font</label><select id="t-fontBody" data-set="fontBody"></select>
+          <label class="eo" for="r-fontBodyCustom">or installed</label><input class="eo" type="text" id="r-fontBodyCustom" data-road="fontBodyCustom" placeholder="font name">
+          <label for="t-fontScale">Text size</label><select id="t-fontScale" data-set="fontScale"><option value="90">Small</option><option value="100">Standard</option><option value="110">Large</option><option value="120">Extra large</option></select>
+          <label for="t-labelScale">Label size</label><select id="t-labelScale" data-set="labelScale"><option value="80">80%</option><option value="90">90%</option><option value="100">100%</option><option value="110">110%</option><option value="120">120%</option><option value="130">130%</option></select>
+          <label for="t-dateScale">Date size</label><select id="t-dateScale" data-set="dateScale"><option value="80">80%</option><option value="90">90%</option><option value="100">100%</option><option value="110">110%</option><option value="120">120%</option><option value="130">130%</option></select>
+        </div>
+        <label class="pchk" for="t-upper"><input type="checkbox" id="t-upper" data-toggle="upper"> Headings in capitals</label>
+      </section>
+      <section class="psec">
+        <h3>Display</h3>
+        <div class="pgrid">
+          <label for="t-theme">Theme</label><select id="t-theme" data-set="theme"><option value="auto">Match system</option><option value="light">Light</option><option value="dark">Dark</option></select>
+          <label class="eo" for="r-accent">Highlight</label><input class="eo" type="color" id="r-accent" data-road="accent">
+        </div>
+        <label class="pchk" for="t-showCards"><input type="checkbox" id="t-showCards" data-toggle="showCards"> Floating cards</label>
+        <label class="pchk" for="t-roundCards"><input type="checkbox" id="t-roundCards" data-toggle="roundCards"> Rounded cards</label>
+        <label class="pchk" for="t-float3d"><input type="checkbox" id="t-float3d" data-toggle="float3d"> 3D card effect</label>
+      </section>
+      <section class="psec eo">
+        <h3>Roadmap</h3>
+        <div class="pbtns">
+          <button type="button" class="btn sm" data-act="sample">Load sample roadmap</button>
+          <button type="button" class="btn sm danger" data-act="clear">Clear all content</button>
+        </div>
+      </section>
+    </div>
+    <div class="pbody pcards" id="tabCards" hidden></div>
+  </aside>
 </div>
 
 <div class="sheet" id="sheet" hidden><div class="card" role="dialog" aria-modal="true" aria-labelledby="sheetTitle" id="card"></div></div>

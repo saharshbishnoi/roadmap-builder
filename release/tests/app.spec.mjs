@@ -113,11 +113,11 @@ test("headings are edited in place", async ({ page }) => {
   expect((await state(page)).cards[0].title).toBe("Renamed card");
 });
 
-test("an item's settings open under it and typing keeps the caret", async ({ page }) => {
+test("an item's settings open in the Properties panel and typing keeps the caret", async ({ page }) => {
   await open(page, "edit");
   await page.click("#pe-a2");
-  await expect(page.locator("#istrip")).toBeVisible();
-  expect(await page.evaluate(() => document.querySelector("#r-a2").nextElementSibling.id)).toBe("istrip");
+  await expect(page.locator("#propsItem #istrip")).toBeVisible();
+  await expect(page.locator("#inner #istrip")).toHaveCount(0);
   await page.click("#f-name");
   await page.keyboard.press("End");
   await page.keyboard.type(" XY");
@@ -151,7 +151,8 @@ test("the Start and End columns can be hidden and shown", async ({ page }) => {
 
 test("the JSON editor applies valid edits live and refuses invalid ones", async ({ page }) => {
   await open(page, "edit");
-  await page.click("#pt-source");
+  await page.click("#jsonBtn");
+  await expect(page.locator("#jsonPanel")).toBeVisible();
   const text = await page.inputValue("#src");
   expect(text).toContain('"workstreams"');
   expect(text).toContain('{"id":"a1","name":"Herd the initial wombats (Shed A)"');
@@ -271,23 +272,20 @@ test("an older roadmap file is brought up to date on import", async ({ page }) =
   expect(s.activities.map(a => a.start)).toEqual(["2026-01-01", ""]);
 });
 
-test("the Guide has narrated videos with subtitles and the list is called Features", async ({ page }) => {
+test("Help opens in its own window with the steps for every chapter", async ({ page, context }) => {
   await open(page);
-  await expect(page.locator("#pt-reqs")).toHaveText("Features");
-  await page.click("#pt-guide");
-  await expect(page.locator(".gstep")).toHaveCount(5);
-  // The videos are rendered later in the release build; until they exist each step says how to make them.
-  if (await page.locator(".gstep video").count()) {
-    await expect(page.locator(".gstep video")).toHaveCount(5);
-    await expect(page.locator('.gstep video track[kind="subtitles"]')).toHaveCount(5);
-    await expect(page.locator(".gstep video source").first()).toHaveAttribute("src", /-light\.mp4$/);
-    await page.selectOption("#t-theme", "dark");
-    await expect(page.locator(".gstep video source").first()).toHaveAttribute("src", /-dark\.mp4$/);
-  } else await expect(page.locator(".gstep .novid")).toHaveCount(5);
-  await expect(page.locator(".gstep ol li").first()).toBeVisible();
-  await page.click("#pt-reqs");
-  await expect(page.locator("#panel")).toContainText("Intuitive interactive view");
-  await expect(page.locator("#panel")).not.toContainText("Jira");
+  await expect(page.locator("#pt-props")).toHaveText("Properties");
+  const [help] = await Promise.all([context.waitForEvent("page"), page.click("#helpBtn")]);
+  await help.waitForLoadState();
+  await expect(help.locator("h1")).toHaveText("Roadmap Builder help");
+  await expect(help.locator(".gstep")).toHaveCount(5);
+  await expect(help.locator(".gstep ol li").first()).toBeVisible();
+  // The videos are rendered later in the release build; where they exist each chapter has one, with subtitles.
+  if (await help.locator(".gstep video").count()) {
+    await expect(help.locator(".gstep video")).toHaveCount(5);
+    await expect(help.locator('.gstep video track[kind="subtitles"]')).toHaveCount(5);
+  }
+  await expect(help.locator("#helpTake")).toContainText("Download the offline copy");
 });
 
 test("the app is installable: it has a manifest, an icon and an offline helper", async ({ page, request }) => {
@@ -308,8 +306,9 @@ test("the app works when opened straight from a folder", async ({ page }) => {
   await page.keyboard.type("From a folder");
   await page.keyboard.press("Enter");
   expect((await state(page)).activities).toHaveLength(37);
-  await page.click("#pt-reqs");
-  await expect(page.locator("#panel")).toContainText("Download the offline copy");
+  await page.goto(new URL("../../app/help.html", import.meta.url).href);
+  await expect(page.locator(".gstep")).toHaveCount(5);
+  await expect(page.locator("#helpTake")).toContainText("Download the offline copy");
 });
 
 test("Export > Standalone page makes one self-contained file that opens from a folder", async ({ page, context }, info) => {
@@ -339,8 +338,8 @@ test("Export > Standalone page makes one self-contained file that opens from a f
   expect(await copy.evaluate(() => document.fonts.check('600 14px "Barlow"'))).toBe(true);
   await copy.click("#exBtn");
   await expect(copy.locator('[data-act="exHtml"]')).toBeHidden();
-  await copy.click("#pt-guide");
-  await expect(copy.locator(".gstep")).toHaveCount(5);
+  await expect(copy.locator("#helpBtn")).toBeHidden();
+  await expect(copy.locator("#pt-props")).toBeVisible();
   expect(problems).toEqual([]);
 });
 
@@ -348,4 +347,67 @@ test("the product film headline stays hidden where the film is not published", a
   await open(page);
   await expect(page.locator("#tourBar")).toBeHidden();
   await expect(page.locator("#tourBtn")).toBeHidden();
+});
+
+test("the schedule fills the window and scrolls inside itself; the side panels are full height", async ({ page }) => {
+  await open(page, "edit");
+  const size = page.viewportSize();
+  expect(await page.evaluate(() => document.documentElement.scrollHeight)).toBe(size.height);
+  const chart = await page.evaluate(() => { const c = document.querySelector("#chart"); return { scrollsDown: c.scrollHeight > c.clientHeight, head: getComputedStyle(document.querySelector(".hrow")).position }; });
+  expect(chart.scrollsDown).toBe(true);
+  expect(chart.head).toBe("sticky");
+  expect((await page.locator("#panel").boundingBox()).height).toBeGreaterThan(size.height - 40);
+  await page.click("#jsonBtn");
+  const json = await page.locator("#jsonPanel").boundingBox();
+  expect(json.height).toBeGreaterThan(size.height - 40);
+  expect(json.x).toBeLessThan(30);
+  await page.click("#propBtn");
+  await expect(page.locator("#panel")).toBeHidden();
+  await page.click("#propBtn");
+  await expect(page.locator("#panel")).toBeVisible();
+});
+
+test("label and date text sizes are set in Properties", async ({ page }) => {
+  await open(page);
+  const size = sel => page.evaluate(sel => parseFloat(getComputedStyle(document.querySelector(sel)).fontSize), sel);
+  const label0 = await size(".aname"), date0 = await size(".blabel");
+  await page.selectOption("#t-labelScale", "130");
+  await page.selectOption("#t-dateScale", "80");
+  expect(await size(".aname")).toBeCloseTo(label0 * 1.3, 1);
+  expect(await size(".blabel")).toBeCloseTo(date0 * 0.8, 1);
+  const s = await state(page);
+  expect([s.settings.labelScale, s.settings.dateScale]).toEqual([130, 80]);
+});
+
+test("the timeline is stretched by dragging its year scale, and double-click fits it again", async ({ page }) => {
+  await open(page);
+  const width = () => page.evaluate(() => document.querySelector(".year").getBoundingClientRect().width);
+  const before = await width();
+  const b = await page.locator(".years").boundingBox();
+  await page.mouse.move(b.x + 200, b.y + 10);
+  await page.mouse.down();
+  await page.mouse.move(b.x + 440, b.y + 10, { steps: 8 });
+  await page.mouse.up();
+  await settle(page);
+  expect(await width()).toBeGreaterThan(before * 1.5);
+  const c = await page.locator("#chart").boundingBox();
+  await page.mouse.dblclick(c.x + c.width - 120, b.y + 10);     // a spot on the scale that is not under the pinned name column
+  await settle(page);
+  expect(await width()).toBeCloseTo(before, 0);
+});
+
+test("a pinned floating card follows its row when rows above it are hidden; a free one stays put", async ({ page }) => {
+  await open(page, "edit");
+  const top = id => page.evaluate(id => parseFloat(document.querySelector("#fc-" + id).style.top), id);
+  expect((await state(page)).cards[1]).toMatchObject({ pin: true, row: "a9" });
+  await page.click("#pi-f3");                                   // f3 is now placed freely
+  expect((await state(page)).cards[2].pin).toBe(false);
+  const pinnedEdit = await top("f2"), freeEdit = await top("f3");
+  await page.click("#eh-a3");
+  await page.click("#eh-a4");                                   // two rows above both cards are hidden
+  await page.click("#modeView");
+  await settle(page);
+  // View mode drops the two hidden rows and the three add rows above the pinned card (30px each).
+  expect(await top("f2")).toBe(pinnedEdit - 5 * 30 + 2 * 30);
+  expect(await top("f3")).toBe(freeEdit);
 });

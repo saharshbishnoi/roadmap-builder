@@ -19,6 +19,7 @@
 @font-face{font-family:"Source Sans 3";font-weight:700;font-style:normal;font-display:swap;src:url(fonts/source-sans-3-latin-700-normal.woff2) format("woff2")}
 
 :root{
+  --lz:1; --dz:1;
   /* Layout: app toolbar, then the release sheet (programme banner, a workstream tree with a month-scaled
      timeline, floating cards above it). A live editor docks on the left in edit mode; a resizable panel
      on the right holds cards, the guide and the requirements. */
@@ -254,18 +255,10 @@ body:not(.float3d) .fx3d{box-shadow:0 1px 3px rgba(var(--shadow),.18)}
 body.dropping .chart{outline:3px dashed var(--accent);outline-offset:-3px}
 
 /* export: lay the whole sheet out at full width, no scrolling */
-body.exporting .work{display:block}
 body.exporting #capture{width:max-content;padding:16px}
 body.exporting .chart{flex:none;overflow:visible}
-body.exporting .panel{margin-left:14px}
 body.exporting .fx3d{transform:none!important}
 
-@media (max-width:1180px){
-  .work,.stage{flex-direction:column;align-items:stretch;gap:12px}
-  .resizer{display:none}
-  .panel{width:auto}
-  body.exporting .stage{flex-direction:row;align-items:flex-start;gap:0}
-}
 @media (max-width:760px){
   .istrip .form{grid-template-columns:1fr 1fr}
   .gsub{display:none}
@@ -436,3 +429,99 @@ body.standalone [data-act="exHtml"]{display:none}
 .tourchap .chipb{height:24px}
 body.exporting .tourbar{display:none}
 a.btn{display:inline-block;text-decoration:none;color:inherit}
+
+/* ===== Layout: the schedule fills the window, with full-height panels either side and a floating toolbar ===== */
+html:has(body.rb),body.rb{height:100%;overflow:hidden}
+.app{display:flex;height:100vh;padding:10px;gap:0}
+.centre{position:relative;flex:1;min-width:0;display:flex;flex-direction:column;gap:10px;padding-top:56px}
+#capture{flex:1;min-height:0;gap:10px}
+.stage{flex:1;min-height:0;align-items:stretch}
+.chart{height:100%;overflow:auto}
+.inner{min-height:100%}
+.hrow{position:sticky;top:0;z-index:9;background:var(--surface)}
+.htrack{background:var(--surface)}
+
+/* floating toolbar */
+.tools{position:absolute;top:2px;left:50%;transform:translateX(-50%);z-index:36;width:max-content;max-width:100%;flex-wrap:nowrap;overflow-x:auto;gap:6px;padding:6px 8px;
+  background:color-mix(in srgb,var(--surface) 92%,transparent);backdrop-filter:blur(10px);border:1px solid var(--line);border-radius:12px;
+  box-shadow:0 1px 2px rgba(var(--shadow),.10),0 10px 24px -8px rgba(var(--shadow),.32)}
+.tools:has(.menu:not([hidden])){overflow:visible}
+.tsep{flex:none;width:1px;align-self:stretch;margin:2px 2px;background:var(--line)}
+.btn.on{background:var(--ink);border-color:var(--ink);color:var(--surface)}
+
+/* side panels */
+.side{flex:none;height:100%;overflow:auto;background:var(--surface);border:1px solid var(--line)}
+.side.right{width:var(--panelw,340px)}
+.side.left{width:var(--jsonw,440px);display:flex;flex-direction:column;gap:8px;padding:0 12px 10px}
+.side .tabs{position:sticky;top:0;z-index:3}
+.shead{display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:var(--surface);padding:10px 0 6px;font:700 calc(13px * var(--fz))/1.2 var(--display);letter-spacing:.06em;text-transform:var(--tt)}
+.side.left #src{flex:1;min-height:200px;resize:none}
+.side.left .status{margin:0}
+.phint{margin:0;color:var(--muted);font-size:calc(12px * var(--fz))}
+.pbody{padding:0 0 16px}
+.psec{padding:12px 14px;border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:8px}
+.psec>h3{margin:0;font:700 calc(12px * var(--fz))/1.2 var(--display);letter-spacing:.1em;text-transform:var(--tt);color:var(--muted)}
+.pbtns{display:flex;flex-wrap:wrap;gap:6px}
+.pgrid{display:grid;grid-template-columns:auto 1fr;gap:6px 10px;align-items:center}
+.pgrid label{color:var(--muted);font-weight:500;font-size:calc(12px * var(--fz));white-space:nowrap}
+.pgrid select,.pgrid input[type=text]{min-width:0;width:100%;background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:4px;padding:5px 6px}
+.pgrid input[type=color]{width:44px;height:26px;padding:0;border:1px solid var(--line);background:none;cursor:pointer}
+.pchk{display:flex;gap:8px;align-items:center;cursor:pointer}
+#propsItem{padding:0;gap:0}
+#propsItem>h3{padding:12px 14px 0}
+#propsItem>.phint{padding:6px 14px 12px}
+.istrip.inpanel{position:static;width:auto;max-width:none;border:0;border-left:5px solid var(--c);box-shadow:none;animation:none}
+.istrip.inpanel .form{grid-template-columns:1fr 1fr;padding:10px 12px}
+.istrip.inpanel .form .f.w{grid-column:1/-1}
+.pcards{display:flex;flex-direction:column;gap:12px;padding:12px}
+.pcards>.istrip.inpanel{border:1px solid var(--line);border-left:5px solid var(--c)}
+.pcards>h2{margin:0;font:600 calc(14px * var(--fz))/1 var(--display);letter-spacing:.12em;text-transform:var(--tt);background:var(--banner);color:var(--banner-ink);padding:10px 12px}
+
+/* text sizes set in Properties: labels (names and headings on the chart) and dates */
+.aname,.nm{font-size:calc(13px * var(--fz) * var(--lz))}
+.gname,.nm.g{font-size:calc(14px * var(--fz) * var(--lz))}
+.gsub,.nm.sub{font-size:calc(11px * var(--fz) * var(--lz))}
+.cp{font-size:calc(12.5px * var(--fz) * var(--lz))}
+.km .lab{font-size:calc(11px * var(--fz) * var(--lz))}
+.lane-l{font-size:calc(12px * var(--fz) * var(--lz))}
+.dcol,.din,.blabel,.off{font-size:calc(11px * var(--fz) * var(--dz))}
+.chead .dcol{font-size:calc(12px * var(--fz) * var(--lz))}
+.km .lab small,.tline span{font-size:calc(10px * var(--fz) * var(--dz))}
+
+/* timeline resize: drag the year scale */
+.years,.quarters{cursor:ew-resize;touch-action:none;user-select:none}
+.years{position:relative}
+.tzoom{position:sticky;right:6px;margin-left:-26px;align-self:center;flex:none;width:20px;height:16px;border-radius:8px;background:var(--accent);color:#fff;font-size:11px;line-height:16px;text-align:center;pointer-events:none;opacity:.85}
+
+/* card pin */
+.mini.pinb svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:2;stroke-linejoin:round;stroke-linecap:round;vertical-align:-2px}
+.mini.pinb.on{color:var(--accent)}
+.mini.pinb.on svg{fill:currentColor}
+
+/* exporting: back to one sheet at full size */
+html:has(body.exporting),body.exporting{height:auto;overflow:visible}
+body.exporting .app{display:block;height:auto;padding:0}
+body.exporting .centre{display:block;padding:0}
+body.exporting .side,body.exporting .tools,body.exporting .app>.resizer,body.exporting .tourbar{display:none}
+body.exporting #capture{display:flex}
+body.exporting .stage{align-items:flex-start}
+body.exporting .chart{height:auto}
+body.exporting .hrow{position:static}
+body.exporting #xpanel{margin-left:14px}
+body.exporting .tzoom{display:none}
+
+/* help page */
+body.helpbody{overflow:auto}
+.help{max-width:900px;margin:0 auto;padding:24px 16px 48px;display:flex;flex-direction:column;gap:16px}
+.helphead h1{margin:0 0 6px;font:700 calc(28px * var(--fz))/1.1 var(--display)}
+.helphead p{margin:0;color:var(--muted)}
+.help .gstep h2,.help .rgroup h2{margin:0;font:700 calc(17px * var(--fz))/1.2 var(--display)}
+.help .rgroup:empty{display:none}
+
+@media (max-width:1000px){
+  .side.right{position:absolute;right:10px;top:10px;bottom:10px;height:auto;z-index:34;box-shadow:0 10px 30px -8px rgba(var(--shadow),.5);max-width:calc(100vw - 20px)}
+  .side.left{position:absolute;left:10px;top:10px;bottom:10px;height:auto;z-index:34;box-shadow:0 10px 30px -8px rgba(var(--shadow),.5);max-width:calc(100vw - 20px)}
+  .app{position:relative}
+  .app>.resizer{display:none}
+  .tools{left:0;transform:none}
+}
