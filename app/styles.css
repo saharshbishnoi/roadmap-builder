@@ -19,7 +19,7 @@
 @font-face{font-family:"Source Sans 3";font-weight:700;font-style:normal;font-display:swap;src:url(fonts/source-sans-3-latin-700-normal.woff2) format("woff2")}
 
 :root{
-  --lz:1; --dz:1;
+  --lz:1; --dz:1; --bz:1; --bfont:var(--display);
   /* Layout: app toolbar, then the release sheet (programme banner, a workstream tree with a month-scaled
      timeline, floating cards above it). A live editor docks on the left in edit mode; a resizable panel
      on the right holds cards, the guide and the requirements. */
@@ -537,3 +537,14 @@ body.helpbody{overflow:auto}
    under the name column, which stays put because it is pinned to the left edge. */
 body.exporting .chart.xwin{flex:none;overflow:hidden}
 body.exporting .chart.xwin .inner{margin-left:calc(-1 * var(--xoff));min-width:0}
+
+/* ===== Header: a slim bar with a short heading, a small tagline and the date chip on the right. Its size and font are set in Properties. ===== */
+.banner{padding:calc(7px * var(--bz)) 16px;gap:4px 20px;align-items:center;flex-wrap:nowrap}
+.btitle{min-width:0;display:flex;flex-direction:column;gap:calc(2px * var(--bz))}
+.banner h1{font:700 calc(21px * var(--bz))/1.12 var(--bfont);letter-spacing:.01em;text-wrap:nowrap;overflow:hidden;text-overflow:ellipsis}
+.banner .tag{font:500 calc(11.5px * var(--bz))/1.2 var(--bfont);letter-spacing:.06em;opacity:.78;text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.banner h1:focus,.banner .tag:focus{text-overflow:clip}
+.bside{flex:none;flex-direction:row;align-items:center;gap:6px}
+.todaychip{font-size:calc(11px * var(--fz));padding:2px 9px;white-space:nowrap}
+.pgrid input[type=number]{min-width:0;width:100%;background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:4px;padding:5px 6px}
+.side .tabs .tab{overflow:hidden;text-overflow:ellipsis}

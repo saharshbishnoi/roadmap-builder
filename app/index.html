@@ -69,15 +69,11 @@
       <header class="banner">
         <div class="btitle">
           <h1 id="title" spellcheck="false"></h1>
-          <p class="sub"><span id="subtitle"></span><span class="yrs eo">from <input type="number" id="r-startYear" data-road="startYear" min="1990" max="2100" aria-label="Start year"> for <input type="number" id="r-years" data-road="years" min="1" max="15" aria-label="Years shown, 1 to 15"> years</span></p>
+          <div class="tag" id="tagline" spellcheck="false"></div>
         </div>
         <div class="bside">
-          <div class="tag" id="tagline" spellcheck="false"></div>
-          <div class="todayrow">
-            <span class="bcol eo"><label for="r-banner">Banner <input type="color" id="r-banner" data-road="banner"></label><label for="r-bannerInk">Text <input type="color" id="r-bannerInk" data-road="bannerInk"></label><label for="r-today">Today line <input type="color" id="r-today" data-road="today"></label></span>
-            <span id="todayeye"></span>
-            <div class="todaychip" id="todaychip"></div>
-          </div>
+          <span id="todayeye"></span>
+          <div class="todaychip" id="todaychip"></div>
         </div>
       </header>
       <div class="stage" id="stage">
@@ -128,6 +124,26 @@
         <label class="pchk" for="t-showCards"><input type="checkbox" id="t-showCards" data-toggle="showCards"> Floating cards</label>
         <label class="pchk" for="t-roundCards"><input type="checkbox" id="t-roundCards" data-toggle="roundCards"> Rounded cards</label>
         <label class="pchk" for="t-float3d"><input type="checkbox" id="t-float3d" data-toggle="float3d"> 3D card effect</label>
+      </section>
+      <section class="psec">
+        <h3>Header</h3>
+        <div class="pgrid">
+          <label for="t-bannerScale">Size</label><select id="t-bannerScale" data-set="bannerScale"><option value="80">Compact</option><option value="100">Standard</option><option value="125">Large</option><option value="150">Extra large</option></select>
+          <label for="t-bannerFont">Font</label><select id="t-bannerFont" data-set="bannerFont"></select>
+          <label class="eo" for="r-banner">Colour</label><input class="eo" type="color" id="r-banner" data-road="banner">
+          <label class="eo" for="r-bannerInk">Text colour</label><input class="eo" type="color" id="r-bannerInk" data-road="bannerInk">
+          <label class="eo" for="r-panelTitle">Cards heading</label><input class="eo" type="text" id="r-panelTitle" data-road="panelTitle" placeholder="Cards">
+        </div>
+        <label class="pchk" for="t-showChip"><input type="checkbox" id="t-showChip" data-toggle="showChip"> Date chip on the right</label>
+        <label class="pchk" for="t-chipExport"><input type="checkbox" id="t-chipExport" data-toggle="chipExport"> Keep the date chip in exports</label>
+      </section>
+      <section class="psec eo">
+        <h3>Timeline</h3>
+        <div class="pgrid">
+          <label for="r-startYear">Start year</label><input type="number" id="r-startYear" data-road="startYear" min="1990" max="2100">
+          <label for="r-years">Years shown</label><input type="number" id="r-years" data-road="years" min="1" max="15">
+          <label for="r-today">Today line</label><input type="color" id="r-today" data-road="today">
+        </div>
       </section>
       <section class="psec eo">
         <h3>Roadmap</h3>

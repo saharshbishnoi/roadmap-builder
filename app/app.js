@@ -72,7 +72,7 @@ function sample(){
   acts[6].details="### Biscuit shortlist\n\n1. Custard cream\n2. Bourbon\n3. A digestive, if we must";
   const K=[["Kettle switched on",3,"#C8102E"],["First wombat sighted",22,"#7E57C2"],["Custard reaches elsewhere",37,"#F07C1F"],["Trombones tuned",50,"#D49B00"],["Pigeons home",67,"#12909A"],["Everyone has a nap",95,"#4A5568"]];
   const C=[["Kettle on",2,9,"#3BA3C4"],["Biscuits",10,16,"#2456A6"],["Sprockets",17,24,"#E0782A"],["Custard",25,30,"#5B3FA8"],["Honk",31,36,"#B5232F"],["Pigeons",37,43,"#2C7A3D"],["Nap time",44,95,"#4A5568"]];
-  return {version:3,title:"Project Wombat · Wibble Modernisation Programme",tagline:"Sillier together for a more biscuity tomorrow",startYear:Y,years:8,settings:{panelTitle:"Guiding principles"},
+  return {version:3,title:"Project Wombat",tagline:"Wibble Modernisation Programme",startYear:Y,years:8,settings:{panelTitle:"Guiding principles"},
     phases:P.map(p=>({id:p[0],name:p[1],sub:p[2],color:p[3]})),activities:acts,
     milestones:K.map((k,i)=>({id:"k"+(i+1),name:k[0],date:at(k[1]),color:k[2],line:true,hover:"",details:i===0?"The kettle is the **single point of failure** for the whole programme.":""})),
     critical:C.map((c,i)=>({id:"c"+(i+1),name:c[0],start:at(c[1]),end:end(c[2]),color:c[3],hover:"",details:""})),
@@ -97,7 +97,7 @@ function normalise(d){
     settings:{theme:["auto","light","dark"].indexOf(st.theme)>=0?st.theme:"auto",banner:hex(st.banner,"#14275A"),bannerInk:hex(st.bannerInk,"#FFFFFF"),accent:hex(st.accent,"#2F6FED"),today:hex(st.today,"#E11D48"),
       showToday:bool(st.showToday,true),showCritical:bool(st.showCritical,true),showLines:bool(st.showLines,true),colStart:bool(st.colStart,true),colEnd:bool(st.colEnd,true),barName:bool(st.barName,false),barStart:bool(st.barStart,bool(st.showLabels,true)),barEnd:bool(st.barEnd,bool(st.showLabels,true)),showCards:bool(st.showCards,true),showPanel:bool(st.showPanel,true),float3d:bool(st.float3d,true),roundCards:bool(st.roundCards,false),
       panelTitle:str(st.panelTitle)||"Notes",lblCritical:str(st.lblCritical)||LBL.lblCritical,lblMilestones:str(st.lblMilestones)||LBL.lblMilestones,lblActivity:str(st.lblActivity)||LBL.lblActivity,lblStart:str(st.lblStart)||LBL.lblStart,lblEnd:str(st.lblEnd)||LBL.lblEnd,panelW:int(st.panelW,240,720,340),nameW:int(st.nameW,150,800,0),fontHead:FONTS[st.fontHead]?st.fontHead:"barlow",fontBody:FONTS[st.fontBody]?st.fontBody:"barlow",
-      fontHeadCustom:fontName(st.fontHeadCustom),fontBodyCustom:fontName(st.fontBodyCustom),fontScale:[90,100,110,120].indexOf(+st.fontScale)>=0?+st.fontScale:100,labelScale:int(st.labelScale,80,130,100),dateScale:int(st.dateScale,80,130,100),upper:old?false:bool(st.upper,false)},
+      fontHeadCustom:fontName(st.fontHeadCustom),fontBodyCustom:fontName(st.fontBodyCustom),fontScale:[90,100,110,120].indexOf(+st.fontScale)>=0?+st.fontScale:100,labelScale:int(st.labelScale,80,130,100),bannerScale:int(st.bannerScale,60,200,100),bannerFont:FONTS[st.bannerFont]?st.bannerFont:"",showChip:bool(st.showChip,true),chipExport:bool(st.chipExport,true),dateScale:int(st.dateScale,80,130,100),upper:old?false:bool(st.upper,false)},
     phases:[],activities:[],milestones:[],critical:[],cards:[],panel:[]};
   const pmap={};
   arr(d.phases).forEach((p,i)=>{const id=nid(p.id);if(!(str(p.id) in pmap))pmap[str(p.id)]=id;o.phases.push({id:id,name:str(p.name)||"Workstream "+(i+1),sub:str(p.sub),color:hex(p.color,PALETTE[i%PALETTE.length]),collapsed:!!p.collapsed,hidden:!!p.hidden});});
@@ -151,7 +151,7 @@ function applyTheme(){
   if(t==="light"||t==="dark")r.setAttribute("data-theme",t);else if(hostTheme)r.setAttribute("data-theme",hostTheme);else r.removeAttribute("data-theme");
   const st=S.settings,stack=(k,c)=>(c?'"'+c+'",':"")+(FONTS[k]||FONTS.barlow)[1];
   r.style.setProperty("--display",stack(st.fontHead,st.fontHeadCustom));r.style.setProperty("--body",stack(st.fontBody,st.fontBodyCustom));
-  r.style.setProperty("--fz",String(st.fontScale/100));r.style.setProperty("--lz",String(st.labelScale/100));r.style.setProperty("--dz",String(st.dateScale/100));r.style.setProperty("--tt",st.upper?"uppercase":"none");
+  r.style.setProperty("--fz",String(st.fontScale/100));r.style.setProperty("--lz",String(st.labelScale/100));r.style.setProperty("--bz",String(st.bannerScale/100));r.style.setProperty("--bfont",st.bannerFont?FONTS[st.bannerFont][1]:stack(st.fontHead,st.fontHeadCustom));r.style.setProperty("--dz",String(st.dateScale/100));r.style.setProperty("--tt",st.upper?"uppercase":"none");
   r.style.setProperty("--banner",S.settings.banner);r.style.setProperty("--banner-ink",S.settings.bannerInk);r.style.setProperty("--accent",S.settings.accent);r.style.setProperty("--today",S.settings.today);
 }
 function spanGeom(o){const M=months(),ps=pos(o.start),pe=posEnd(o.end);if(pe<=0)return {off:"l"};if(ps>=M)return {off:"r"};const l=Math.max(0,ps)*mw,r=Math.min(M,pe)*mw;return {l:l,r:r,w:Math.max(4,r-l)};}
@@ -328,8 +328,9 @@ function render(soft){
   if(document.activeElement!==t)t.textContent=S.title;
   if(document.activeElement!==g)g.textContent=S.tagline;
   g.hidden=!edit&&!S.tagline;
-  $("#subtitle").textContent="Roadmap & schedule "+S.startYear+(S.years>1?" – "+(S.startYear+S.years-1):"");
-  $("#todaychip").textContent="Today "+fmtD(todayIso());$("#todaychip").classList.toggle("ghost",edit&&!st.showToday);
+  // The date chip sits on the right of the header. In an export it reads "As at", and can be left out altogether.
+  $("#todaychip").textContent=(exporting?"As at ":"Today ")+fmtD(todayIso());$("#todaychip").classList.toggle("ghost",edit&&!st.showToday);
+  $("#todaychip").hidden=!st.showChip||(exporting&&!st.chipExport);
   $("#todayeye").innerHTML=edit?eyeS("showToday","the today line"):"";
   $("#modeView").classList.toggle("on",!edit);$("#modeEdit").classList.toggle("on",edit);
   $("#modeView").setAttribute("aria-pressed",String(!edit));$("#modeEdit").setAttribute("aria-pressed",String(edit));
@@ -561,6 +562,7 @@ function renderPanel(soft){
   if(!st.showPanel||exporting)return;
   const tab=ui.panelTab==="cards"?"cards":"props";
   [["props","#tabProps"],["cards","#tabCards"]].forEach(t=>{const b=$("#pt-"+t[0]);b.classList.toggle("on",tab===t[0]);b.setAttribute("aria-selected",String(tab===t[0]));$(t[1]).hidden=tab!==t[0];});
+  $("#pt-cards").textContent=st.panelTitle||"Cards";
   const forCard=!!dock&&sel.kind==="n";
   setHtml($("#propsItem"),dock&&!forCard?stripHtml("inpanel"):'<h3>Selected item</h3><p class="phint">'+(edit?'Click a bar, milestone, stage or floating card, or the pencil on a row, to edit all of its settings here.':'Switch to Edit to change the roadmap. The settings below apply in both modes.')+'</p>',true);
   setHtml($("#tabCards"),(forCard?stripHtml("inpanel"):'')+'<h2'+ceA("s:panelTitle")+'>'+esc(st.panelTitle)+'</h2>'+cardsHtml(list,edit)+
@@ -879,7 +881,7 @@ document.addEventListener("contextmenu",e=>{
 /* ---------- events ---------- */
 function closeMenus(except){document.querySelectorAll(".menu").forEach(m=>{if(m!==except)m.hidden=true;});}
 function setMode(m){ui.mode=VIEWONLY?"view":m;saveUi();closeSheet();render();}
-(function(){const o=Object.keys(FONTS).map(k=>'<option value="'+k+'">'+FONTS[k][0]+(/^(barlow|barlowc|inter|plex|source)$/.test(k)?'':' (if installed)')+'</option>').join("");$("#t-fontHead").innerHTML=o;$("#t-fontBody").innerHTML=o;})();
+(function(){const o=Object.keys(FONTS).map(k=>'<option value="'+k+'">'+FONTS[k][0]+(/^(barlow|barlowc|inter|plex|source)$/.test(k)?'':' (if installed)')+'</option>').join("");$("#t-fontHead").innerHTML=o;$("#t-fontBody").innerHTML=o;$("#t-bannerFont").innerHTML='<option value="">Same as headings</option>'+o;})();
 const ACT={
   undo:undo,addPhase:()=>addThing("p"),addKm:()=>addThing("k"),addCp:()=>addThing("c"),addCard:()=>addThing("f"),addPanel:()=>addThing("n"),
   zin:()=>{ui.zoom="manual";mw=Math.min(60,mw*1.25);render();},zout:()=>{ui.zoom="manual";mw=Math.max(4,mw/1.25);render();},zfit:()=>{ui.zoom="fit";render();},

@@ -134,8 +134,13 @@ choose "Fit the timeline to this row" to scale and scroll the timeline so that r
 
 **Properties panel** (right): the selected item, Add (workstream, key milestone, critical path
 stage, floating card, panel card), Text (fonts, text size, and separate sizes for labels and for
-dates), Display (theme, floating cards, rounded cards, 3D effect) and, on its Cards tab, the panel
-cards. Drag its edge to resize it.
+dates), Display (theme, floating cards, rounded cards, 3D effect), Header (size and font of the
+heading, its colours, the name of the Cards tab, and the date chip), Timeline (start year, years
+shown, today line colour) and, on its Cards tab, the panel cards.
+
+**Header.** A slim bar with a short heading and a small tagline, both typed in place in Edit mode.
+The date chip sits on the right; it can be switched off, or kept on screen but left out of exports,
+where it reads "As at" the day of the export. Drag its edge to resize it.
 
 **JSON editor** (left, Edit mode): one line per activity and per card; change a name, a date or a
 card's text and the chart follows. Copy a line to add one, delete a line to remove one. Switch Show to Whole roadmap

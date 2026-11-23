@@ -540,3 +540,42 @@ test("Export > Standalone page, view only opens exactly as exported and cannot b
   expect((await copy.evaluate(look)).rows).toBe(before.rows);
   expect(problems).toEqual([]);
 });
+
+test("the header is a slim bar whose size and font are set in Properties, with a date chip that can be left out", async ({ page }) => {
+  await open(page);
+  await expect(page.locator("#subtitle")).toHaveCount(0);
+  await expect(page.locator(".banner")).not.toContainText("Roadmap & schedule");
+  const box = () => page.locator(".banner").boundingBox(), h1 = () => page.evaluate(() => parseFloat(getComputedStyle(document.querySelector("#title")).fontSize));
+  const slim = (await box()).height, size = await h1();
+  expect(slim).toBeLessThan(64);
+  await page.selectOption("#t-bannerScale", "150");
+  expect(await h1()).toBeCloseTo(size * 1.5, 0);
+  expect((await box()).height).toBeGreaterThan(slim);
+  await page.selectOption("#t-bannerFont", "inter");
+  await expect(page.locator("#title")).toHaveCSS("font-family", /Inter/);
+  // The chip is on the right, and can be switched off.
+  const chip = await page.locator("#todaychip").boundingBox(), bar = await box();
+  expect(chip.x + chip.width).toBeGreaterThan(bar.x + bar.width - 40);
+  await expect(page.locator("#todaychip")).toHaveText(/^Today \d{2} \w{3} \d{4}$/);
+  await page.uncheck("#t-showChip");
+  await expect(page.locator("#todaychip")).toBeHidden();
+  const s = await state(page);
+  expect([s.settings.bannerScale, s.settings.bannerFont, s.settings.showChip, s.settings.chipExport]).toEqual([150, "inter", false, true]);
+});
+
+test("the Cards heading is renamed in Properties, and the tab follows", async ({ page }) => {
+  await open(page, "edit");
+  await expect(page.locator("#pt-cards")).toHaveText("Guiding principles");
+  await page.fill("#r-panelTitle", "House rules");
+  await expect(page.locator("#pt-cards")).toHaveText("House rules");
+  await page.click("#pt-cards");
+  await expect(page.locator("#tabCards h2")).toHaveText("House rules");
+  expect((await state(page)).settings.panelTitle).toBe("House rules");
+});
+
+test("the timeline years are set in Properties", async ({ page }) => {
+  await open(page, "edit");
+  await page.fill("#r-years", "4");
+  await expect(page.locator(".year")).toHaveCount(4);
+  expect((await state(page)).years).toBe(4);
+});
