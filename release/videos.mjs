@@ -54,9 +54,15 @@ const CHAPTERS = [
     { say: "The card stays right where it is, so you can pick it up, and place it wherever you like.", do: async h => {
         const b = await h.box("#hover"); await h.dragTo({ x: b.x + 40, y: b.y + 14 }, { x: b.x + 300, y: b.y + 150 }); } },
     { say: "Click an item to see the full details.", do: async h => { await h.click("#b-a1", { fx: 0.3 }); await h.wait(1900); await h.click('[data-sheet="close"]'); } },
+    { say: "The schedule scrolls on its own, and its headings stay in place.", do: async h => { await h.glide(await h.pt("#r-a9 .track", 0.5)); await h.scroll("#chart", 420, 1400); await h.wait(700); await h.scroll("#chart", -420, 1200); } },
     { say: "As you move across the timeline, a faint line shows the date under your pointer. And the activity column resizes with a simple drag.", do: async h => {
         await h.sweep(await h.pt("#r-a8 .track", 0.1), await h.pt("#r-a8 .track", 0.72), 3000);
-        const p = await h.pt("#colrz"); await h.dragTo(p, { x: p.x + 100, y: p.y }); } }
+        const p = await h.pt("#colrz"); await h.dragTo(p, { x: p.x + 100, y: p.y }); } },
+    { say: "Drag the year scale to stretch the timeline. Or right-click a row, and fit the timeline to it.", do: async h => {
+        const y = await h.pt(".years", 0.35); await h.dragTo(y, { x: y.x + 150, y: y.y }, 1300); await h.wait(700);
+        const r = await h.pt("#r-a11 .aname"); await h.glide(r); await h.pulse(); await h.page.mouse.click(r.x, r.y, { button: "right" }); await h.wait(700);
+        await h.click("#ctx button:nth-of-type(2)"); } },
+    { say: "And Help opens in its own window, with every step written down.", do: async h => { await h.glide(await h.pt("#helpBtn")); await h.pulse(); } }
   ] },
   { id: "02-rows", kicker: "Edit mode", title: "Add and edit rows", panel: false, mode: "edit", scenes: [
     { say: "Editing happens right where you look." },
@@ -72,38 +78,49 @@ const CHAPTERS = [
     { say: "The chips above the table choose what appears beside each bar. And the eye icons hide anything you don't need.", do: async h => {
         await h.click("#ey-barName"); await h.wait(1500); await h.click("#ey-colEnd"); await h.wait(1300); await h.click("#ey-colEnd"); } }
   ] },
-  { id: "03-settings", kicker: "Edit mode", title: "Everything, on the item", panel: false, mode: "edit", scenes: [
-    { say: "Every setting lives on the item itself." },
-    { say: "Click a bar, and all of its settings open directly beneath it.", do: async h => { await h.click("#b-a2"); } },
+  { id: "03-settings", kicker: "Edit mode", title: "Properties", panel: true, mode: "edit", cols: false, scenes: [
+    { say: "Every setting has one home: the Properties panel." },
+    { say: "Click a bar, and all of its settings open in Properties, on the right.", do: async h => { await h.click("#b-a2"); await h.wait(500); } },
     { say: "Change a date, or the colour, and the chart follows as you type.", do: async h => {
         await h.click("#f-end", { fx: 0.3 }); await h.set("#f-end", "2028-10-31"); await h.wait(1100);
         await h.glide(await h.pt("#f-color")); await h.pulse(); await h.set("#f-color", "#f07c1f"); } },
     { say: "Write hover cards and dialogs in Markdown, with a live preview underneath.", do: async h => { await h.click("#f-hover"); await h.type("**Ready** by spring. Bring a spanner."); } },
+    { say: "Further down, set the size of labels, and of dates, separately.", do: async h => {
+        await h.click("#dx-done"); await h.glide(await h.pt("#t-labelScale")); await h.pulse(); await h.set("#t-labelScale", "120"); await h.wait(1200);
+        await h.glide(await h.pt("#t-dateScale")); await h.pulse(); await h.set("#t-dateScale", "90"); } },
+    { say: "The Properties button hides the panel when you want more room, and brings it back.", do: async h => { await h.click("#propBtn"); await h.wait(1300); await h.click("#propBtn"); } },
     { say: "Drag a bar to move it. Drag an edge to resize it. And Undo is always one click away.", do: async h => {
-        await h.click("#dx-done"); await h.wait(400);
-        const c = await h.pt("#b-a3"); await h.dragTo(c, { x: c.x + 90, y: c.y }); await h.wait(600);
-        const e = await h.pt("#b-a3", 0.985); await h.dragTo(e, { x: e.x + 70, y: e.y }); await h.wait(600);
+        const c = await h.pt("#b-a3"); await h.dragTo(c, { x: c.x + 60, y: c.y }); await h.wait(600);
+        const e = await h.pt("#b-a3", 0.97); await h.dragTo(e, { x: e.x + 50, y: e.y }); await h.wait(600);
         await h.click("#undo"); } }
   ] },
   { id: "04-cards", kicker: "Make it yours", title: "Cards and display", panel: true, mode: "edit", cols: false, scenes: [
     { say: "Now, make it yours." },
-    { say: "Floating cards sit over the chart. Drag them anywhere.", do: async h => { const p = await h.pt("#fc-f1 .md"); await h.dragTo(p, { x: p.x - 150, y: p.y + 70 }, 1400); } },
-    { say: "Edit a title in place, and open the pencil for everything else.", do: async h => {
-        await h.click("#ce-n-n1-title"); await h.key("Control+A"); await h.type("Tea, always"); await h.key("Enter");
-        await h.wait(400); await h.click("#pe-n1"); } },
-    { say: "Square or rounded corners. Light or dark. Your fonts, your colours. It's all in the Display bar.", do: async h => {
-        await h.click("#dx-done"); await h.top(); await h.click("#t-roundCards"); await h.wait(1100);
+    { say: "Floating cards sit over the chart. Drag them anywhere.", do: async h => { const p = await h.pt("#fc-f1 .md"); await h.dragTo(p, { x: p.x - 120, y: p.y + 60 }, 1400); } },
+    { say: "A pinned card belongs to its row. Hide the rows above it, switch to View, and it moves up with its row.", do: async h => {
+        await h.click("#eh-a3"); await h.click("#eh-a4"); await h.wait(500); await h.click("#modeView"); await h.wait(1600); await h.click("#modeEdit"); } },
+    { say: "Panel cards live on the Cards tab. Edit a title in place.", do: async h => {
+        await h.click("#pt-cards"); await h.click("#ce-n-n1-title"); await h.key("Control+A"); await h.type("Tea, always"); await h.key("Enter"); } },
+    { say: "Square or rounded corners. Light or dark. Your fonts. It's all in Properties.", do: async h => {
+        await h.click("#pt-props"); await h.click("#t-roundCards"); await h.wait(1100);
         await h.glide(await h.pt("#t-theme")); await h.pulse(); await h.set("#t-theme", h.theme === "dark" ? "light" : "dark"); await h.wait(1900);
         await h.pulse(); await h.set("#t-theme", "auto"); } }
   ] },
-  { id: "05-json", kicker: "For precise changes", title: "JSON and files", panel: true, panelW: 470, mode: "edit", cols: false, scenes: [
+  { id: "05-json", kicker: "For precise changes", title: "JSON and files", panel: false, mode: "edit", cols: false, scenes: [
     { say: "For fast, precise changes, there's a live JSON editor." },
-    { say: "Open the JSON tab. Every activity is one line, with its start, and its end.", do: async h => { await h.click("#pt-source"); } },
+    { say: "Open the JSON editor. It takes the left side, with every activity on one line.", do: async h => { await h.click("#jsonBtn"); await h.wait(500); } },
     { say: "Change a date, and the chart follows instantly.", do: async h => {
         await h.glide(await h.pt("#src", 0.6, 0.1)); await h.pulse();
         await h.page.evaluate(() => { const t = document.querySelector("#src"), i = t.value.indexOf("2028-08-31"); t.focus(); t.setSelectionRange(i, i + 10); });
         await h.wait(600); await h.type("2027-03-31", 110); } },
-    { say: "When you're ready, export a roadmap file, an image, or a PDF.", do: async h => { await h.click("#exBtn"); await h.wait(1900); await h.key("Escape"); } },
+    { say: "Lines are numbered. Break something, and the message names the line.", do: async h => {
+        await h.page.evaluate(() => { const t = document.querySelector("#src"), i = t.value.indexOf('"workstreams":[') + 14; t.focus(); t.setSelectionRange(i, i + 1); t.scrollTop = 0; });
+        await h.glide(await h.pt("#src", 0.3, 0.06)); await h.pulse(); await h.wait(400); await h.key("Delete"); await h.wait(900); await h.glide(await h.pt("#srcStatus", 0.3)); } },
+    { say: "Fix it, press Control S, and the text is laid out neatly again.", do: async h => { await h.type("[", 200); await h.wait(900); await h.key("Control+s"); } },
+    { say: "Cards are listed too. Retype a title, and the card updates.", do: async h => {
+        await h.page.evaluate(() => { const t = document.querySelector("#src"), i = t.value.indexOf('"title":"Wombat Wrangling"') + 9; t.focus(); t.setSelectionRange(i, i + 16); const line = t.value.slice(0, i).split("\n").length; t.scrollTop = Math.max(0, line * 17 - t.clientHeight / 2); t.scrollLeft = 0; });
+        await h.glide(await h.pt("#src", 0.5, 0.5)); await h.pulse(); await h.wait(500); await h.type("Wombat herding", 90); } },
+    { say: "When you're ready, export a roadmap file, a standalone page, an image of this view, or a PDF.", do: async h => { await h.click("#exBtn"); await h.wait(1900); await h.key("Escape"); } },
     { say: "Roadmap Builder. Plan it. See it. Share it.", do: async h => { await h.title("Roadmap Builder", "Plan it. See it. Share it.", ""); } }
   ] }
 ];
@@ -124,16 +141,30 @@ function helpers(page, theme, wait) {
       return b;
     },
     async pt(sel, fx = 0.5, fy = 0.5) {
-      let b = await h.box(sel);
-      if (b.y < 64 || b.y + b.height > H - 24) { await h.scrollBy(b.y + b.height / 2 - H / 2); b = await h.box(sel); }
+      await h.box(sel);
+      await h.reveal(sel);
+      const b = await h.box(sel);
       return { x: b.x + b.width * fx, y: b.y + b.height * fy };
     },
-    // Scrolling is stepped with timers so that it follows the stepped clock.
-    async scrollBy(dy, ms = 650) {
-      await page.evaluate(([dy, ms]) => { const y0 = scrollY, t0 = Date.now(), id = setInterval(() => { const t = Math.min(1, (Date.now() - t0) / ms), e = t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2; scrollTo(0, y0 + dy * e); if (t >= 1) clearInterval(id); }, 8); }, [dy, ms]);
-      await wait(ms + 120);
+    // Bring something into view by scrolling whatever it sits in: the schedule or a side panel. The page itself does
+    // not scroll. Scrolling is stepped with timers so that it follows the stepped clock.
+    async reveal(sel) {
+      const moved = await page.evaluate(([sel, ms]) => {
+        const el = document.querySelector(sel); if (!el || el.closest(".hrow,.tools,#ctx,#hover,#sheet,#toast,.menu")) return false;
+        let sc = el.parentElement; while (sc && !(sc.scrollHeight > sc.clientHeight + 2 && /(auto|scroll)/.test(getComputedStyle(sc).overflowY))) sc = sc.parentElement;
+        if (!sc) return false;
+        const r = el.getBoundingClientRect(), c = sc.getBoundingClientRect(), head = sc.id === "chart" ? sc.querySelector(".hrow").offsetHeight : 44;
+        if (r.top >= c.top + head + 4 && r.bottom <= c.bottom - 18) return false;
+        const dy = r.top + r.height / 2 - (c.top + head + (c.height - head) / 2), y0 = sc.scrollTop, t0 = Date.now();
+        const id = setInterval(() => { const t = Math.min(1, (Date.now() - t0) / ms), e = t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2; sc.scrollTop = y0 + dy * e; if (t >= 1) clearInterval(id); }, 8);
+        return true;
+      }, [sel, 650]);
+      if (moved) await wait(800);
     },
-    async top() { await h.scrollBy(-(await page.evaluate(() => scrollY)), 800); },
+    async scroll(sel, dy, ms = 900) {
+      await page.evaluate(([sel, dy, ms]) => { const sc = document.querySelector(sel), y0 = sc.scrollTop, t0 = Date.now(), id = setInterval(() => { const t = Math.min(1, (Date.now() - t0) / ms), e = t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2; sc.scrollTop = y0 + dy * e; if (t >= 1) clearInterval(id); }, 8); }, [sel, dy, ms]);
+      await wait(ms + 150);
+    },
     async glide(p, ms) {
       ms = ms || Math.min(950, 400 + Math.hypot(p.x - cur.x, p.y - cur.y) * 0.9);
       await setCur(p.x, p.y, ms); await wait(ms);
@@ -199,11 +230,11 @@ async function build(ch, theme) {
     await page.evaluate(cursor => { const t = document.createElement("div"); t.id = "gtitle"; t.innerHTML = "<small></small><h1></h1><p></p>"; document.body.appendChild(t);
       const c = document.createElement("div"); c.id = "gcur"; c.innerHTML = cursor; c.style.transform = "translate(" + innerWidth / 2 + "px," + innerHeight / 2 + "px)"; document.body.appendChild(c); }, CURSOR);
     // Set the stage behind the title card, in real time.
-    if (!ch.panel) await page.uncheck("#t-showPanel");
-    if (ch.panelW) await page.evaluate(w => { window.__roadmap.state.settings.panelW = w; }, ch.panelW);
+    if (!ch.panel) await page.click("#propBtn");
     await page.click(ch.mode === "edit" ? "#modeEdit" : "#modeView");
-    if (ch.cols === false) { await page.click("#ey-colStart"); await page.click("#ey-colEnd"); }
-    await page.evaluate(() => { document.querySelector("#stage").scrollIntoView(); window.scrollBy(0, -58); document.querySelector("#toast").hidden = true; });
+    // Clicked from inside the page: a real click would make the browser scroll the schedule sideways to "reach" a pinned heading.
+    if (ch.cols === false) await page.evaluate(() => { document.querySelector("#ey-colStart").click(); document.querySelector("#ey-colEnd").click(); });
+    await page.evaluate(() => { document.querySelector("#toast").hidden = true; const c = document.querySelector("#chart"); c.scrollLeft = 0; c.scrollTop = 0; });
     await page.mouse.move(W / 2, H / 2);
     await document_fonts(page);
     await page.waitForTimeout(900);

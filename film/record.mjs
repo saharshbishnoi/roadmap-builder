@@ -139,15 +139,14 @@ async function record(scene, stills) {
     await load("app/index.html");
     const win = await page.evaluate(() => { const w = document.getElementById("win"); return { x: w.offsetLeft, y: w.offsetTop }; });
 
-    // Set the stage before the first frame: mode, panel, columns, scroll position.
+    // Set the stage before the first frame: mode, panels, columns.
     await app().evaluate(s => {
-      const R = window.__roadmap, click = sel => document.querySelector(sel).click();
-      if (s.panelW) R.state.settings.panelW = s.panelW;
+      const click = sel => document.querySelector(sel).click();
+      if (s.props === false) click("#propBtn");
       click(s.mode === "edit" ? "#modeEdit" : "#modeView");
       if (s.columns === false) { click("#modeEdit"); click("#ey-colStart"); click("#ey-colEnd"); click(s.mode === "edit" ? "#modeEdit" : "#modeView"); }
       document.querySelector("#toast").hidden = true;
-      if (s.steps && s.id !== "04-cards" && s.id !== "06-share") { document.querySelector("#stage").scrollIntoView(); window.scrollBy(0, -58); }
-    }, { panelW: scene.panelW, mode: scene.mode, columns: scene.columns, steps: scene.steps.length > 0, id: scene.id });
+    }, { props: scene.props, mode: scene.mode, columns: scene.columns });
     await fonts();
 
     let n = 0, due = 0, cur = { x: W / 2, y: H * 0.55 };
@@ -169,24 +168,39 @@ async function record(scene, stills) {
     const f = {
       pause: hold,
       eval: (fn, ...args) => app().evaluate(fn, ...args),
-      async rect(sel) { return app().evaluate(sel => { const el = document.querySelector(sel); if (!el) return null; const r = el.getBoundingClientRect(); return r.width && r.height ? { x: r.x, y: r.y, w: r.width, h: r.height, vh: innerHeight, top: scrollY, pinned: !!el.closest(".tools,#ctx,#hover,#sheet,#toast,.menu") } : null; }, sel).catch(() => null); },
+      async rect(sel) { return app().evaluate(sel => { const el = document.querySelector(sel); if (!el) return null; const r = el.getBoundingClientRect(); return r.width && r.height ? { x: r.x, y: r.y, w: r.width, h: r.height, vh: innerHeight, top: scrollY, pinned: !!el.closest(".tools,#ctx,#hover,#sheet,#toast,.menu,.hrow,.banner") } : null; }, sel).catch(() => null); },
       // Find a thing on screen. If the page is redrawing, look again on the next frame; scroll it into view if needed.
       async at(sel, fx = 0.5, fy = 0.5) {
         for (let tries = 0; tries < 150; tries++) {
           const r = await f.rect(sel);
           if (!r) { await frame(); continue; }
-          // Things in the toolbar, menus and dialogs do not scroll with the page. Otherwise bring it into view, once;
-          // if the page cannot scroll any further, use it where it is.
-          if (!r.pinned && (r.y < 62 || r.y + r.h > r.vh - 24)) { await f.scrollBy(r.y + r.h / 2 - r.vh / 2); const again = await f.rect(sel); if (again && Math.abs(again.top - r.top) > 1) continue; if (again) return { x: win.x + again.x + again.w * fx, y: win.y + again.y + again.h * fy }; continue; }
+          if (!r.pinned && await f.reveal(sel)) continue;
           return { x: win.x + r.x + r.w * fx, y: win.y + r.y + r.h * fy };
         }
         throw new Error("Nothing on screen matches " + sel);
       },
-      async scrollBy(dy, ms = 650) {
-        await app().evaluate(([dy, ms]) => { const y0 = scrollY, t0 = Date.now(), id = setInterval(() => { const t = Math.min(1, (Date.now() - t0) / ms), e = t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2; scrollTo(0, y0 + dy * e); if (t >= 1) clearInterval(id); }, 8); }, [dy, ms]);
+      // Bring something into view by scrolling whatever it sits in (the schedule or a side panel; the page itself does
+      // not scroll). Returns false when it is already in view, or when its container cannot scroll any further.
+      async reveal(sel) {
+        const moved = await app().evaluate(([sel, ms]) => {
+          const el = document.querySelector(sel); if (!el || el.closest(".hrow")) return false;
+          let sc = el.parentElement; while (sc && !(sc.scrollHeight > sc.clientHeight + 2 && /(auto|scroll)/.test(getComputedStyle(sc).overflowY))) sc = sc.parentElement;
+          if (!sc) return false;
+          const r = el.getBoundingClientRect(), c = sc.getBoundingClientRect(), head = sc.id === "chart" ? sc.querySelector(".hrow").offsetHeight : 44;
+          if (r.top >= c.top + head + 4 && r.bottom <= c.bottom - 18) return false;
+          const y0 = sc.scrollTop, to = Math.max(0, Math.min(sc.scrollHeight - sc.clientHeight, y0 + r.top + r.height / 2 - (c.top + head + (c.height - head) / 2)));
+          if (Math.abs(to - y0) < 2) return false;
+          const t0 = Date.now(), id = setInterval(() => { const t = Math.min(1, (Date.now() - t0) / ms), e = t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2; sc.scrollTop = y0 + (to - y0) * e; if (t >= 1) clearInterval(id); }, 8);
+          return true;
+        }, [sel, 650]).catch(() => false);
+        if (moved) await hold(800);
+        return moved;
+      },
+      // Scroll the schedule or a panel by an amount, the way a wheel would.
+      async scroll(sel, dy, ms = 900) {
+        await app().evaluate(([sel, dy, ms]) => { const sc = document.querySelector(sel), y0 = sc.scrollTop, t0 = Date.now(), id = setInterval(() => { const t = Math.min(1, (Date.now() - t0) / ms), e = t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2; sc.scrollTop = y0 + dy * e; if (t >= 1) clearInterval(id); }, 8); }, [sel, dy, ms]);
         await hold(ms + 150);
       },
-      async top() { await f.scrollBy(-(await app().evaluate(() => scrollY)), 800); },
       async glide(p) {
         const ms = Math.round(Math.min(950, 380 + Math.hypot(p.x - cur.x, p.y - cur.y) * 0.75));
         await pointer(p.x, p.y, ms); await hold(ms); await page.mouse.move(p.x, p.y); cur = p; await hold(120);
