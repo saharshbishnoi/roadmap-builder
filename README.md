@@ -134,7 +134,8 @@ cards. Drag its edge to resize it.
 
 **JSON editor** (left, Edit mode): one line per activity and per card; change a name, a date or a
 card's text and the chart follows. Copy a line to add one, delete a line to remove one. Switch Show to Whole roadmap
-to edit the complete file.
+to edit the complete file. Lines are numbered and a mistake is reported with its line. Ctrl+S,
+the Format button, or leaving the editor applies the text and lays it out again, one item per line.
 
 ## Files in and out
 

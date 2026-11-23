@@ -468,3 +468,29 @@ test("the JSON editor lists floating cards and panel cards, and edits to them ap
   await expect(page.locator("#srcStatus")).toContainText("Not applied");
   await expect(page.locator("#srcStatus")).toContainText("nope");
 });
+
+test("the JSON editor numbers its lines, names the line of a mistake, and formats on save", async ({ page }) => {
+  await open(page, "edit");
+  await page.click("#jsonBtn");
+  const text = await page.inputValue("#src"), lines = text.split("\n").length;
+  await expect(page.locator("#srcNum div")).toHaveCount(lines);
+  await expect(page.locator("#srcNum div").last()).toHaveText(String(lines));
+  // Messy but valid: everything on fewer lines, with odd spacing. Saving lays it out again.
+  const messy = text.replace(/\n\s*\{"id":"a2"/, '   {"id":"a2"').replace('"name":"Paint the invisible fence"', '"name" :   "Paint it twice"');
+  await page.fill("#src", messy);
+  await expect(page.locator("#srcStatus")).toContainText("Valid");
+  await page.locator("#src").press("Control+s");
+  await expect(page.locator("#srcStatus")).toContainText("formatted");
+  const tidy = await page.inputValue("#src");
+  expect(tidy.split("\n").length).toBe(lines);
+  expect(tidy).toContain('      {"id":"a3","name":"Paint it twice"');
+  await expect(page.locator("#srcNum div")).toHaveCount(lines);
+  // A mistake is reported with its line, and that line is marked in the gutter.
+  const broken = tidy.split("\n"); broken[4] = broken[4].replace('"name":', '"name"');
+  await page.fill("#src", broken.join("\n"));
+  await expect(page.locator("#srcStatus")).toContainText("Not applied, line 5");
+  await expect(page.locator("#srcNum div.bad")).toHaveText("5");
+  // The Format button does nothing to text that is not valid.
+  await page.click("#srcFmt");
+  expect(await page.inputValue("#src")).toBe(broken.join("\n"));
+});

@@ -494,12 +494,30 @@ function fromCompact(d){
     return Object.assign({},was,{id:c.id||uid(),eyebrow:c.label!=null?String(c.label):(was.eyebrow||""),title:c.title||"Card",badge:c.badge!=null?String(c.badge):(was.badge||""),md:text(c,was)});});
   return normalise(n);
 }
+/* Line numbers beside the JSON, with the line of a mistake marked. */
+function srcNums(bad){
+  const ta=$("#src"),g=$("#srcNum");if(!ta||!g)return;
+  const n=ta.value.split("\n").length;let h="";for(let i=1;i<=n;i++)h+='<div'+(i===bad?' class="bad"':'')+'>'+i+'</div>';
+  g.innerHTML=h;g.scrollTop=ta.scrollTop;
+}
 function srcApply(){
-  const ta=$("#src"),stt=$("#srcStatus");if(!ta)return;
+  const ta=$("#src"),stt=$("#srcStatus");if(!ta)return false;
   try{const d=JSON.parse(ta.value);if(!d||typeof d!=="object"||Array.isArray(d))throw new Error("The top level must be an object in curly brackets.");
     let next;if(ui.srcScope==="all"){if(!Array.isArray(d.phases))throw new Error('The top level needs a "phases" list.');next=normalise(d);}else next=fromCompact(d);
-    live("src",()=>{S=next;});stt.textContent="Valid. Applied to the roadmap.";stt.classList.remove("bad");}
-  catch(e){stt.textContent="Not applied: "+e.message;stt.classList.add("bad");}
+    live("src",()=>{S=next;});stt.textContent="Valid. Applied to the roadmap.";stt.classList.remove("bad");srcNums(0);return true;}
+  catch(e){
+    // Where the JSON itself is broken, say which line.
+    let line=0;const at=/position (\d+)/.exec(e.message),lc=/line (\d+)/.exec(e.message);
+    if(lc)line=+lc[1];else if(at)line=ta.value.slice(0,+at[1]).split("\n").length;
+    stt.textContent="Not applied"+(line?", line "+line:"")+": "+e.message;stt.classList.add("bad");srcNums(line);return false;}
+}
+/* Saving (Ctrl+S, the Format button, or leaving the editor) applies the text and lays it out again, one item per line. */
+function srcFormat(){
+  const ta=$("#src"),stt=$("#srcStatus");if(!ta)return;clearTimeout(srcT);
+  if(!srcApply())return;
+  const line=ta.value.slice(0,ta.selectionStart).split("\n").length,top=ta.scrollTop,text=srcText();
+  if(text!==ta.value){ta.value=text;const start=text.split("\n").slice(0,line-1).join("\n").length+(line>1?1:0);if(document.activeElement===ta)ta.setSelectionRange(start,start);ta.scrollTop=top;}
+  srcNums(0);stt.textContent="Valid. Applied and formatted.";
 }
 function select(kind,id){sel=kind?{kind:kind,id:id}:null;if(kind){ui.panelTab=kind==="n"?"cards":"props";S.settings.showPanel=true;}liveKey="";saveUi();render();}
 function editItem(kind,id){select(kind,id);}
@@ -553,7 +571,7 @@ function renderJson(){
   $("#srcScope").value=ui.srcScope;
   $("#srcHelp").textContent=ui.srcScope==="all"?"Everything in the roadmap file. The chart follows as you type, whenever the text is valid."
     :'One line per activity and per card. Change a name or a date and the chart follows as you type. Copy a line to add one, delete a line to remove one, or move an activity line to another workstream. Leave "start" or "end" as "" for an open-ended bar. A line with "milestone" instead of "start" and "end" is a milestone. For cards, "text" is Markdown; a floating card with "row" is pinned to that row.';
-  if(document.activeElement.id!=="src")$("#src").value=srcText();
+  if(document.activeElement.id!=="src"){$("#src").value=srcText();srcNums(0);}
 }
 const FROM_FOLDER=location.protocol==="file:";
 /* The product film. It is published only with the hosted site (GitHub Pages), so everything about it stays hidden
@@ -860,7 +878,7 @@ const ACT={
   today:()=>{const p=pos(todayIso()),c=$("#chart");if(p<0||p>months()){toast("Today, "+fmtD(todayIso())+", is outside this timeline. Change the start year in the banner, in Edit mode.");return;}c.scrollLeft=Math.max(0,p*mw-(c.clientWidth-leftW())/2);},
   import:()=>$("#file").click(),exJson:()=>saveFile(slug()+".json",JSON.stringify(S,null,2)),exCsv:()=>saveFile(slug()+".csv",toCSV()),
   exHtml:exportHtml,exPngAll:()=>exportVisual("png",true),tour:openTour,tourHide:hideTour,
-  json:()=>{ui.json=!ui.json;saveUi();render();},props:()=>setView(()=>{S.settings.showPanel=!S.settings.showPanel;}),
+  json:()=>{ui.json=!ui.json;saveUi();render();},srcFormat:srcFormat,props:()=>setView(()=>{S.settings.showPanel=!S.settings.showPanel;}),
   help:()=>{const w=window.open("help.html","roadmap-help");if(!w)toast("The browser blocked the Help window. Allow pop-ups for this page, or open help.html yourself.");},exPng:()=>exportVisual("png"),exPdfA3:()=>exportVisual("pdfA3",true),exPdf:()=>exportVisual("pdf",true),deselect:()=>select(null),
   clear:()=>{mutate(()=>{S.activities=[];S.milestones=[];S.critical=[];S.cards=[];S.panel=[];});toast("Cleared all content",true);},
   sample:()=>{mutate(()=>{S=normalise(sample());});toast("Loaded the sample roadmap",true);}
@@ -934,7 +952,7 @@ document.addEventListener("change",e=>{
     if(v!==a[k])mutate(()=>{if(a.type==="milestone")a.start=a.end=v;else if(k==="start"){a.start=v;if(v&&a.end&&a.end<v)a.end=mEndOf(v);}else{a.end=v;if(v&&a.start&&v<a.start)a.start=iso(pd(v).y,pd(v).m,1);}},true);
     return;}
   if(t.dataset.addnm||t.dataset.addws){addRow(t);return;}
-  if(t.id==="src"){clearTimeout(srcT);srcApply();return;}
+  if(t.id==="src"){srcFormat();return;}
   if(t.id==="srcScope"){ui.srcScope=t.value==="all"?"all":"dates";saveUi();$("#src").blur();renderJson();return;}
   if(t.dataset.toggle){const k=t.dataset.toggle;setView(()=>{S.settings[k]=t.checked;});return;}
   if(t.dataset.set){const k=t.dataset.set;setView(()=>{S.settings[k]=/Scale$/.test(k)?+t.value:t.value;});return;}
@@ -942,7 +960,7 @@ document.addEventListener("change",e=>{
 });
 function dockInput(e){
   const t=e.target;
-  if(t.id==="src"){clearTimeout(srcT);srcT=setTimeout(srcApply,350);return;}
+  if(t.id==="src"){srcNums(0);clearTimeout(srcT);srcT=setTimeout(srcApply,350);return;}
   if(!t.dataset||!t.dataset.f)return;
   if(t.dataset.prev){const p=document.getElementById(t.dataset.prev);if(p)p.innerHTML=md(t.value)||'<span class="muted">Preview appears here.</span>';}
   if(t.type==="color"){const on=document.getElementById(t.id+"-on");if(on)on.checked=true;}
@@ -980,7 +998,9 @@ function resizer(el,get,set,dir,def){
 }
 resizer($("#rzPanel"),()=>S.settings.panelW,(w,done)=>{S.settings.panelW=Math.min(720,Math.max(240,Math.round(w)));$("#work").style.setProperty("--panelw",S.settings.panelW+"px");if(done)save();},-1,340);
 resizer($("#rzJson"),()=>ui.jsonW,(w,done)=>{ui.jsonW=Math.min(900,Math.max(280,Math.round(w)));$("#work").style.setProperty("--jsonw",ui.jsonW+"px");if(done)saveUi();},1,440);
+$("#src").addEventListener("scroll",()=>{$("#srcNum").scrollTop=$("#src").scrollTop;});
 document.addEventListener("keydown",e=>{
+  if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==="s"&&e.target.id==="src"){e.preventDefault();srcFormat();return;}
   if(e.key==="Escape"){if(!$("#sheet").hidden)closeSheet();else if(sel){sel=null;render();}closeMenus();return;}
   if(e.key==="Enter"&&e.target.matches&&e.target.matches(".nm.add")){e.preventDefault();addRow(e.target);return;}
   if(e.key==="Enter"&&e.target.matches&&e.target.matches(".nm,[data-ce]")){e.preventDefault();e.target.blur();return;}

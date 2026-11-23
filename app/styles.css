@@ -455,7 +455,11 @@ html:has(body.rb),body.rb{height:100%;overflow:hidden}
 .side.left{width:var(--jsonw,440px);display:flex;flex-direction:column;gap:8px;padding:0 12px 10px}
 .side .tabs{position:sticky;top:0;z-index:3}
 .shead{display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:var(--surface);padding:10px 0 6px;font:700 calc(13px * var(--fz))/1.2 var(--display);letter-spacing:.06em;text-transform:var(--tt)}
-.side.left #src{flex:1;min-height:200px;resize:none}
+.srcwrap{flex:1;min-height:200px;display:flex;border:1px solid var(--line);border-radius:4px;overflow:hidden;background:var(--surface)}
+.srcwrap:focus-within{border-color:var(--accent)}
+.srcnum{flex:none;min-width:40px;padding:8px 8px 8px 6px;text-align:right;color:var(--muted);background:var(--paper);border-right:1px solid var(--line);font:calc(12px * var(--fz))/1.45 ui-monospace,Consolas,monospace;overflow:hidden;user-select:none}
+.srcnum .bad{background:var(--today);color:#fff;margin:0 -8px 0 -6px;padding:0 8px 0 6px}
+.side.left #src{flex:1;min-width:0;min-height:0;height:auto;width:auto;border:0;border-radius:0;resize:none;outline:none}
 .side.left .status{margin:0}
 .phint{margin:0;color:var(--muted);font-size:calc(12px * var(--fz))}
 .pbody{padding:0 0 16px}

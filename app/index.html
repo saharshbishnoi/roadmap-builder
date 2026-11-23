@@ -15,9 +15,9 @@
 
   <aside class="side left" id="jsonPanel" aria-label="JSON live editor" hidden>
     <div class="shead"><b>JSON live editor</b><button type="button" class="mini" data-act="json" aria-label="Close the JSON editor">×</button></div>
-    <div class="srcbar"><label for="srcScope">Show</label><select id="srcScope"><option value="dates">Activities, dates and cards</option><option value="all">Whole roadmap</option></select></div>
+    <div class="srcbar"><label for="srcScope">Show</label><select id="srcScope"><option value="dates">Activities, dates and cards</option><option value="all">Whole roadmap</option></select><span class="spacer"></span><button type="button" class="btn sm" id="srcFmt" data-act="srcFormat" title="Apply the text and lay it out again, one item per line. Ctrl+S does the same.">Format</button></div>
     <p class="phint" id="srcHelp"></p>
-    <textarea id="src" spellcheck="false" aria-label="Roadmap JSON"></textarea>
+    <div class="srcwrap"><div class="srcnum" id="srcNum" aria-hidden="true"></div><textarea id="src" spellcheck="false" wrap="off" aria-label="Roadmap JSON"></textarea></div>
     <p class="status" id="srcStatus">In step with the roadmap.</p>
   </aside>
   <div class="resizer" id="rzJson" role="separator" aria-orientation="vertical" aria-label="Resize the JSON editor" tabindex="0" hidden></div>
