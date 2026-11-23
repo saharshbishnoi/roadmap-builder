@@ -203,6 +203,7 @@ publish-pages.sh     builds the site and pushes it to the gh-pages branch for Gi
 package-release.sh   gathers the zip, guide videos, film and notes for a release into dist/
 film/                the product film: scenes, recorder and its own container (see film/README.md)
 release/             tests, the video builder and the narration script, used only by a release build
+quality/             the quality report: vulnerabilities, static analysis and test coverage (see quality/README.md)
 app/vendor/          marked, DOMPurify, html-to-image, jsPDF: fetched by the build (see THIRD-PARTY.txt)
 assets/              the list of libraries and fonts the build fetches
 app/fonts/           sans-serif fonts (SIL Open Font License): fetched by the build

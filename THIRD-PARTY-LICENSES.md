@@ -117,6 +117,22 @@ recordings to be used and shared, commercially included.
 
 The videos are encoded as H.264 with AAC sound.
 
+### Quality report (`quality/`)
+
+| Tool | Version | Licence |
+|---|---|---|
+| [Grype](https://github.com/anchore/grype) and [Syft](https://github.com/anchore/syft) | 0.122.1, 1.57.2 | Apache-2.0 |
+| [ESLint](https://eslint.org/), `@eslint/js`, `globals` | 10.15.0, 10.0.1, 17.14.0 | MIT |
+| [Stylelint](https://stylelint.io/) and its recommended rules | 18.1.0, 19.1.0 | MIT |
+| [html-validate](https://html-validate.org/) | 11.21.1 | MIT |
+| [monocart-coverage-reports](https://github.com/cenfun/monocart-coverage-reports) | 3.2.1 | MIT |
+| [ShellCheck](https://www.shellcheck.net/) | 0.11.0 | GPL-3.0 |
+| [Hadolint](https://github.com/hadolint/hadolint) | 2.15.1 | GPL-3.0 |
+| [Ruff](https://docs.astral.sh/ruff/) | 0.17.6 | MIT |
+
+These run inside the quality build and only read the code; none is copied into the app or a release file.
+The report they produce is attached to a release as its own zip.
+
 ### Desktop scaffold (`desktop/`, not built or released)
 
 [Tauri](https://tauri.app) 2 (MIT or Apache-2.0) and the Rust crates it brings in. Nothing from it is in

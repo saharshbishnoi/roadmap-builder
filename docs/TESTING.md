@@ -135,7 +135,7 @@ Further reading: [writing tests](https://playwright.dev/docs/writing-tests),
 - Tools that would help but are **not set up here**: the
   [trace viewer](https://playwright.dev/docs/trace-viewer), screenshots and video on failure
   ([options](https://playwright.dev/docs/test-use-options#recording-options)), and the
-  [HTML report](https://playwright.dev/docs/test-reporters#html-reporter). See section 8.
+  [HTML report](https://playwright.dev/docs/test-reporters#html-reporter). See section 9.
 
 ## 7. Automation beyond the tests
 
@@ -150,7 +150,13 @@ Further reading: [writing tests](https://playwright.dev/docs/writing-tests),
 - **Hooks for scripts**: `window.__roadmap.state`, `.importText(name, text)` and `.toCSV()`; see
   `docs/DEVELOPMENT.md`.
 
-## 8. What is not tested, and improvements worth making
+## 8. The quality report
+
+`./quality/run.sh` makes `dist/quality/index.html`: known vulnerabilities and an inventory of what is
+packaged, static analysis, and how much of the app the browser tests run, gathered into one page of
+figures. It reports only and never fails a build. See `quality/README.md`.
+
+## 9. What is not tested, and improvements worth making
 
 Known gaps, for review:
 

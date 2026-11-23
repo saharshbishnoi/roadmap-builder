@@ -1,0 +1,17 @@
+# What quality/Dockerfile may see. Unlike the main build it reads the shell scripts and the workflow too.
+.git
+**/node_modules
+dist
+docs
+release/test-results
+app/guide
+app/vendor/*.js
+app/fonts/*.woff2
+app/icon-*.png
+app/standalone-template.js
+film/out
+film/cache
+desktop/out
+desktop/src-tauri/target
+desktop/src-tauri/gen
+desktop/src-tauri/icons

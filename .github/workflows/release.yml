@@ -1,5 +1,6 @@
 # On every version tag (v*): run the release build in Docker (all tests, guide videos, site, zip), record the
 # product film, and create the GitHub Release with the app zip, the 4K film and the rest of the package attached.
+# A quality report (quality/) is made and attached too; it reports only and cannot stop a release.
 # The Pages site is NOT published from here: it is pushed to the gh-pages branch with ./publish-pages.sh, so
 # publishing stays a deliberate step.
 name: Release
@@ -29,6 +30,13 @@ jobs:
         run: FILM_UID=$(id -u) FILM_GID=$(id -g) docker compose -f film/compose.yml run --rm film
       - name: Gather the release package
         run: ./package-release.sh "${{ github.ref_name }}"
+      # Report only: a finding, or a failure of the report itself, never stops the release.
+      - name: Quality report (vulnerabilities, static analysis, coverage)
+        continue-on-error: true
+        run: |
+          ./quality/run.sh "${{ github.ref_name }}"
+          cd dist && cp -r quality roadmap-builder-quality-report && zip -q -r "release-${{ github.ref_name }}/roadmap-builder-quality-report.zip" roadmap-builder-quality-report
+          cd "release-${{ github.ref_name }}" && sha256sum roadmap-builder-quality-report.zip >> SHA256SUMS.txt
       - name: Keep the package for the release job
         uses: actions/upload-artifact@v4
         with:
@@ -58,5 +66,6 @@ jobs:
           cd package
           ls -la
           files="roadmap-builder.zip roadmap-builder-film-4k.mp4 roadmap-builder-film-1080p.mp4 roadmap-builder-film.srt roadmap-builder-film-chapters.txt roadmap-builder-guide-videos.zip SHA256SUMS.txt"
+          if [ -f roadmap-builder-quality-report.zip ]; then files="$files roadmap-builder-quality-report.zip"; fi
           if [ -f RELEASE-NOTES.md ]; then notes="--notes-file RELEASE-NOTES.md"; else notes="--generate-notes"; fi
           gh release create "$TAG" $files --title "$TAG" $notes --verify-tag || gh release upload "$TAG" $files --clobber
