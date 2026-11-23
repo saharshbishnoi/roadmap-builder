@@ -11,3 +11,8 @@ film/out/*
 !film/out/.gitkeep
 film/cache/*
 !film/cache/.gitkeep
+desktop/out/*
+!desktop/out/.gitkeep
+desktop/src-tauri/target/
+desktop/src-tauri/gen/
+desktop/src-tauri/icons/

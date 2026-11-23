@@ -529,13 +529,13 @@ function renderPanel(soft){
         :'One line per activity. Change a name or a date and the chart follows as you type. Copy a line to add an activity, delete a line to remove one, or move a line to another workstream. Leave "start" or "end" as "" for an open-ended bar. A line with "milestone" instead of "start" and "end" is a milestone.')+'</p>'+
       '<textarea id="src" spellcheck="false" aria-label="Roadmap JSON"></textarea><p class="status" id="srcStatus">In step with the roadmap.</p></div>';
   }else if(tab==="guide"){
-    h+='<p class="gintro">'+(EMBED?'The steps for each part of the app.':'Five short narrated videos with subtitles, each followed by the steps to follow. Select Enlarge to watch one at full size.')+'</p>';
+    h+='<p class="gintro">'+(EMBED||(DESKTOP&&!hasVideos)?'The steps for each part of the app.':'Five short narrated videos with subtitles, each followed by the steps to follow. Select Enlarge to watch one at full size.')+'</p>';
     (window.GUIDE||[]).forEach((g,i)=>{h+='<section class="gstep"><h3>'+(i+1)+'. '+esc(g.title)+'</h3>'+guideVideo(g,"v-"+g.id,false)+
       (hasVideos?'<div class="gact"><span>Narrated, with subtitles, in 4K</span><button type="button" class="btn" data-enlarge="'+i+'">Enlarge</button></div>':'')+'<ol>'+g.steps.map(x=>'<li>'+esc(x)+'</li>').join("")+'</ol></section>';});
   }else{
     h+='<p class="gintro">What this app does, and where to find each thing.</p>';
     (window.REQS||[]).forEach(g=>{h+='<section class="rgroup"><h3>'+esc(g.group)+'</h3><ul>'+g.items.map(r=>'<li><span class="tick" aria-label="Included">✓</span><span>'+esc(r[0])+'<small>'+esc(r[1])+'</small></span></li>').join("")+'</ul></section>';});
-    if(window.DOWNLOAD_URL&&!EMBED)h+='<section class="rgroup"><h3>Take it with you</h3><ul><li><span class="tick info" aria-hidden="true">i</span><span>Install it: use Install in the address bar of Chrome or Edge to run it in its own window, offline<small>Available when the app is opened from a web address</small></span></li>'+
+    if(window.DOWNLOAD_URL&&!EMBED&&!DESKTOP)h+='<section class="rgroup"><h3>Take it with you</h3><ul><li><span class="tick info" aria-hidden="true">i</span><span>Install it: use Install in the address bar of Chrome or Edge to run it in its own window, offline<small>Available when the app is opened from a web address</small></span></li>'+
       '<li><span class="tick info" aria-hidden="true">i</span><span><a href="'+esc(window.DOWNLOAD_URL)+'" target="_blank" rel="noopener noreferrer">Download the offline copy (.zip)</a><small>The whole app with its guide videos. Unzip it and open index.html</small></span></li></ul></section>';
     h+='<section class="rgroup"><h3>To run it</h3><ul>'+(window.RUNREQS||[]).map(r=>'<li><span class="tick info" aria-hidden="true">i</span><span>'+esc(r[0])+'<small>'+esc(r[1])+'</small></span></li>').join("")+'</ul></section>';
   }
@@ -571,7 +571,7 @@ function keepGuide(){
 }
 const guideVideo=(g,id,auto)=>{const f=g.clip+(isDark()?"-dark":"-light");
   return hasVideos?'<video id="'+id+'" controls playsinline preload="none"'+(auto?' autoplay':'')+' poster="'+f+'.jpg" aria-label="Video: '+esc(g.title)+'"><source src="'+f+'.mp4" type="video/mp4">'+(FROM_FOLDER?'':'<track kind="subtitles" srclang="en" label="English" src="'+g.clip+'.vtt" default>')+'</video>'
-    :EMBED?'':'<p class="novid">The video for this step is made by a release build: <code>RELEASE=1 docker compose up -d --build</code></p>';};
+    :EMBED||DESKTOP?'':'<p class="novid">The video for this step is made by a release build: <code>RELEASE=1 docker compose up -d --build</code></p>';};
 /* The product film. It is published only with the hosted site (GitHub Pages), so everything about it stays hidden
    unless its poster picture is found next to the app. */
 const FILM="film/roadmap-builder-film";
@@ -619,7 +619,16 @@ function addThing(kind,at,y){
 /* ---------- files ---------- */
 const hasHost=!!(window.claude&&typeof window.claude.use==="function");
 const dlP=hasHost?Promise.resolve().then(()=>window.claude.use("downloads")).catch(()=>null):Promise.resolve(null);
+/* In the desktop app (Tauri) exports go through a native Save dialog. */
+const DESKTOP=!!(window.__TAURI__&&window.__TAURI__.dialog&&window.__TAURI__.fs);
 async function saveFile(name,data){
+  if(DESKTOP){
+    try{const where=await window.__TAURI__.dialog.save({defaultPath:name,title:"Save "+name});if(!where)return;
+      const bytes=typeof data==="string"?new TextEncoder().encode(data):new Uint8Array(await data.arrayBuffer());
+      await window.__TAURI__.fs.writeFile(where,bytes);toast("Saved "+String(where).split(/[\\/]/).pop());}
+    catch(e){toast("Could not save "+name+". "+(e&&e.message?e.message:String(e)));}
+    return;
+  }
   if(hasHost){
     const d=await Promise.race([dlP,new Promise(r=>setTimeout(()=>r(null),4000))]);
     if(d){try{await d.save({filename:name,data:data});toast("Saved "+name);}catch(e){if(e&&e.code==="declined")return;toast(e&&e.code==="rate_limited"?"A save prompt is already open. Answer it, then try again.":"Could not save "+name+" in this view.");}return;}
