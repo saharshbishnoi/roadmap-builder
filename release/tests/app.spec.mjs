@@ -287,9 +287,9 @@ test("Guide opens a large dialog at the top, with the steps for every chapter an
   await expect(g.locator(".gstep")).toHaveCount(5);
   await expect(g.locator(".gstep ol li").first()).toBeVisible();
   await expect(g.locator("#helpTake")).toContainText("Download the offline copy");
-  const box = await g.boundingBox();
-  expect(box.y).toBeLessThan(30);                       // at the top of the window
-  expect(box.width).toBeGreaterThan(1000);              // and big
+  // The dialog pops in with a short animation, so wait for it to come to rest before measuring.
+  await expect.poll(async () => (await g.boundingBox()).y).toBeLessThan(30);        // at the top of the window
+  await expect.poll(async () => (await g.boundingBox()).width).toBeGreaterThan(1000); // and big
   // The videos are rendered later in the release build; where they exist each chapter has one, in the app's theme.
   const has = await g.locator(".gstep video").count();
   if (has) {
