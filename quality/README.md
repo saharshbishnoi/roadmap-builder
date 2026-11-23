@@ -72,6 +72,9 @@ report cannot stop the release.
 - Coverage says which code the tests ran, not whether the checks are good.
 - A listed vulnerability means an advisory matches a package and version. Whether the app uses the affected
   part has not been assessed.
+- The shipped group is read from the lock file, so it includes packages that a library lists but the app
+  never serves (for example an older DOMPurify that jsPDF names as optional). Check a finding against
+  `app/vendor` before acting on it.
 - The vulnerability figures are as of the database date and change without any change to the code.
 - `release/package.json` has no lock file, so the test runner's packages are not in the scan.
 - The linters use recommended rules only; they do not judge how the roadmap behaves.

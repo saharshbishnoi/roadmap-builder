@@ -8,8 +8,8 @@ import path from "node:path";
 
 const [REPORT = "/report", SITE = "/site", SRC = "/src"] = process.argv.slice(2);
 const VERSION = process.env.VERSION || "working copy", SCAN_DATE = process.env.SCAN_DATE || "unset";
-const read = f => { try { return fs.readFileSync(path.join(REPORT, f), "utf8"); } catch (e) { return null; } };
-const json = f => { const t = read(f); if (t == null) return null; try { return JSON.parse(t); } catch (e) { return null; } };
+const read = f => { try { return fs.readFileSync(path.join(REPORT, f), "utf8"); } catch { return null; } };
+const json = f => { const t = read(f); if (t == null) return null; try { return JSON.parse(t); } catch { return null; } };
 const esc = s => String(s == null ? "" : s).replace(/[&<>"]/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" }[c]));
 const rel = p => String(p || "").replace(/^\/src\//, "").replace(/^\.\//, "");
 const SEV = ["Critical", "High", "Medium", "Low", "Negligible", "Unknown"];
@@ -72,11 +72,11 @@ for (const [key] of GROUPS) {
 }
 
 /* ---------- size ---------- */
-const size = f => { try { return fs.statSync(f).size; } catch (e) { return null; } };
-const lines = f => { try { return fs.readFileSync(f, "utf8").split("\n").length; } catch (e) { return null; } };
+const size = f => { try { return fs.statSync(f).size; } catch { return null; } };
+const lines = f => { try { return fs.readFileSync(f, "utf8").split("\n").length; } catch { return null; } };
 const sizes = {
   appJs: { bytes: size(SITE + "/app.js"), lines: lines(SITE + "/app.js") }, stylesCss: { bytes: size(SITE + "/styles.css"), lines: lines(SITE + "/styles.css") }, indexHtml: { bytes: size(SITE + "/index.html"), lines: lines(SITE + "/index.html") },
-  vendorBytes: (() => { try { return fs.readdirSync(SITE + "/vendor").filter(f => f.endsWith(".js")).reduce((a, f) => a + size(SITE + "/vendor/" + f), 0); } catch (e) { return null; } })(),
+  vendorBytes: (() => { try { return fs.readdirSync(SITE + "/vendor").filter(f => f.endsWith(".js")).reduce((a, f) => a + size(SITE + "/vendor/" + f), 0); } catch { return null; } })(),
   standaloneTemplateBytes: size(SITE + "/standalone-template.js"), testLines: lines(SRC + "/release/tests/app.spec.mjs")
 };
 
@@ -89,6 +89,7 @@ TOOLS.filter(t => toolState[t] !== "ran").forEach(t => notes.push(t + ": " + too
 if (!tests) notes.push("The test results are not available."); if (!coverage) notes.push("The coverage results are not available.");
 notes.push("Coverage is of the code the 38 browser tests run in Chromium. It says what was exercised, not whether the checks are good.");
 notes.push("The vulnerability figures are as of the database date; they change without any change to the code.");
+notes.push("The shipped group is read from the lock file, so it includes packages that a library lists but the app never serves (for example an older DOMPurify that jsPDF names as optional). Check a finding against app/vendor before acting on it.");
 notes.push("A listed vulnerability means a known advisory matches a package and version. Whether the app uses the affected part has not been assessed.");
 
 /* ---------- the figures ---------- */
