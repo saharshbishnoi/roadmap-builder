@@ -16,3 +16,4 @@ film/cache
 publish-pages.sh
 desktop/out
 desktop/src-tauri/target
+package-release.sh

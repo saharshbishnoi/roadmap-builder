@@ -65,6 +65,11 @@ whole app with its guide videos, to the GitHub Release. Unzip it and open `index
 needed. The newest one is always at
 `https://github.com/saharshbishnoi/roadmap-builder/releases/latest/download/roadmap-builder.zip`.
 
+**A release package** for uploading to a release by hand is gathered by `./package-release.sh v1.3.0`
+into `dist/release-v1.3.0/`: the zip, the guide videos on their own, the product film (4K and 1080p),
+its subtitles and chapter list, checksums, and the notes from `docs/releases/`. `BUILD=1` runs the
+release build first and `FILM=1` re-records the film.
+
 To make the same site folder and zip on your own machine without publishing:
 
 ```
@@ -178,6 +183,7 @@ app/guide/           guide videos, subtitles and posters: made by a release buil
 docs/                requirements, ideas, planned editions and the design language
 .github/workflows/   the pipeline that tests a tagged release and attaches the zip to it
 publish-pages.sh     builds the site and pushes it to the gh-pages branch for GitHub Pages
+package-release.sh   gathers the zip, guide videos, film and notes for a release into dist/
 film/                the product film: scenes, recorder and its own container (see film/README.md)
 release/             tests, the video builder and the narration script, used only by a release build
 app/vendor/          marked, DOMPurify, html-to-image, jsPDF: fetched by the build (see THIRD-PARTY.txt)
