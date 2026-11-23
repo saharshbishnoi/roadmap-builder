@@ -465,7 +465,10 @@ function srcText(){
   const ws=S.phases.map(p=>'    {"id":'+L(p.id)+',"name":'+L(p.name)+',"activities":[\n'+
     S.activities.filter(a=>a.phase===p.id).map(a=>'      '+L(a.type==="milestone"?{id:a.id,name:a.name,milestone:a.start}:{id:a.id,name:a.name,start:a.start,end:a.end})).join(",\n")+'\n    ]}').join(",\n");
   return '{\n  "workstreams":[\n'+ws+'\n  ],\n  "keyMilestones":[\n'+rows(S.milestones,m=>({id:m.id,name:m.name,date:m.date}))+
-    '\n  ],\n  "criticalPath":[\n'+rows(S.critical,c=>({id:c.id,name:c.name,start:c.start,end:c.end}))+'\n  ]\n}';
+    '\n  ],\n  "criticalPath":[\n'+rows(S.critical,c=>({id:c.id,name:c.name,start:c.start,end:c.end}))+
+    // Cards: a floating card sits at a date, and at a row if it is pinned; a panel card is on the Cards tab. "text" is Markdown.
+    '\n  ],\n  "floatingCards":[\n'+rows(S.cards,c=>Object.assign({id:c.id,title:c.title,badge:c.badge,date:c.date},c.pin?{row:c.row}:{},{text:c.md}))+
+    '\n  ],\n  "panelCards":[\n'+rows(S.panel,c=>({id:c.id,label:c.eyebrow,title:c.title,badge:c.badge,text:c.md}))+'\n  ]\n}';
 }
 function fromCompact(d){
   if(!Array.isArray(d.workstreams))throw new Error('The top level needs a "workstreams" list.');
@@ -482,6 +485,13 @@ function fromCompact(d){
   if(Array.isArray(d.keyMilestones))n.milestones=d.keyMilestones.map(m=>{obj(m,"key milestone");const nm=m.name||"Milestone";return Object.assign({},prev(S.milestones,m.id),{id:m.id||uid(),name:nm,date:day(m.date,nm,"a")});});
   if(Array.isArray(d.criticalPath))n.critical=d.criticalPath.map(c=>{obj(c,"critical path stage");const nm=c.name||"Stage",s=day(c.start,nm,"a start"),e=day(c.end,nm,"an end");
     if(e<s)throw new Error('"'+nm+'" ends before it starts.');return Object.assign({},prev(S.critical,c.id),{id:c.id||uid(),name:nm,start:s,end:e});});
+  const text=(c,was)=>c.text!=null?String(c.text):(was.md||"");
+  if(Array.isArray(d.floatingCards))n.cards=d.floatingCards.map(c=>{obj(c,"floating card");const was=prev(S.cards,c.id),nm=c.title||"Card",pinned=typeof c.row==="string"&&c.row!=="";
+    if(pinned&&!n.activities.some(a=>a.id===c.row)&&!n.phases.some(p=>p.id===c.row))throw new Error('"'+nm+'" is pinned to row "'+c.row+'", which is not the id of a workstream or an activity.');
+    return Object.assign({},was,{id:c.id||uid(),title:nm,badge:c.badge!=null?String(c.badge):(was.badge||""),date:c.date==null||c.date===""?(was.date||mStart(0)):day(c.date,nm,"a"),md:text(c,was),
+      pin:pinned,row:pinned?c.row:(was.row||""),dy:pinned&&c.row!==was.row?0:(was.dy||0)});});
+  if(Array.isArray(d.panelCards))n.panel=d.panelCards.map(c=>{obj(c,"panel card");const was=prev(S.panel,c.id);
+    return Object.assign({},was,{id:c.id||uid(),eyebrow:c.label!=null?String(c.label):(was.eyebrow||""),title:c.title||"Card",badge:c.badge!=null?String(c.badge):(was.badge||""),md:text(c,was)});});
   return normalise(n);
 }
 function srcApply(){
@@ -542,7 +552,7 @@ function renderJson(){
   if(!editing()||!ui.json)return;
   $("#srcScope").value=ui.srcScope;
   $("#srcHelp").textContent=ui.srcScope==="all"?"Everything in the roadmap file. The chart follows as you type, whenever the text is valid."
-    :'One line per activity. Change a name or a date and the chart follows as you type. Copy a line to add an activity, delete a line to remove one, or move a line to another workstream. Leave "start" or "end" as "" for an open-ended bar. A line with "milestone" instead of "start" and "end" is a milestone.';
+    :'One line per activity and per card. Change a name or a date and the chart follows as you type. Copy a line to add one, delete a line to remove one, or move an activity line to another workstream. Leave "start" or "end" as "" for an open-ended bar. A line with "milestone" instead of "start" and "end" is a milestone. For cards, "text" is Markdown; a floating card with "row" is pinned to that row.';
   if(document.activeElement.id!=="src")$("#src").value=srcText();
 }
 const FROM_FOLDER=location.protocol==="file:";

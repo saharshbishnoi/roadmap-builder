@@ -442,3 +442,29 @@ test("the image export shows the timeline as it is on screen; the whole timeline
   expect(await page.evaluate(() => document.querySelector("#chart").scrollLeft)).toBeCloseTo(scrolled, -1);
   await expect(page.locator("#panel")).toBeVisible();
 });
+
+test("the JSON editor lists floating cards and panel cards, and edits to them apply", async ({ page }) => {
+  await open(page, "edit");
+  await page.click("#jsonBtn");
+  const text = await page.inputValue("#src");
+  expect(text).toContain('"floatingCards":[');
+  expect(text).toContain('"panelCards":[');
+  expect(text).toContain('{"id":"f2","title":"Custard Logistics","badge":"4"');
+  expect(text).toContain('{"id":"n1","label":"Principle 1","title":"Tea first"');
+  const before = (await state(page)).cards[1];
+  // Rename a floating card, change a panel card's text, and add a panel card by copying a line shape.
+  await page.fill("#src", text.replace('"title":"Custard Logistics"', '"title":"Custard, logistically"').replace("No decision is taken before the kettle has boiled.", "Tea **first**.")
+    .replace('"panelCards":[', '"panelCards":[\n    {"label":"New","title":"Added in JSON","badge":"9","text":"Hello"},'));
+  await expect(page.locator("#srcStatus")).toContainText("Valid");
+  const s = await state(page);
+  expect(s.cards[1].title).toBe("Custard, logistically");
+  expect([s.cards[1].color, s.cards[1].w, s.cards[1].pin, s.cards[1].row]).toEqual([before.color, before.w, true, "a9"]);   // what is not in the line is kept
+  expect(s.panel).toHaveLength(6);
+  expect(s.panel[0]).toMatchObject({ title: "Added in JSON", eyebrow: "New", badge: "9", md: "Hello" });
+  expect(s.panel[1].md).toBe("Tea **first**.");
+  await expect(page.locator("#fc-f2 h3")).toHaveText("Custard, logistically");
+  // Pinning to a row that does not exist is refused, with a reason.
+  await page.fill("#src", (await page.inputValue("#src")).replace('"row":"a9"', '"row":"nope"'));
+  await expect(page.locator("#srcStatus")).toContainText("Not applied");
+  await expect(page.locator("#srcStatus")).toContainText("nope");
+});

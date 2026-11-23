@@ -31,6 +31,7 @@ window.GUIDE=[
   {id:"json",title:"JSON and files",clip:"guide/05-json",steps:[
     "In Edit mode, select JSON in the toolbar. The editor opens as a full-height panel on the left, with one line per activity and its start and end.",
     "Change a name or a date and the chart follows. Copy a line to add an activity, delete a line to remove one.",
+    "Floating cards and panel cards are listed there too, one line each: change a title, a date or the Markdown text, copy a line to add a card, delete a line to remove one.",
     "Export, then Roadmap file (.json), saves everything. Import loads a .json roadmap file or a .csv activity list.",
     "Export, then Standalone page (.html), makes one file with the app and this roadmap inside. Send it to anyone; it opens in their browser with nothing to install.",
     "Export, then Image of this view, saves a picture of the timeline as it is on screen: the same zoom, starting where it is scrolled to, with every row. Image, whole timeline and the two PDF exports show the full timeline. Exports always look like View mode."]}

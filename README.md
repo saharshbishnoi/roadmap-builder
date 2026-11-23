@@ -132,8 +132,8 @@ stage, floating card, panel card), Text (fonts, text size, and separate sizes fo
 dates), Display (theme, floating cards, rounded cards, 3D effect) and, on its Cards tab, the panel
 cards. Drag its edge to resize it.
 
-**JSON editor** (left, Edit mode): one line per activity; change a name or a date and the chart
-follows. Copy a line to add an activity, delete a line to remove one. Switch Show to Whole roadmap
+**JSON editor** (left, Edit mode): one line per activity and per card; change a name, a date or a
+card's text and the chart follows. Copy a line to add one, delete a line to remove one. Switch Show to Whole roadmap
 to edit the complete file.
 
 ## Files in and out
