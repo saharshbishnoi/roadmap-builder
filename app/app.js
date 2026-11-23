@@ -132,7 +132,7 @@ function md(src){
 const LBL={lblCritical:"Critical path",lblMilestones:"Key milestones",lblActivity:"Workstream / activity",lblStart:"Start",lblEnd:"End",panelTitle:"Notes"};
 const EYE='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.6-6.5 10-6.5S22 12 22 12s-3.6 6.5-10 6.5S2 12 2 12z"/><circle cx="12" cy="12" r="2.8"/></svg>';
 const EYEOFF='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.6-6.5 10-6.5S22 12 22 12s-3.6 6.5-10 6.5S2 12 2 12z"/><path d="M4 20L20 4"/></svg>';
-let LW=380,COLS={s:0,e:0},ROWY={},ROWS=[];
+let LW=380,COLS={s:0,e:0},ROWY={},ROWS=[],XFROM=null;   // XFROM: first month shown, while exporting the current view
 const PIN='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3h6l-1 6 4 4H6l4-4-1-6z"/><path d="M12 13v8"/></svg>';
 /* Floating cards: either placed freely (a distance from the top), or pinned to a row plus an offset. */
 const cardTop=c=>c.pin&&ROWY[c.row]!=null?ROWY[c.row]+c.dy:c.y;
@@ -303,9 +303,9 @@ function render(soft){
   });
   if(edit)h+='<section class="phase" id="s-new" style="--pc:var(--muted)"><div class="row addrow ws" id="ar-new"><div class="rleft"><span class="plus" aria-hidden="true">+</span><input class="nm add g" id="an-new" data-addws="1" type="text" placeholder="Add a workstream: type a name and press Enter" aria-label="Add a workstream"></div><div class="track"></div></div></section>';
   const off='calc(var(--leftw) + ';
-  if(st.showLines||edit)kms.forEach(m=>{if(m.line)h+='<div class="kline'+(st.showLines&&!m.hidden?'':' ghost')+'" style="left:'+off+(pos(m.date)*mw)+'px);--c:'+m.color+'"></div>';});
+  if(st.showLines||edit)kms.forEach(m=>{if(m.line&&!(XFROM!=null&&pos(m.date)<XFROM))h+='<div class="kline'+(st.showLines&&!m.hidden?'':' ghost')+'" style="left:'+off+(pos(m.date)*mw)+'px);--c:'+m.color+'"></div>';});
   const tp=pos(todayIso());
-  if((st.showToday||edit)&&tp>=0&&tp<=M)h+='<div class="tline'+(st.showToday?'':' ghost')+'" style="left:'+off+(tp*mw)+'px)"><span>Today '+fmtS(todayIso())+'</span></div>';
+  if((st.showToday||edit)&&tp>=0&&tp<=M&&!(XFROM!=null&&tp<XFROM))h+='<div class="tline'+(st.showToday?'':' ghost')+'" style="left:'+off+(tp*mw)+'px)"><span>Today '+fmtS(todayIso())+'</span></div>';
   if(st.showCards){h+='<div class="fcards">';
     S.cards.forEach(c=>{if(c.hidden&&!edit)return;const x=Math.min(M,Math.max(0,pos(c.date)))*mw;
       h+='<article class="fcard fx3d'+(c.hidden?' ghost':'')+isSel("f",c.id)+'" id="fc-'+c.id+'" data-fc="'+c.id+'" style="left:'+x+'px;top:'+cardTop(c)+'px;width:'+c.w+'px;--c:'+c.color+';--ci:'+ink(c.color)+'">'+
@@ -677,12 +677,16 @@ function exportHtml(){
   document.head.appendChild(s);
 }
 const frame=()=>new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));
-async function exportVisual(kind){
+/* A picture of the roadmap. By default it shows the timeline as it looks now: the same zoom, starting where the
+   timeline is scrolled to and as wide as the part on screen (all rows, top to bottom). `whole` gives the full timeline. */
+async function exportVisual(kind,whole){
   if(!window.htmlToImage){toast("The export library did not load. Reload the page and try again.");return;}
   toast("Preparing the export…");
-  const prevMode=ui.mode;hideTip();
+  const prevMode=ui.mode,chart=$("#chart"),x0=chart.scrollLeft,view=whole?null:{from:chart.scrollLeft/mw,months:Math.max(1,(chart.clientWidth-LW)/mw)};hideTip();
   try{
+    if(view){freeze=true;XFROM=view.from;}     // keep the zoom exactly as it is; lines before the first month shown are left out
     ui.mode="view";exporting=true;render();await frame();render();freeze=true;document.body.classList.add("exporting");
+    if(view){const span=Math.min(view.months,months()-view.from);chart.classList.add("xwin");chart.style.setProperty("--xoff",(view.from*mw)+"px");chart.style.width=Math.ceil(LW+span*mw+2)+"px";}
     if(document.fonts&&document.fonts.ready)await document.fonts.ready;
     await frame();
     const node=$("#capture"),w=Math.ceil(node.scrollWidth),h=Math.ceil(node.scrollHeight),ratio=Math.max(1,Math.min(2,Math.sqrt(2.4e7/(w*h))));
@@ -695,7 +699,8 @@ async function exportVisual(kind){
       await saveFile(slug()+".pdf",pdf.output("blob"));
     }
   }catch(e){toast("The export failed. "+(e&&e.message?e.message:"Try zooming out and exporting again."));}
-  finally{document.body.classList.remove("exporting");freeze=false;exporting=false;ui.mode=prevMode;render();}
+  finally{XFROM=null;chart.classList.remove("xwin");chart.style.removeProperty("--xoff");chart.style.removeProperty("width");
+    document.body.classList.remove("exporting");freeze=false;exporting=false;ui.mode=prevMode;render();chart.scrollLeft=x0;}
 }
 
 /* ---------- dragging (edit mode) ---------- */
@@ -760,6 +765,25 @@ function rowDrag(e,row){
   });
 }
 
+/* Fit the timeline to one row: scale and scroll it so the row's dates fill the middle 80% of the timeline on screen. */
+function rowSpan(kind,o){
+  if(kind==="c")return {a:pos(o.start),b:posEnd(o.end)};
+  if(kind==="k")return {a:pos(o.date),b:pos(o.date)};
+  const list=kind==="p"?S.activities.filter(x=>x.phase===o.id):[o],d=[];
+  list.forEach(x=>{if(x.start)d.push(pos(x.start));if(x.end)d.push(x.type==="milestone"?pos(x.end):posEnd(x.end));});
+  if(!d.length)return null;
+  let a=Math.min.apply(null,d),b=Math.max.apply(null,d);
+  if(kind==="a"&&o.type==="bar"&&(!o.start||!o.end)){if(o.start)b=a+12;else a=b-12;}   // an open-ended bar is drawn a year long
+  return {a:Math.max(0,a),b:Math.min(months(),b)};
+}
+function fitRow(kind,id){
+  const o=find(kind,id),sp=o&&rowSpan(kind,o);if(!sp)return;
+  const c=$("#chart"),vis=Math.max(120,c.clientWidth-LW);
+  if(sp.b-sp.a>0.05){ui.zoom="manual";mw=Math.min(400,Math.max(3,0.8*vis/(sp.b-sp.a)));}   // a short row needs more zoom than the + button gives
+  render();
+  c.scrollLeft=Math.max(0,(sp.a+sp.b)/2*mw-vis/2);
+}
+
 /* ---------- right-click menu: what it offers depends on what is under the pointer ---------- */
 let ctxItems=[],ctxAt=0;
 function ctxOpen(e,items){
@@ -802,6 +826,7 @@ function ctxFor(e){
   if(edit&&!o&&t.closest("#panel"))it.push({label:"Add a panel card",fn:()=>addThing("n")});
   if(t.closest("#chart")){
     if(it.length)it.push("-");
+    if(o&&"apck".indexOf(kind)>=0&&rowSpan(kind,o))it.push({label:kind==="k"?"Centre the timeline on this milestone":"Fit the timeline to this row",fn:()=>fitRow(kind,id)});
     it.push({label:"Zoom in",fn:ACT.zin},{label:"Zoom out",fn:ACT.zout},{label:"Fit the timeline to the window",fn:ACT.zfit},{label:"Go to today",fn:ACT.today});
   }
   if(it.length)it.push("-",edit?{label:"Switch to View",fn:()=>setMode("view")}:{label:"Switch to Edit",fn:()=>setMode("edit")});
@@ -824,9 +849,9 @@ const ACT={
   zin:()=>{ui.zoom="manual";mw=Math.min(60,mw*1.25);render();},zout:()=>{ui.zoom="manual";mw=Math.max(4,mw/1.25);render();},zfit:()=>{ui.zoom="fit";render();},
   today:()=>{const p=pos(todayIso()),c=$("#chart");if(p<0||p>months()){toast("Today, "+fmtD(todayIso())+", is outside this timeline. Change the start year in the banner, in Edit mode.");return;}c.scrollLeft=Math.max(0,p*mw-(c.clientWidth-leftW())/2);},
   import:()=>$("#file").click(),exJson:()=>saveFile(slug()+".json",JSON.stringify(S,null,2)),exCsv:()=>saveFile(slug()+".csv",toCSV()),
-  exHtml:exportHtml,tour:openTour,tourHide:hideTour,
+  exHtml:exportHtml,exPngAll:()=>exportVisual("png",true),tour:openTour,tourHide:hideTour,
   json:()=>{ui.json=!ui.json;saveUi();render();},props:()=>setView(()=>{S.settings.showPanel=!S.settings.showPanel;}),
-  help:()=>{const w=window.open("help.html","roadmap-help");if(!w)toast("The browser blocked the Help window. Allow pop-ups for this page, or open help.html yourself.");},exPng:()=>exportVisual("png"),exPdfA3:()=>exportVisual("pdfA3"),exPdf:()=>exportVisual("pdf"),deselect:()=>select(null),
+  help:()=>{const w=window.open("help.html","roadmap-help");if(!w)toast("The browser blocked the Help window. Allow pop-ups for this page, or open help.html yourself.");},exPng:()=>exportVisual("png"),exPdfA3:()=>exportVisual("pdfA3",true),exPdf:()=>exportVisual("pdf",true),deselect:()=>select(null),
   clear:()=>{mutate(()=>{S.activities=[];S.milestones=[];S.critical=[];S.cards=[];S.panel=[];});toast("Cleared all content",true);},
   sample:()=>{mutate(()=>{S=normalise(sample());});toast("Loaded the sample roadmap",true);}
 };
@@ -838,7 +863,7 @@ $("#chart").addEventListener("pointerdown",e=>{
   if(rz){const w0=LW-COLS.s-COLS.e;rz.classList.add("on");drag(e,rz,{move:dx=>setNameW(w0+dx,false),end:()=>{rz.classList.remove("on");setNameW(S.settings.nameW,true);},click:()=>rz.classList.remove("on")});return;}
   const scale=e.target.closest(".years,.quarters");
   if(scale){const c=$("#chart"),mw0=mw,months0=(e.clientX-$("#inner").getBoundingClientRect().left-LW)/mw0,vx=e.clientX-c.getBoundingClientRect().left-LW;
-    drag(e,scale,{move:dx=>{ui.zoom="manual";mw=Math.min(60,Math.max(3,mw0*Math.exp(dx/240)));render(true);c.scrollLeft=Math.max(0,months0*mw-vx);},end:()=>{}});return;}
+    drag(e,scale,{move:dx=>{ui.zoom="manual";mw=Math.min(200,Math.max(3,mw0*Math.exp(dx/240)));render(true);c.scrollLeft=Math.max(0,months0*mw-vx);},end:()=>{}});return;}
   if(ui.mode!=="edit")return;const t=e.target;let el;
   if(t.closest(".istrip,.cctl,[contenteditable=true],input,button,label"))return;
   if((el=t.closest(".grip"))){rowDrag(e,el.closest(".row"));return;}

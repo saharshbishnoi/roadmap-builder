@@ -8,6 +8,7 @@ window.GUIDE=[
     "Click an item to open its dialog card with the full details. Use the arrow beside a workstream to collapse it.",
     "The schedule fills the window and scrolls on its own, up and down and sideways; the headings stay in place.",
     "Drag the year scale left or right to squeeze or stretch the timeline. Double-click it to fit the window. A faint line follows the pointer and shows the date under it.",
+    "Right-click a row and choose Fit the timeline to this row: the timeline is scaled and scrolled so that row's dates fill the middle 80% of the screen.",
     "Drag the right edge of the Workstream / activity heading to make that column wider or narrower. Right-click a row, bar, milestone, card or the empty timeline for a menu of what you can do there."]},
   {id:"rows",title:"Add and edit rows",clip:"guide/02-rows",steps:[
     "Switch to Edit. Type straight into a name or a date. Each row has a colour square, an eye to hide it, a pencil for all settings and a cross to delete.",
@@ -32,7 +33,7 @@ window.GUIDE=[
     "Change a name or a date and the chart follows. Copy a line to add an activity, delete a line to remove one.",
     "Export, then Roadmap file (.json), saves everything. Import loads a .json roadmap file or a .csv activity list.",
     "Export, then Standalone page (.html), makes one file with the app and this roadmap inside. Send it to anyone; it opens in their browser with nothing to install.",
-    "For a release copy, export an image or a PDF. The export shows the roadmap as it looks in View mode."]}
+    "Export, then Image of this view, saves a picture of the timeline as it is on screen: the same zoom, starting where it is scrolled to, with every row. Image, whole timeline and the two PDF exports show the full timeline. Exports always look like View mode."]}
 ];
 /* Where the offline copy of the latest release can be downloaded. */
 window.DOWNLOAD_URL="https://github.com/saharshbishnoi/roadmap-builder/releases/latest/download/roadmap-builder.zip";

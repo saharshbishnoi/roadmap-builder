@@ -411,3 +411,34 @@ test("a pinned floating card follows its row when rows above it are hidden; a fr
   expect(await top("f2")).toBe(pinnedEdit - 5 * 30 + 2 * 30);
   expect(await top("f3")).toBe(freeEdit);
 });
+
+test("right-click fits the timeline to a row, so the row fills the middle 80%", async ({ page }) => {
+  await open(page);
+  await page.locator("#r-a11 .aname").click({ button: "right" });
+  await page.locator("#ctx button", { hasText: "Fit the timeline to this row" }).click();
+  await settle(page);
+  const m = await page.evaluate(() => { const c = document.querySelector("#chart").getBoundingClientRect(), left = document.querySelector(".corner").getBoundingClientRect().right, b = document.querySelector("#b-a11").getBoundingClientRect();
+    return { vis: c.right - left, bar: b.width, before: b.left - left, after: c.right - b.right }; });
+  expect(m.bar / m.vis).toBeGreaterThan(0.76);
+  expect(m.bar / m.vis).toBeLessThan(0.84);
+  expect(Math.abs(m.before - m.after)).toBeLessThan(m.vis * 0.05);
+  await page.locator("#g-p2 .gname").click({ button: "right" });
+  await expect(page.locator("#ctx")).toContainText("Fit the timeline to this row");
+});
+
+test("the image export shows the timeline as it is on screen; the whole timeline is a separate export", async ({ page }, info) => {
+  await open(page);
+  const fs = await import("node:fs");
+  const width = file => fs.readFileSync(file).readUInt32BE(16);                 // PNG width
+  const save = async act => { await page.click("#exBtn"); const [d] = await Promise.all([page.waitForEvent("download"), page.click('[data-act="' + act + '"]')]); const f = info.outputPath(act + ".png"); await d.saveAs(f); await settle(page); return f; };
+  await page.locator("#r-a11 .aname").click({ button: "right" });
+  await page.locator("#ctx button", { hasText: "Fit the timeline to this row" }).click();
+  await settle(page);
+  const scrolled = await page.evaluate(() => document.querySelector("#chart").scrollLeft);
+  expect(scrolled).toBeGreaterThan(100);
+  const view = width(await save("exPng")), all = width(await save("exPngAll"));
+  expect(all).toBeGreaterThan(view * 2);
+  // Afterwards the screen is as it was.
+  expect(await page.evaluate(() => document.querySelector("#chart").scrollLeft)).toBeCloseTo(scrolled, -1);
+  await expect(page.locator("#panel")).toBeVisible();
+});

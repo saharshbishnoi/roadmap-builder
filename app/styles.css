@@ -525,3 +525,8 @@ body.helpbody{overflow:auto}
   .app>.resizer{display:none}
   .tools{left:0;transform:none}
 }
+
+/* exporting the current view: show only the part of the timeline that was on screen. The timeline is slid left
+   under the name column, which stays put because it is pinned to the left edge. */
+body.exporting .chart.xwin{flex:none;overflow:hidden}
+body.exporting .chart.xwin .inner{margin-left:calc(-1 * var(--xoff));min-width:0}

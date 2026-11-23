@@ -102,7 +102,9 @@ release build, a short narrated video for each. The list of requirements is in
 
 **View mode** is for reading and presenting. Hover over a bar, milestone or critical path stage to
 see its hover card; click it to open its dialog card. Collapse a workstream with its arrow. Drag the
-year scale to squeeze or stretch the timeline; double-click it to fit the window.
+year scale to squeeze or stretch the timeline; double-click it to fit the window. Right-click a row and
+choose "Fit the timeline to this row" to scale and scroll the timeline so that row fills the middle
+80% of the screen.
 
 **Edit mode** keeps the quick edits on the roadmap itself and everything else in Properties:
 
@@ -140,7 +142,8 @@ to edit the complete file.
 |---|---|
 | Roadmap file (.json) | Everything: content, Markdown cards, colours, fonts, positions and display settings |
 | Activity list (.csv) | Activities, milestones and critical path stages, for a spreadsheet |
-| Image (.png) | The whole roadmap at full width |
+| Image of this view (.png) | The timeline as it is on screen: same zoom, starting where it is scrolled to, every row |
+| Image, whole timeline (.png) | The whole roadmap at full width |
 | PDF, A3 landscape | The roadmap fitted to one A3 page |
 | PDF, exact size | One page the same size as the roadmap |
 
