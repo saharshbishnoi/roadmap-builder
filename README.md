@@ -59,13 +59,16 @@ of Chrome or Edge) to run in its own window, offline. It is also the only place 
 appears (a five-minute narrated tour, see `film/README.md`), behind a "Watch the tour" bar. GitHub
 refuses files over 100 MB, so the site plays the film's 1080p copy; the 4K master stays in `film/out`.
 
-**The zip** is still attached by the pipeline: pushing a version tag (for example `v1.3.0`) runs
-`.github/workflows/release.yml`, which does the release build and attaches `roadmap-builder.zip`, the
-whole app with its guide videos, to the GitHub Release. Unzip it and open `index.html`; no server is
-needed. The newest one is always at
+**Releases** are made by the pipeline: pushing a version tag (for example `v1.4.1`) runs
+`.github/workflows/release.yml`, which does the release build, records the product film, and creates
+the GitHub Release with everything attached: `roadmap-builder.zip` (the whole app with its guide
+videos; unzip it and open `index.html`, no server needed), the film in 4K and 1080p with its
+subtitles and chapter list, the guide videos on their own, and checksums. The release text comes
+from `docs/releases/<tag>.md` when that file exists. The newest zip is always at
 `https://github.com/saharshbishnoi/roadmap-builder/releases/latest/download/roadmap-builder.zip`.
+On GitHub's machines a run takes about an hour and a quarter.
 
-**A release package** for uploading to a release by hand is gathered by `./package-release.sh v1.3.0`
+**The same package** can be gathered on your own machine by `./package-release.sh v1.3.0`
 into `dist/release-v1.3.0/`: the zip, the guide videos on their own, the product film (4K and 1080p),
 its subtitles and chapter list, checksums, and the notes from `docs/releases/`. `BUILD=1` runs the
 release build first and `FILM=1` re-records the film.
@@ -190,7 +193,7 @@ app/sw.js            offline support for the installed web app
 app/manifest.webmanifest, app/icon.svg   what makes the app installable
 app/guide/           guide videos, subtitles and posters: made by a release build, not in git
 docs/                requirements, ideas, planned editions and the design language
-.github/workflows/   the pipeline that tests a tagged release and attaches the zip to it
+.github/workflows/   the pipeline that builds a tagged release and attaches the zip, film and videos
 publish-pages.sh     builds the site and pushes it to the gh-pages branch for GitHub Pages
 package-release.sh   gathers the zip, guide videos, film and notes for a release into dist/
 film/                the product film: scenes, recorder and its own container (see film/README.md)

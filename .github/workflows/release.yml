@@ -1,6 +1,7 @@
-# On every version tag (v*): run the release build in Docker (all tests, guide videos, site, zip) and attach the
-# zip to a GitHub Release. The Pages site is NOT published from here: it is pushed to the gh-pages branch with
-# ./publish-pages.sh, so publishing stays a deliberate step.
+# On every version tag (v*): run the release build in Docker (all tests, guide videos, site, zip), record the
+# product film, and create the GitHub Release with the app zip, the 4K film and the rest of the package attached.
+# The Pages site is NOT published from here: it is pushed to the gh-pages branch with ./publish-pages.sh, so
+# publishing stays a deliberate step.
 name: Release
 
 on:
@@ -17,22 +18,27 @@ concurrency:
 
 jobs:
   build:
-    name: Test, render videos, build the zip
+    name: Test, render videos, record the film, package
     runs-on: ubuntu-latest
-    timeout-minutes: 120
+    timeout-minutes: 240
     steps:
       - uses: actions/checkout@v4
-      - name: Release build in Docker
+      - name: Release build in Docker (tests, guide videos, site, zip)
         run: docker buildx build --build-arg RELEASE=1 --target dist --output type=local,dest=dist .
-      - name: Zip for the release
+      - name: Record the product film (4K)
+        run: FILM_UID=$(id -u) FILM_GID=$(id -g) docker compose -f film/compose.yml run --rm film
+      - name: Gather the release package
+        run: ./package-release.sh "${{ github.ref_name }}"
+      - name: Keep the package for the release job
         uses: actions/upload-artifact@v4
         with:
-          name: roadmap-builder-zip
-          path: dist/roadmap-builder.zip
+          name: release-package
+          path: dist/release-${{ github.ref_name }}/
           if-no-files-found: error
+          compression-level: 0
 
   release:
-    name: Attach the zip to the release
+    name: Create the release and attach the files
     needs: build
     if: startsWith(github.ref, 'refs/tags/')
     runs-on: ubuntu-latest
@@ -41,11 +47,16 @@ jobs:
     steps:
       - uses: actions/download-artifact@v4
         with:
-          name: roadmap-builder-zip
-      - name: Create the release, or add the zip to it
+          name: release-package
+          path: package
+      - name: Create the release, or add the files to it
         env:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
           TAG: ${{ github.ref_name }}
-        run: gh release create "$TAG" roadmap-builder.zip --title "$TAG" --generate-notes --verify-tag || gh release upload "$TAG" roadmap-builder.zip --clobber
-
+        run: |
+          cd package
+          ls -la
+          files="roadmap-builder.zip roadmap-builder-film-4k.mp4 roadmap-builder-film-1080p.mp4 roadmap-builder-film.srt roadmap-builder-film-chapters.txt roadmap-builder-guide-videos.zip SHA256SUMS.txt"
+          if [ -f RELEASE-NOTES.md ]; then notes="--notes-file RELEASE-NOTES.md"; else notes="--generate-notes"; fi
+          gh release create "$TAG" $files --title "$TAG" $notes --verify-tag || gh release upload "$TAG" $files --clobber

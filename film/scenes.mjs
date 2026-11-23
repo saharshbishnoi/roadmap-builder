@@ -22,7 +22,10 @@ export const FILM = {
     id: "00-opening", title: "Opening",
     cards: [{ heading: "Roadmap Builder", line: TAGLINE }, { heading: "The full tour", line: "Six chapters, one sample programme." }],
     steps: [],
-    lines: ["Roadmap Builder. Your whole programme, in one intuitive, interactive view.", "Here is the full tour."]
+    lines: [
+      "Welcome to Roadmap Builder. It gives you a whole programme in one intuitive, interactive view, and it all runs in an ordinary browser.",
+      "Over the next few minutes we will take the full tour, in six short chapters, using a made-up programme so you can see how it fits together."
+    ]
   },
 
   chapters: [
@@ -40,16 +43,16 @@ export const FILM = {
         async f => { await f.click("#r-a11 .aname", { button: "right" }); await f.menu("Fit the timeline to this row"); await f.pause(600); }
       ],
       lines: [
-        "Chapter one. Read the roadmap.",
-        "This is a sample programme. Workstreams run down the left. Months run across the top.",
-        "Point at a bar. Its card shows the dates and a note.",
-        "Drag the card. It stays where you put it.",
-        "Click a bar. The full details open.",
-        "Scroll down. The schedule moves on its own, and the headings stay in place.",
-        "Back at the top, move across the timeline. A thin line names the date under the pointer.",
-        "Collapse a workstream. It folds into one summary bar.",
-        "Open it again, and drag the year scale. The timeline stretches.",
-        "Right-click a row and fit the timeline to it. The row fills the middle of the screen."
+        "Let's begin with the simplest thing you can do with a roadmap, which is to read it.",
+        "This is our sample programme. Each coloured band on the left is a workstream with its activities beneath it, and time runs across the top, so you can see at a glance what happens when.",
+        "When you want to know more about something, just point at it. A small card appears with its dates and any note the author left.",
+        "If the card is in your way, pick it up and move it. It keeps opening in the spot you chose, which is handy when you are presenting.",
+        "For the full story, click the bar. A dialog opens with everything written about that activity.",
+        "Longer programmes run off the bottom of the screen, so the schedule scrolls on its own. Notice that the years and the headings stay put.",
+        "Back at the top, move across the timeline. A faint line follows your pointer and tells you the exact date underneath it.",
+        "When you only care about the big picture, collapse a workstream. Its activities fold away into one summary bar.",
+        "Open it again, and try dragging the year scale itself. The timeline stretches under your hand, so you can zoom in on a busy period.",
+        "And if you want one row to fill the screen, right-click it and choose fit. The timeline scales so that row sits neatly in the middle."
       ] },
 
     { id: "02-edit", title: "Edit in place", mode: "view", props: false,
@@ -65,15 +68,15 @@ export const FILM = {
         async f => { await f.click("#eh-a5"); await f.pause(400); }
       ],
       lines: [
-        "Chapter two. Edit in place.",
-        "Switch to Edit. Every name and every date is now a field.",
-        "Type in a row. The activity is renamed.",
-        "Change a start date. The bar moves.",
-        "Type in the add row and press Enter. Twice. Two new activities.",
-        "A new row has no dates. Click its timeline. The bar lands there.",
-        "Give the other one a start date only. Its bar fades out.",
-        "Turn on the Activity chip. Names appear beside the bars.",
-        "Click an eye. The row dims here, and leaves View mode."
+        "Reading is only half of it. Next, let's change things, and you will see that editing happens right where you are looking.",
+        "Switch to Edit, and the roadmap quietly becomes a form. Every name and every date turns into a field you can type in.",
+        "To rename an activity, click its name and type. There is no save button to remember. The change is kept as you go.",
+        "Dates work the same way. Change a start date in the row, and you can watch the bar slide along the timeline to match.",
+        "Adding work is just as quick. Type a name in the highlighted row and press Enter, then keep typing to add another. It feels like filling in a list.",
+        "New activities start without dates, because you often know the work before you know the timing. When you are ready, click the row's timeline and the bar lands there.",
+        "Sometimes you only know when something begins. Give it a start date and nothing else, and its bar fades out, an honest way of saying the end is still open.",
+        "These chips decide what is written beside each bar. Turn on Activity, and every bar is labelled with its name.",
+        "And if a row is not ready to be seen, click its eye. It dims here so you can still find it, and it disappears from View and from anything you export."
       ] },
 
     { id: "03-item", title: "Properties", mode: "edit", columns: false,
@@ -87,19 +90,25 @@ export const FILM = {
         async f => { await f.click("#b-a5", { button: "right" }); await f.menu("Make it a milestone"); await f.pause(300); },
         async f => { await f.click("#undo"); await f.pause(300); },
         async f => { await f.click("#propBtn"); await f.pause(900); await f.click("#propBtn"); await f.pause(400); },
-        async f => { await f.hover("#t-labelScale"); await f.ring(); await f.set("#t-labelScale", "120"); await f.pause(500); await f.hover("#t-dateScale"); await f.ring(); await f.set("#t-dateScale", "90"); await f.pause(300); }
+        async f => { await f.hover("#t-labelScale"); await f.ring(); await f.set("#t-labelScale", "120"); await f.pause(500); await f.hover("#t-dateScale"); await f.ring(); await f.set("#t-dateScale", "90"); await f.pause(300); },
+        async f => { await f.hover("#t-bannerScale"); await f.ring(); await f.set("#t-bannerScale", "125"); await f.pause(600); await f.hover("#t-bannerFont"); await f.ring(); await f.set("#t-bannerFont", "inter"); await f.pause(300); },
+        async f => { await f.click("#t-showChip"); await f.pause(500); },
+        async f => { await f.click("#t-showChip"); await f.click("#r-years"); await f.set("#r-years", "6"); await f.pause(500); }
       ],
       lines: [
-        "Chapter three. Properties.",
-        "Click a bar. Its settings open in the Properties panel.",
-        "Pick a colour. The bar repaints.",
-        "Write the hover card in Markdown. The preview updates below.",
-        "Close the settings and drag a bar. It moves by whole months.",
-        "Drag its edge. It gets longer.",
-        "Right-click a bar and make it a milestone. It becomes a diamond.",
-        "Undo. The bar is back.",
-        "The Properties button hides the panel, and brings it back.",
-        "Set the label size and the date size. Names grow. Dates shrink."
+        "Quick changes happen on the chart. For everything else, there is one place to go, the Properties panel.",
+        "Click any bar, and all of its settings appear in the panel on the right. The details sit beside the chart, not on top of it.",
+        "Change the colour, and the bar repaints straight away, so you can try a few until one looks right.",
+        "This is where you write the hover card too. It is plain text with simple formatting, and the preview underneath shows exactly how it will read.",
+        "Close the settings when you are done. And remember you can simply drag a bar to move it. It snaps to whole months, so things stay tidy.",
+        "Dragging an edge changes how long it runs. That is often faster than typing a date when you are sketching a plan.",
+        "Not everything is a stretch of work. Right-click a bar and make it a milestone, and it becomes a single diamond on the day that matters.",
+        "Changed your mind? Undo steps back through what you did, one change at a time, so it is safe to experiment.",
+        "When you want more room for the chart, the Properties button tucks the panel away, and brings it back when you need it.",
+        "Further down, set the size of the labels and of the dates separately. Here the names grow while the dates shrink, which suits a screen at the back of a room.",
+        "The header has its own settings. Choose a size and a font, and the heading follows.",
+        "There is a date chip in the corner of the header. If you would rather not show it, untick it and it is gone.",
+        "Bring it back, and look at Timeline. Ask for six years instead of eight, and the whole scale redraws to fit."
       ] },
 
     { id: "04-cards", title: "Cards and display", mode: "edit", columns: false,
@@ -109,21 +118,23 @@ export const FILM = {
         async f => { await f.click("#eh-a3"); await f.click("#eh-a4"); await f.click("#modeView"); await f.pause(700); },
         async f => { await f.click("#modeEdit"); await f.click("#pt-cards"); await f.click("#ce-n-n1-title"); await f.key("Control+A"); await f.type("Tea, always"); await f.key("Enter"); },
         async f => { await f.click("#pe-n2"); await f.waitFor("#tabCards #istrip"); await f.click("#f-md"); await f.key("Control+End"); await f.type(" Then **admired again**."); },
-        async f => { await f.click("#dx-done"); await f.click("#pt-props"); await f.click("#t-roundCards"); await f.pause(400); },
+        async f => { await f.click("#dx-done"); await f.click("#pt-props"); await f.click("#r-panelTitle"); await f.key("Control+A"); await f.type("House rules"); await f.pause(400); },
+        async f => { await f.click("#t-roundCards"); await f.pause(400); },
         async f => { await f.hover("#t-theme"); await f.ring(); await f.set("#t-theme", "dark"); await f.pause(500); },
-        async f => { await f.hover("#t-fontHead"); await f.ring(); await f.set("#t-fontHead", "inter"); await f.pause(400); },
-        async f => { await f.hover("#t-theme"); await f.ring(); await f.set("#t-theme", "light"); await f.hover("#r-banner"); await f.ring(); await f.set("#r-banner", "#0f5c4a"); await f.pause(400); }
+        async f => { await f.click("#randCol"); await f.pause(700); },
+        async f => { await f.click("#randCol"); await f.pause(600); await f.click("#flipTheme"); await f.pause(600); }
       ],
       lines: [
-        "Chapter four. Cards and display.",
-        "Drag a floating card. It sits anywhere on the chart.",
-        "Hide two rows and switch to View. The pinned cards move up with their rows.",
-        "Back in Edit, open the Cards tab. Click a card title and retype it.",
-        "The pencil opens the card's text. It is Markdown, and the card updates as you type.",
-        "In Properties, tick Rounded cards. Every corner softens.",
-        "Switch the theme. The roadmap goes dark.",
-        "Pick another heading font. The headings change.",
-        "Back to light, and change the banner colour in the banner itself."
+        "A roadmap is more than bars. Let's look at the notes you can add around them, and at making the whole thing look like yours.",
+        "Floating cards are notes that sit on top of the chart. Drag one to wherever it tells the story best.",
+        "Each card is pinned to the row it sits on. Watch as we hide two rows and switch to View. The cards move up with their rows, so they still point at the right thing.",
+        "Back in Edit, there is a second kind of card on the right, good for principles or key messages. Click a title and simply retype it.",
+        "The pencil opens the rest of the card. The text uses the same simple formatting as before, and the card updates as you type.",
+        "The heading of this group is yours to name as well. Rename it in Properties, and the tab at the top changes with it.",
+        "Now for the look. Tick rounded cards, and every corner softens. It is a small change that shifts the whole feel.",
+        "Prefer a dark screen? Switch the theme, and the entire roadmap follows.",
+        "And when you are not sure what colours to use, let the app suggest some. Randomise colours gives every workstream a fresh, matched colour.",
+        "Press it again for another idea, then flip back to light. Each set is chosen to read well in both, and Undo takes you back to where you started."
       ] },
 
     { id: "05-json", title: "JSON live editor", mode: "edit", props: false, columns: false,
@@ -139,15 +150,15 @@ export const FILM = {
         async f => { await f.select("#src", 'Wombat Wrangling","badge"'); await f.type('Wombat herding","badge"', 60); await f.waitFor("#srcStatus", { text: "Valid" }); }
       ],
       lines: [
-        { say: "Chapter five. The Jayson live editor.", show: "Chapter five. The JSON live editor." },
-        { say: "Open the Jayson editor. It fills the left side, with numbered lines, one per activity.", show: "Open the JSON editor. It fills the left side, with numbered lines, one per activity." },
-        "Retype an end date. The bar shortens as you type.",
-        "Rename an activity here. Its row updates.",
-        "Add a line. A new activity appears on the chart.",
-        "Break the syntax. Nothing is applied, and the message names the line.",
-        "Fix it. The roadmap is in step again.",
-        "Save with Control S. The text is laid out again, and the new line gets its id.",
-        "Cards are listed too. Retype a title, and the card on the chart changes."
+        { say: "Sometimes it is quicker to edit a plan as text. For that, there is a live Jayson editor.", show: "Sometimes it is quicker to edit a plan as text. For that, there is a live JSON editor." },
+        "Open it, and it takes the left side of the screen. Every activity is one numbered line with its start and its end, so the whole plan is easy to scan.",
+        "Retype an end date, and the bar on the right shortens as you type. The two views are always the same roadmap.",
+        "Names work the same way. Change one here, and its row updates beside it.",
+        "To add an activity, just add a line. A moment later it appears on the chart, in the workstream you put it under.",
+        "Typing mistakes happen. When they do, nothing is changed. The editor says what is wrong and marks the line, so your roadmap is never left half broken.",
+        "Put it right, and the message clears. The roadmap and the text are back in step.",
+        "Press Control S to tidy up. The text is laid out neatly again, and the line we added is given its own id.",
+        "Cards are in here too. Retype a title in the text, and the card on the chart changes to match."
       ] },
 
     { id: "06-share", title: "Share it", mode: "view", props: false,
@@ -158,21 +169,24 @@ export const FILM = {
         async f => { await f.click("#exBtn"); await f.click('[data-act="exHtml"]'); await f.waitFor("#toast", { text: ".html" }); },
         async f => { await f.open(await f.exported(".html")); await f.waitFor("#inner .row"); },
         async f => { await f.hover("#b-a4", { fx: 0.35 }); await f.waitFor("#hover"); },
+        async f => { await f.open("app/index.html"); await f.waitFor("#inner .row"); await f.click("#ct-p2"); await f.click("#exBtn"); await f.click('[data-act="exHtmlView"]'); await f.waitFor("#toast", { text: "-view.html" });
+          await f.open(await f.exported("-view.html")); await f.waitFor("#inner .row"); await f.pause(400); },
         async f => { await f.open("app/index.html"); await f.waitFor("#inner .row"); await f.click("#r-a11 .aname", { button: "right" }); await f.menu("Fit the timeline to this row"); await f.pause(500);
           await f.click("#exBtn"); await f.click('[data-act="exPng"]'); await f.waitFor("#toast", { text: ".png", frames: 900 }); },
         async f => { await f.click("#exBtn"); await f.click('[data-act="exPdfA3"]'); await f.waitFor("#toast", { text: ".pdf", frames: 900 }); },
         async f => { await f.hover("#helpBtn"); await f.ring(); await f.open("app/help.html"); await f.waitFor(".gstep"); await f.pause(500); }
       ],
       lines: [
-        "Chapter six. Share it.",
-        "Open Export. The formats are listed.",
-        "Save the roadmap file. It holds the whole roadmap.",
-        "Export a standalone page. That is the app and this roadmap in one file.",
-        "Here is that file, opened on its own. No server.",
-        "It is the same roadmap. Hover cards still work.",
-        "Back in the app, fit the timeline to a row and export an image of this view. The picture shows what is on screen.",
-        "Export a PDF on one A3 page. It is saved too.",
-        "Help opens in its own window. Here it is, with the steps for every part."
+        "A roadmap is only useful when other people can see it. So, finally, let's share it.",
+        "Everything you need is under Export. There are several formats, depending on who it is for.",
+        "The roadmap file is your master copy. It holds everything, and it is what you would keep, or hand to a colleague who wants to carry on editing.",
+        "For someone who just needs to open it, export a standalone page. That is the whole app and this roadmap, packed into a single file.",
+        "Here is that file, opened on its own. There is no server behind it, and nothing to install.",
+        "And it is still the real thing. The hover cards work, and the person you sent it to can explore it for themselves.",
+        "If you would rather they look but not change anything, collapse what they do not need and export a view-only page. It opens exactly as you left it, with no Edit button.",
+        "For a slide, fit the timeline to the part you want to talk about and export an image of this view. The picture shows just what is on your screen.",
+        "For print, there is a PDF that fits the whole roadmap onto a single A3 page.",
+        "And if you ever get stuck, Help opens in its own window, with every step written down for each part of the app."
       ] }
   ],
 
@@ -180,6 +194,8 @@ export const FILM = {
     id: "99-closing", title: "Closing",
     cards: [{ heading: "Roadmap Builder", line: "Your whole programme, in one view.", small: "saharshbishnoi.github.io/roadmap-builder" }],
     steps: [],
-    lines: ["Roadmap Builder. Your whole programme, in one view."]
+    lines: [
+      "That is Roadmap Builder. Your whole programme in one view, ready to read, to change, and to share."
+    ]
   }
 };

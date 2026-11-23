@@ -49,79 +49,88 @@ const CURSOR = '<svg viewBox="0 0 26 26" width="24" height="24"><path d="M4 3l16
 /* ---------- chapters: what is said and what happens on screen while it is said ---------- */
 const CHAPTERS = [
   { id: "01-read", kicker: "Roadmap Builder", title: "Read the roadmap", panel: false, mode: "view", scenes: [
-    { say: "This is Roadmap Builder. Your whole programme, in one intuitive, interactive view." },
-    { say: "Hover over any bar, milestone, or critical path stage, and its card appears.", do: async h => { await h.glide(await h.pt("#b-a4", 0.4)); } },
-    { say: "The card stays right where it is, so you can pick it up, and place it wherever you like.", do: async h => {
+    { say: "Welcome to Roadmap Builder. It puts your whole programme into one intuitive, interactive view, and this short guide shows you how to read it." },
+    { say: "Start by pointing at anything on the chart. A bar, a milestone, or a stage on the critical path will show a small card with its dates and a note.", do: async h => { await h.glide(await h.pt("#b-a4", 0.4)); } },
+    { say: "The card stays where it opened, so you can reach it. Pick it up and put it wherever suits you, and it will keep opening there.", do: async h => {
         const b = await h.box("#hover"); await h.dragTo({ x: b.x + 40, y: b.y + 14 }, { x: b.x + 300, y: b.y + 150 }); } },
-    { say: "Click an item to see the full details.", do: async h => { await h.click("#b-a1", { fx: 0.3 }); await h.wait(1900); await h.click('[data-sheet="close"]'); } },
-    { say: "The schedule scrolls on its own, and its headings stay in place.", do: async h => { await h.glide(await h.pt("#r-a9 .track", 0.5)); await h.scroll("#chart", 420, 1400); await h.wait(700); await h.scroll("#chart", -420, 1200); } },
-    { say: "As you move across the timeline, a faint line shows the date under your pointer. And the activity column resizes with a simple drag.", do: async h => {
+    { say: "When you want the full story, click the item. A dialog opens with everything that has been written about it.", do: async h => { await h.click("#b-a1", { fx: 0.3 }); await h.wait(1900); await h.click('[data-sheet="close"]'); } },
+    { say: "Long programmes run off the screen, so the schedule scrolls on its own. The years and the headings stay in place, so you never lose your bearings.", do: async h => { await h.glide(await h.pt("#r-a9 .track", 0.5)); await h.scroll("#chart", 420, 1400); await h.wait(700); await h.scroll("#chart", -420, 1200); } },
+    { say: "As you move across the timeline, a faint line shows the exact date under your pointer. And if the names feel cramped, drag the edge of the activity column to give them more room.", do: async h => {
         await h.sweep(await h.pt("#r-a8 .track", 0.1), await h.pt("#r-a8 .track", 0.72), 3000);
         const p = await h.pt("#colrz"); await h.dragTo(p, { x: p.x + 100, y: p.y }); } },
-    { say: "Drag the year scale to stretch the timeline. Or right-click a row, and fit the timeline to it.", do: async h => {
+    { say: "To zoom, drag the year scale and the timeline stretches under your hand. Or right-click a row and fit the timeline to it, so that row fills the middle of the screen.", do: async h => {
         const y = await h.pt(".years", 0.35); await h.dragTo(y, { x: y.x + 150, y: y.y }, 1300); await h.wait(700);
         const r = await h.pt("#r-a11 .aname"); await h.glide(r); await h.pulse(); await h.page.mouse.click(r.x, r.y, { button: "right" }); await h.wait(700);
         await h.click("#ctx button:nth-of-type(2)"); } },
-    { say: "And Help opens in its own window, with every step written down.", do: async h => { await h.glide(await h.pt("#helpBtn")); await h.pulse(); } }
+    { say: "If you ever need a reminder, the Help button opens these steps in a window of their own.", do: async h => { await h.glide(await h.pt("#helpBtn")); await h.pulse(); } }
   ] },
   { id: "02-rows", kicker: "Edit mode", title: "Add and edit rows", panel: false, mode: "edit", scenes: [
-    { say: "Editing happens right where you look." },
-    { say: "Switch to Edit, and every name, and every date, becomes a field you can type in.", do: async h => {
+    { say: "Now let's change the roadmap. You will find that editing happens right where you are looking." },
+    { say: "Switch to Edit, and every name and every date becomes a field. Click one and type. There is no save button, your changes are kept as you go.", do: async h => {
         await h.click("#n-a2"); await h.key("End"); await h.type(" (phase one)"); await h.key("Enter"); } },
-    { say: "To add an activity, type in the highlighted row, and press Enter. Then just keep going.", do: async h => {
+    { say: "To add an activity, type a name in the highlighted row at the end of a workstream and press Enter. Keep typing to add the next one, much as you would in a list.", do: async h => {
         await h.click("#an-p1"); await h.type("Order more carrots"); await h.key("Enter"); await h.wait(400);
         await h.type("Thank the wombats"); await h.key("Enter"); } },
-    { say: "New rows have no dates. Click the timeline to place one. Or set only a start date, and the bar gently fades out.", do: async h => {
+    { say: "New rows start without dates, because you often know the work before you know the timing. Click the timeline to place one, or give it only a start date and its bar fades out towards the future.", do: async h => {
         const id = n => h.page.evaluate(n => window.__roadmap.state.activities.find(a => a.name === n).id, n);
         await h.click("#pl-" + await id("Order more carrots"), { fx: 0.2 }); await h.wait(1100);
         const w = await id("Thank the wombats"); await h.click("#ds-" + w, { fx: 0.3 }); await h.set("#ds-" + w, "2027-06-01"); } },
-    { say: "The chips above the table choose what appears beside each bar. And the eye icons hide anything you don't need.", do: async h => {
+    { say: "The chips above the table choose what is written beside each bar. And the eye on each row hides it from View and from exports, while keeping it within reach here in Edit.", do: async h => {
         await h.click("#ey-barName"); await h.wait(1500); await h.click("#ey-colEnd"); await h.wait(1300); await h.click("#ey-colEnd"); } }
   ] },
   { id: "03-settings", kicker: "Edit mode", title: "Properties", panel: true, mode: "edit", cols: false, scenes: [
-    { say: "Every setting has one home: the Properties panel." },
-    { say: "Click a bar, and all of its settings open in Properties, on the right.", do: async h => { await h.click("#b-a2"); await h.wait(500); } },
-    { say: "Change a date, or the colour, and the chart follows as you type.", do: async h => {
+    { say: "Quick edits happen on the chart. For everything else, there is the Properties panel." },
+    { say: "Click a bar, and all of its settings open in the panel on the right, beside the chart rather than on top of it.", do: async h => { await h.click("#b-a2"); await h.wait(500); } },
+    { say: "Change a date or pick a new colour, and the chart follows as you type, so you can see the effect straight away.", do: async h => {
         await h.click("#f-end", { fx: 0.3 }); await h.set("#f-end", "2028-10-31"); await h.wait(1100);
         await h.glide(await h.pt("#f-color")); await h.pulse(); await h.set("#f-color", "#f07c1f"); } },
-    { say: "Write hover cards and dialogs in Markdown, with a live preview underneath.", do: async h => { await h.click("#f-hover"); await h.type("**Ready** by spring. Bring a spanner."); } },
-    { say: "Further down, set the size of labels, and of dates, separately.", do: async h => {
+    { say: "The hover card and the details dialog are written here too, in plain text with simple formatting. The preview underneath shows how each will read.", do: async h => { await h.click("#f-hover"); await h.type("**Ready** by spring. Bring a spanner."); } },
+    { say: "Further down, you can set the size of the labels and the size of the dates separately, which helps when the roadmap is shown on a big screen.", do: async h => {
         await h.click("#dx-done"); await h.glide(await h.pt("#t-labelScale")); await h.pulse(); await h.set("#t-labelScale", "120"); await h.wait(1200);
         await h.glide(await h.pt("#t-dateScale")); await h.pulse(); await h.set("#t-dateScale", "90"); } },
-    { say: "The Properties button hides the panel when you want more room, and brings it back.", do: async h => { await h.click("#propBtn"); await h.wait(1300); await h.click("#propBtn"); } },
-    { say: "Drag a bar to move it. Drag an edge to resize it. And Undo is always one click away.", do: async h => {
+    { say: "The header has its own settings. Choose a size and a font for the heading, and give the cards tab a name that suits your programme.", do: async h => {
+        await h.glide(await h.pt("#t-bannerScale")); await h.pulse(); await h.set("#t-bannerScale", "125"); await h.wait(1000);
+        await h.glide(await h.pt("#t-bannerFont")); await h.pulse(); await h.set("#t-bannerFont", "inter"); await h.wait(900);
+        await h.click("#r-panelTitle"); await h.key("Control+A"); await h.type("House rules"); } },
+    { say: "The date chip in the corner can be switched off altogether, or kept on screen and left out of anything you export.", do: async h => { await h.click("#t-showChip"); await h.wait(1200); await h.click("#t-showChip"); await h.wait(600); await h.click("#t-chipExport"); } },
+    { say: "And under Timeline, you set the year the roadmap starts, and how many years it shows.", do: async h => { await h.click("#r-years"); await h.set("#r-years", "6"); await h.wait(1500); await h.set("#r-years", "8"); } },
+    { say: "When you want more room for the chart, the Properties button tucks the panel away, and brings it back.", do: async h => { await h.click("#propBtn"); await h.wait(1300); await h.click("#propBtn"); } },
+    { say: "You can also work directly on the bars. Drag one to move it, drag an edge to change its length, and if you change your mind, Undo takes you back a step.", do: async h => {
         const c = await h.pt("#b-a3"); await h.dragTo(c, { x: c.x + 60, y: c.y }); await h.wait(600);
         const e = await h.pt("#b-a3", 0.97); await h.dragTo(e, { x: e.x + 50, y: e.y }); await h.wait(600);
         await h.click("#undo"); } }
   ] },
   { id: "04-cards", kicker: "Make it yours", title: "Cards and display", panel: true, mode: "edit", cols: false, scenes: [
-    { say: "Now, make it yours." },
-    { say: "Floating cards sit over the chart. Drag them anywhere.", do: async h => { const p = await h.pt("#fc-f1 .md"); await h.dragTo(p, { x: p.x - 120, y: p.y + 60 }, 1400); } },
-    { say: "A pinned card belongs to its row. Hide the rows above it, switch to View, and it moves up with its row.", do: async h => {
+    { say: "A roadmap is more than bars. Let's add some notes, and make it look like yours." },
+    { say: "Floating cards are notes that sit over the chart. Drag one to wherever it tells the story best.", do: async h => { const p = await h.pt("#fc-f1 .md"); await h.dragTo(p, { x: p.x - 120, y: p.y + 60 }, 1400); } },
+    { say: "Each card is pinned to its row. Hide the rows above it and switch to View, and the card moves up with its row, so it still points at the right thing.", do: async h => {
         await h.click("#eh-a3"); await h.click("#eh-a4"); await h.wait(500); await h.click("#modeView"); await h.wait(1600); await h.click("#modeEdit"); } },
-    { say: "Panel cards live on the Cards tab. Edit a title in place.", do: async h => {
+    { say: "There is a second kind of card on the right, good for principles or key messages. Open its tab, and edit a title in place.", do: async h => {
         await h.click("#pt-cards"); await h.click("#ce-n-n1-title"); await h.key("Control+A"); await h.type("Tea, always"); await h.key("Enter"); } },
-    { say: "Square or rounded corners. Light or dark. Your fonts. It's all in Properties.", do: async h => {
+    { say: "Not sure about colours? Randomise colours suggests a fresh, matched set. Press it again for another idea, and flip between light and dark to see how it holds up.", do: async h => {
+        await h.click("#pt-props"); await h.click("#randCol"); await h.wait(1500); await h.click("#randCol"); await h.wait(1500);
+        await h.click("#flipTheme"); await h.wait(1500); await h.click("#flipTheme"); } },
+    { say: "The rest of the look is in Properties as well. Square or rounded corners, a light or a dark theme, and the fonts you prefer.", do: async h => {
         await h.click("#pt-props"); await h.click("#t-roundCards"); await h.wait(1100);
         await h.glide(await h.pt("#t-theme")); await h.pulse(); await h.set("#t-theme", h.theme === "dark" ? "light" : "dark"); await h.wait(1900);
         await h.pulse(); await h.set("#t-theme", "auto"); } }
   ] },
   { id: "05-json", kicker: "For precise changes", title: "JSON and files", panel: false, mode: "edit", cols: false, scenes: [
-    { say: "For fast, precise changes, there's a live JSON editor." },
-    { say: "Open the JSON editor. It takes the left side, with every activity on one line.", do: async h => { await h.click("#jsonBtn"); await h.wait(500); } },
-    { say: "Change a date, and the chart follows instantly.", do: async h => {
+    { say: "Sometimes it is quicker to edit a plan as text. For that, there is a live JSON editor." },
+    { say: "Open it, and it takes the left side of the screen. Every activity is one numbered line, with its start and its end.", do: async h => { await h.click("#jsonBtn"); await h.wait(500); } },
+    { say: "Change a date in the text, and the bar on the chart moves as you type. The two are always the same roadmap.", do: async h => {
         await h.glide(await h.pt("#src", 0.6, 0.1)); await h.pulse();
         await h.page.evaluate(() => { const t = document.querySelector("#src"), i = t.value.indexOf("2028-08-31"); t.focus(); t.setSelectionRange(i, i + 10); });
         await h.wait(600); await h.type("2027-03-31", 110); } },
-    { say: "Lines are numbered. Break something, and the message names the line.", do: async h => {
+    { say: "Typing mistakes happen. When the text is not valid, nothing is changed, and the message tells you which line to look at.", do: async h => {
         await h.page.evaluate(() => { const t = document.querySelector("#src"), i = t.value.indexOf('"workstreams":[') + 14; t.focus(); t.setSelectionRange(i, i + 1); t.scrollTop = 0; });
         await h.glide(await h.pt("#src", 0.3, 0.06)); await h.pulse(); await h.wait(400); await h.key("Delete"); await h.wait(900); await h.glide(await h.pt("#srcStatus", 0.3)); } },
-    { say: "Fix it, press Control S, and the text is laid out neatly again.", do: async h => { await h.type("[", 200); await h.wait(900); await h.key("Control+s"); } },
-    { say: "Cards are listed too. Retype a title, and the card updates.", do: async h => {
+    { say: "Put it right, press Control S, and the text is laid out neatly again.", do: async h => { await h.type("[", 200); await h.wait(900); await h.key("Control+s"); } },
+    { say: "Cards are listed here as well. Retype a title, and the card on the chart updates to match.", do: async h => {
         await h.page.evaluate(() => { const t = document.querySelector("#src"), i = t.value.indexOf('"title":"Wombat Wrangling"') + 9; t.focus(); t.setSelectionRange(i, i + 16); const line = t.value.slice(0, i).split("\n").length; t.scrollTop = Math.max(0, line * 17 - t.clientHeight / 2); t.scrollLeft = 0; });
         await h.glide(await h.pt("#src", 0.5, 0.5)); await h.pulse(); await h.wait(500); await h.type("Wombat herding", 90); } },
-    { say: "When you're ready, export a roadmap file, a standalone page, an image of this view, or a PDF.", do: async h => { await h.click("#exBtn"); await h.wait(1900); await h.key("Escape"); } },
-    { say: "Roadmap Builder. Plan it. See it. Share it.", do: async h => { await h.title("Roadmap Builder", "Plan it. See it. Share it.", ""); } }
+    { say: "When you are ready to share, Export offers a roadmap file to keep, a standalone page, a view-only page, an image of what is on screen, or a PDF.", do: async h => { await h.click("#exBtn"); await h.wait(1900); await h.key("Escape"); } },
+    { say: "That is Roadmap Builder. Plan it, see it, and share it.", do: async h => { await h.title("Roadmap Builder", "Plan it. See it. Share it.", ""); } }
   ] }
 ];
 
@@ -296,9 +305,10 @@ fs.mkdirSync(OUT, { recursive: true }); fs.mkdirSync(TMP, { recursive: true });
 const only = process.argv[2];
 const chapters = CHAPTERS.filter(c => !only || c.id === only);
 
+// "JSON" is spelt "Jayson" for the voice only; the subtitles keep "JSON".
 // Narration first, in one go: the same recordings serve the light and the dark version.
 const manifest = [];
-chapters.forEach(ch => { ch.clips = ch.scenes.map((s, i) => { const file = path.join(TMP, ch.id + "-say-" + i + ".wav"); manifest.push({ text: s.say, file }); return { file }; }); });
+chapters.forEach(ch => { ch.clips = ch.scenes.map((s, i) => { const file = path.join(TMP, ch.id + "-say-" + i + ".wav"); manifest.push({ text: s.say.replace(/\bJSON\b/g, "Jayson"), file }); return { file }; }); });
 fs.writeFileSync(path.join(TMP, "say.json"), JSON.stringify(manifest));
 process.stdout.write(run(PYTHON, [new URL("./speak.py", import.meta.url).pathname, path.join(TMP, "say.json")]).toString());
 chapters.forEach(ch => ch.clips.forEach(c => { c.dur = duration(c.file); }));
