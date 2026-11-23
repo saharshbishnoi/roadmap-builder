@@ -596,6 +596,42 @@ function openTour(){
   fetch("film/chapters.txt").then(r=>r.ok?r.text():"").then(t=>{const box=$("#tourChap");if(!box)return;
     box.innerHTML=t.split("\n").map(l=>/^(\d\d):(\d\d)\s+(.+)$/.exec(l.trim())).filter(Boolean).map(m=>'<button type="button" class="chipb" data-seek="'+(+m[1]*60+ +m[2])+'">'+m[1]+':'+m[2]+' '+esc(m[3])+'</button>').join("");}).catch(()=>{});
 }
+/* ---------- colour ideas ---------- */
+/* Randomise colours: a fresh, matched set for the header, the highlight, the today line and every workstream, built
+   around one random hue. Colours are mid-toned so they read on both the light and the dark theme. */
+function hsl(h,s,l){
+  h=((h%360)+360)%360;s/=100;l/=100;const k=n=>(n+h/30)%12,a=s*Math.min(l,1-l),f=n=>l-a*Math.max(-1,Math.min(k(n)-3,Math.min(9-k(n),1)));
+  return "#"+[f(0),f(8),f(4)].map(v=>Math.round(v*255).toString(16).padStart(2,"0")).join("").toUpperCase();
+}
+function randomColours(){
+  const r=(a,b)=>a+Math.random()*(b-a),h0=Math.floor(r(0,360)),n=Math.max(1,S.phases.length);
+  const schemes=[
+    ["Full spectrum",i=>[h0+i*360/n,r(58,70),r(44,50)]],
+    ["Neighbouring hues",i=>[h0+(i-(n-1)/2)*Math.min(26,150/n),r(50,68),40+(i%3)*7]],
+    ["Two families",i=>[h0+(i%2?165:0)+Math.floor(i/2)*14,r(52,66),40+(Math.floor(i/2)%3)*7]],
+    ["Three families",i=>[h0+(i%3)*120+Math.floor(i/3)*16,r(52,66),42+(Math.floor(i/3)%2)*8]],
+    ["One hue, many shades",i=>[h0+(i%2?10:-10),r(40,64),30+i*(34/Math.max(1,n-1))]],
+    ["Soft and muted",i=>[h0+i*360/n,r(30,42),r(46,54)]]
+  ];
+  const pick=schemes[Math.floor(Math.random()*schemes.length)],pal=S.phases.map((p,i)=>hsl.apply(null,pick[1](i)));
+  const warm=(h0>330||h0<25)?38:350;   // the today line stays a warm warning colour, away from the base hue
+  mutate(()=>{
+    const st=S.settings,of=i=>pal[((i%pal.length)+pal.length)%pal.length];
+    st.banner=hsl(h0,r(42,60),r(15,22));st.bannerInk="#FFFFFF";st.accent=hsl(h0+r(-12,12),r(68,80),r(46,52));st.today=hsl(warm,82,52);
+    S.phases.forEach((p,i)=>{p.color=pal[i];});
+    S.critical.forEach((c,i)=>{const v=pick[1](i);c.color=hsl(v[0],Math.min(70,v[1]+4),Math.max(30,v[2]-8));});
+    S.milestones.forEach((m,i)=>{m.color=of(i);});
+    // A card that carries a workstream's number takes that workstream's colour; the rest go round the set.
+    const byBadge=(c,i)=>{const b=parseInt(c.badge,10);return b>=1&&b<=pal.length?pal[b-1]:of(i);};
+    S.cards.forEach((c,i)=>{c.color=byBadge(c,i);});S.panel.forEach((c,i)=>{c.color=byBadge(c,i);});
+  });
+  toast("New colours: "+pick[0].toLowerCase()+". Press again for another idea.",true);
+}
+function flipTheme(){
+  const t=document.documentElement.getAttribute("data-theme"),dark=t?t==="dark":!!(window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches);
+  setView(()=>{S.settings.theme=dark?"light":"dark";});
+}
+
 /* ---------- adding ---------- */
 function centreMonth(){const c=$("#chart");return Math.min(months()-1,Math.max(0,Math.floor((c.scrollLeft+(c.clientWidth-leftW())/2)/mw)));}
 function addAct(pid){const M=months(),i=centreMonth(),id=uid();
@@ -888,6 +924,7 @@ const ACT={
   today:()=>{const p=pos(todayIso()),c=$("#chart");if(p<0||p>months()){toast("Today, "+fmtD(todayIso())+", is outside this timeline. Change the start year in the banner, in Edit mode.");return;}c.scrollLeft=Math.max(0,p*mw-(c.clientWidth-leftW())/2);},
   import:()=>$("#file").click(),exJson:()=>saveFile(slug()+".json",JSON.stringify(S,null,2)),exCsv:()=>saveFile(slug()+".csv",toCSV()),
   exHtml:()=>exportHtml(false),exHtmlView:()=>exportHtml(true),exPngAll:()=>exportVisual("png",true),tour:openTour,tourHide:hideTour,
+  randCol:randomColours,flipTheme:flipTheme,
   json:()=>{ui.json=!ui.json;saveUi();render();},srcFormat:srcFormat,props:()=>setView(()=>{S.settings.showPanel=!S.settings.showPanel;}),
   help:()=>{const w=window.open("help.html","roadmap-help");if(!w)toast("The browser blocked the Help window. Allow pop-ups for this page, or open help.html yourself.");},exPng:()=>exportVisual("png"),exPdfA3:()=>exportVisual("pdfA3",true),exPdf:()=>exportVisual("pdf",true),deselect:()=>select(null),
   clear:()=>{mutate(()=>{S.activities=[];S.milestones=[];S.critical=[];S.cards=[];S.panel=[];});toast("Cleared all content",true);},

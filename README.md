@@ -138,6 +138,10 @@ dates), Display (theme, floating cards, rounded cards, 3D effect), Header (size 
 heading, its colours, the name of the Cards tab, and the date chip), Timeline (start year, years
 shown, today line colour) and, on its Cards tab, the panel cards.
 
+**Colour ideas.** Under Display, Randomise colours gives the header, the highlight and every
+workstream a fresh, matched set of colours built around one random hue, chosen to read on both
+themes. Press it again for another idea, use Light / dark to check each one, and Undo to go back.
+
 **Header.** A slim bar with a short heading and a small tagline, both typed in place in Edit mode.
 The date chip sits on the right; it can be switched off, or kept on screen but left out of exports,
 where it reads "As at" the day of the export. Drag its edge to resize it.

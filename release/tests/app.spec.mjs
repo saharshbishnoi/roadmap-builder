@@ -579,3 +579,28 @@ test("the timeline years are set in Properties", async ({ page }) => {
   await expect(page.locator(".year")).toHaveCount(4);
   expect((await state(page)).years).toBe(4);
 });
+
+test("Randomise colours gives a new matched set each time, and Undo brings the old colours back", async ({ page }) => {
+  await open(page, "edit");
+  const colours = async () => { const s = await state(page); return { banner: s.settings.banner, accent: s.settings.accent, ws: s.phases.map(p => p.color), cards: s.cards.map(c => c.color), all: [s.settings.banner, s.settings.bannerInk, s.settings.accent, s.settings.today].concat(s.phases.map(p => p.color), s.critical.map(c => c.color), s.milestones.map(m => m.color), s.cards.map(c => c.color), s.panel.map(c => c.color)) }; };
+  const before = await colours();
+  await page.click("#randCol");
+  const first = await colours();
+  for (const c of first.all) expect(c).toMatch(/^#[0-9A-F]{6}$/);
+  expect(first.ws).not.toEqual(before.ws);
+  expect(new Set(first.ws).size).toBe(first.ws.length);                       // every workstream gets its own colour
+  expect(first.cards[0]).toBe(first.ws[0]);                                   // card "1" follows workstream 1
+  await expect(page.locator("#toast")).toContainText("New colours");
+  await page.click("#randCol");
+  expect((await colours()).ws).not.toEqual(first.ws);
+  await page.click("#undo");
+  expect((await colours()).ws).toEqual(first.ws);
+  await page.click("#undo");
+  expect(await colours()).toEqual(before);
+  // Light / dark switches the theme either way.
+  const theme = () => page.evaluate(() => document.documentElement.getAttribute("data-theme"));
+  await page.click("#flipTheme");
+  const one = await theme();
+  await page.click("#flipTheme");
+  expect([one, await theme()].sort()).toEqual(["dark", "light"]);
+});

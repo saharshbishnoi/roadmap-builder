@@ -27,6 +27,7 @@ window.GUIDE=[
     "Drag a floating card anywhere over the chart, and drag its right edge to change its width.",
     "Use the pin on a floating card to keep it on the row it sits on. A pinned card moves with its row, so it stays in the right place when rows are hidden in View mode. Unpinned, it stays a fixed distance from the top.",
     "Panel cards are on the Cards tab of the right panel. Lane headings, column headings and the Cards heading are edited in place.",
+    "Under Display, Randomise colours gives the header and every workstream a fresh, matched set of colours; press it again for another idea, and use Light / dark to check each one in both themes. Undo brings the old colours back.",
     "Under Display, set the theme and rounded or square cards. Under Header, set the size and font of the heading, its colours, the name of the Cards tab, and whether the date chip on the right is shown and kept in exports. Under Timeline, set the start year and the number of years."]},
   {id:"json",title:"JSON and files",clip:"guide/05-json",steps:[
     "In Edit mode, select JSON in the toolbar. The editor opens as a full-height panel on the left, with one line per activity and its start and end.",
