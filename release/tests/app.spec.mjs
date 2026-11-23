@@ -46,6 +46,10 @@ test("headings are not in capitals and cards are square by default; Rounded card
   await page.check("#t-roundCards");
   await expect(page.locator(".fcard").first()).toHaveCSS("border-top-left-radius", "8px");
   await expect(page.locator(".pcard").first()).toHaveCSS("border-top-left-radius", "8px");
+  // The dialog keeps its accent strip square: only its bottom corners round.
+  await expect(page.locator("#card")).toHaveCSS("border-top-left-radius", "0px");
+  await expect(page.locator("#card")).toHaveCSS("border-top-right-radius", "0px");
+  await expect(page.locator("#card")).toHaveCSS("border-bottom-left-radius", "10px");
 });
 
 test("the add row creates activities without dates, and a click on the timeline places one", async ({ page }) => {

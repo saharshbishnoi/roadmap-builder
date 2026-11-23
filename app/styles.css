@@ -337,7 +337,8 @@ body.exporting .fx3d{transform:none!important}
 /* Rounded cards (Display bar): floating, panel, hover and dialog cards. Off means square corners everywhere. */
 body.round .fcard,body.round .pcard,body.round .tile,body.round #hover{border-radius:8px}
 body.round .badge{border-radius:17px}
-body.round .card{border-radius:10px}
+/* The dialog's coloured accent strip runs along its top edge and always stays square: only the bottom corners round. */
+body.round .card{border-radius:0 0 10px 10px}
 #hover #tipReset{background:transparent;border:1px solid var(--line);border-radius:3px;padding:1px 6px;cursor:pointer;margin-left:4px}
 #hover #tipFoot .thint{border-top:0;padding-top:0;margin-top:4px}
 
