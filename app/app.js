@@ -322,6 +322,7 @@ function render(soft){
   $("#jsonBtn").classList.toggle("on",ui.json);$("#jsonBtn").setAttribute("aria-pressed",String(ui.json));
   $("#propBtn").classList.toggle("on",st.showPanel);$("#propBtn").setAttribute("aria-pressed",String(st.showPanel));
   $("#helpBtn").hidden=!!EMBED;
+  {const d=isDark(),b=$("#themeBtn");b.textContent=d?"☀ Light":"☾ Dark";b.title=d?"Switch to the light theme":"Switch to the dark theme";}
 
   const t=$("#title"),g=$("#tagline");
   t.contentEditable=edit?"true":"false";g.contentEditable=edit?"true":"false";
@@ -385,8 +386,8 @@ function toast(msg,withUndo){
   const t=$("#toast");t.innerHTML='<span>'+esc(msg)+'</span>'+(withUndo?'<button type="button" id="toastUndo">Undo</button>':'');
   t.hidden=false;clearTimeout(toastT);toastT=setTimeout(()=>{t.hidden=true;},withUndo?7000:4000);
 }
-function openSheet(html,wide){hideTip();const c=$("#card");c.classList.toggle("wide",!!wide);c.innerHTML=html;$("#sheet").hidden=false;const f=$("#card button,#card textarea");if(f)f.focus();}
-function closeSheet(){$("#sheet").hidden=true;$("#card").innerHTML="";}
+function openSheet(html,wide){hideTip();const c=$("#card");c.className="card"+(wide?" wide":"");c.innerHTML=html;$("#sheet").hidden=false;const f=$("#card button,#card textarea");if(f)f.focus();}
+function closeSheet(){$("#sheet").hidden=true;$("#sheet").classList.remove("top");$("#card").innerHTML="";}
 function openInfo(kind,id){
   const o=find(kind,id);if(!o)return;
   openSheet('<h2 id="sheetTitle" style="--c:'+colourOf(kind,o)+'">'+esc(o.name)+'</h2><p class="meta">'+metaOf(kind,o)+'</p><div class="body md">'+(md(o.details)||md(o.hover)||'<p class="muted">No details have been added to this item yet.</p>')+
@@ -627,9 +628,44 @@ function randomColours(){
   });
   toast("New colours: "+pick[0].toLowerCase()+". Press again for another idea.",true);
 }
+/* Is the app showing its dark theme right now? The theme setting wins; "Match system" follows the device. */
+function isDark(){const t=document.documentElement.getAttribute("data-theme");return t?t==="dark":!!(window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches);}
 function flipTheme(){
-  const t=document.documentElement.getAttribute("data-theme"),dark=t?t==="dark":!!(window.matchMedia&&window.matchMedia("(prefers-color-scheme: dark)").matches);
+  const dark=isDark();
   setView(()=>{S.settings.theme=dark?"light":"dark";});
+}
+
+/* ---------- the Guide: a large dialog at the top of the window ----------
+   The steps for each part of the app and, where a release build has made them, the narrated videos. The videos come
+   in a light and a dark set; the dialog plays the set that matches the theme the app is showing. */
+let guideVideos=false;
+function checkGuide(){
+  const g=window.GUIDE||[];if(EMBED||!g.length)return;
+  const probe=new Image();probe.onload=()=>{guideVideos=true;if($("#card.guide"))drawGuide();};probe.src=g[0].clip+"-light.jpg";
+}
+function drawGuide(){
+  const g=window.GUIDE||[],theme=isDark()?"-dark":"-light",body=$("#guideBody");if(!body)return;
+  body.innerHTML='<p class="gintro">'+(guideVideos?"Five short narrated videos with subtitles, each beside the steps to follow.":"The steps for each part of the app.")+'</p>'+
+    g.map((x,i)=>'<section class="gstep'+(guideVideos?' vid':'')+'"><h3>'+(i+1)+'. '+esc(x.title)+'</h3>'+
+      (guideVideos?'<video id="v-'+x.id+'" controls playsinline preload="none" poster="'+x.clip+theme+'.jpg" aria-label="Video: '+esc(x.title)+'"><source src="'+x.clip+theme+'.mp4" type="video/mp4">'+
+        (FROM_FOLDER?'':'<track kind="subtitles" srclang="en" label="English" src="'+x.clip+'.vtt" default>')+'</video>':'')+
+      '<ol>'+x.steps.map(t=>'<li>'+esc(t)+'</li>').join("")+'</ol></section>').join("")+
+    (window.DOWNLOAD_URL?'<section class="rgroup" id="helpTake"><h3>Take it with you</h3><ul><li><span class="tick info" aria-hidden="true">i</span><span>Install it: use Install in the address bar of Chrome or Edge to run it in its own window, offline<small>Available when the app is opened from a web address</small></span></li>'+
+      '<li><span class="tick info" aria-hidden="true">i</span><span><a href="'+esc(window.DOWNLOAD_URL)+'" target="_blank" rel="noopener noreferrer">Download the offline copy (.zip)</a><small>The whole app with its guide videos. Unzip it and open index.html</small></span></li></ul></section>':'');
+  if(!guideVideos)return;
+  /* Opened straight from a folder, the browser will not read subtitle files, so the same subtitles are loaded as a script. */
+  if(FROM_FOLDER&&window.VTTCue)g.forEach(x=>{const add=()=>{const list=(window.GUIDE_SUBS||{})[x.clip.split("/").pop()],v=document.getElementById("v-"+x.id);if(!list||!v)return;const t=v.addTextTrack("subtitles","English","en");t.mode="showing";
+      list.forEach(c=>{const cue=new VTTCue(c[0],c[1],c[2]);cue.line=88;cue.snapToLines=false;t.addCue(cue);});};
+    if((window.GUIDE_SUBS||{})[x.clip.split("/").pop()])add();else{const sc=document.createElement("script");sc.src=x.clip+".subs.js";sc.onload=add;document.head.appendChild(sc);}});
+  /* Installed web app: keep this theme's videos for offline use. */
+  const sw=navigator.serviceWorker&&navigator.serviceWorker.controller;
+  if(sw){const urls=[];g.forEach(x=>{[theme+".mp4",theme+".jpg",".vtt"].forEach(e=>urls.push(new URL(x.clip+e,location.href).href));});sw.postMessage({type:"keepGuide",urls:urls});}
+}
+function openGuide(){
+  if(EMBED)return;
+  openSheet('<h2 id="sheetTitle">Guide<button type="button" class="gclose" data-sheet="close" aria-label="Close the guide">×</button></h2><div class="gbody" id="guideBody"></div>'+
+    '<div class="acts"><button type="button" class="btn primary" data-sheet="close">Close</button></div>',true);
+  $("#card").classList.add("guide");$("#sheet").classList.add("top");drawGuide();$("#card").scrollTop=0;
 }
 
 /* ---------- adding ---------- */
@@ -926,7 +962,7 @@ const ACT={
   exHtml:()=>exportHtml(false),exHtmlView:()=>exportHtml(true),exPngAll:()=>exportVisual("png",true),tour:openTour,tourHide:hideTour,
   randCol:randomColours,flipTheme:flipTheme,
   json:()=>{ui.json=!ui.json;saveUi();render();},srcFormat:srcFormat,props:()=>setView(()=>{S.settings.showPanel=!S.settings.showPanel;}),
-  help:()=>{const w=window.open("help.html","roadmap-help");if(!w)toast("The browser blocked the Help window. Allow pop-ups for this page, or open help.html yourself.");},exPng:()=>exportVisual("png"),exPdfA3:()=>exportVisual("pdfA3",true),exPdf:()=>exportVisual("pdf",true),deselect:()=>select(null),
+  help:openGuide,exPng:()=>exportVisual("png"),exPdfA3:()=>exportVisual("pdfA3",true),exPdf:()=>exportVisual("pdf",true),deselect:()=>select(null),
   clear:()=>{mutate(()=>{S.activities=[];S.milestones=[];S.critical=[];S.cards=[];S.panel=[];});toast("Cleared all content",true);},
   sample:()=>{mutate(()=>{S=normalise(sample());});toast("Loaded the sample roadmap",true);}
 };
@@ -1103,7 +1139,7 @@ function start(data){
   S=data&&Array.isArray(data.phases)?normalise(data):(load()||normalise(EMBED&&EMBED.roadmap?EMBED.roadmap:sample()));render();
 }
 if("serviceWorker" in navigator&&/^https?:$/.test(location.protocol)&&!window.claude&&!EMBED)navigator.serviceWorker.register("sw.js").catch(()=>{});
-checkFilm();
+checkFilm();checkGuide();
 const hot=window.claude&&window.claude.hot;
 if(hot&&typeof hot.snapshot==="function"){try{hot.snapshot(()=>S);}catch(e){}}
 if(hot&&typeof hot.ready==="function")hot.ready(start);else start((hot&&hot.data)||{});

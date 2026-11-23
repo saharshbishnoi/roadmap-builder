@@ -106,7 +106,7 @@ What is said and shown in each video is in `release/videos.mjs`; the steps under
 
 The schedule fills the window and scrolls on its own. A floating toolbar sits above it; two
 full-height panels open beside it: Properties on the right (both modes) and the JSON editor on the
-left (Edit mode). Help opens in its own window, with the steps for each part of the app and, after a
+left (Edit mode). The Guide button, at the end of the toolbar, opens a large dialog with the steps for each part of the app and, after a
 release build, a short narrated video for each. The list of requirements is in
 [docs/REQUIREMENTS.md](docs/REQUIREMENTS.md).
 
@@ -189,8 +189,7 @@ nginx.conf           static hosting and a content security policy
 app/index.html       page shell
 app/styles.css       layout, themes, fonts, 3D card effect
 app/app.js           all behaviour
-app/guide.js         the steps shown on the Help page (edit them here)
-app/help.html, app/help.js   the Help page, opened in its own window
+app/guide.js         the steps shown in the Guide dialog (edit them here)
 app/sw.js            offline support for the installed web app
 app/manifest.webmanifest, app/icon.svg   what makes the app installable
 app/guide/           guide videos, subtitles and posters: made by a release build, not in git

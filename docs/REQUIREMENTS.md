@@ -58,7 +58,8 @@ What the app is required to do, and where each thing is found. This list used to
 
 | Requirement | Where it is |
 |---|---|
-| A features list and a guide with narrated, subtitled 4K videos in light and dark | This panel: Guide and Features tabs. The videos are made by a release build |
+| A guide with narrated, subtitled 4K videos in light and dark | Guide, the last button on the toolbar, opens a large dialog at the top of the window. It plays the videos that match the theme the app is showing. The videos are made by a release build |
+| Switch between light and dark from the toolbar | The Dark / Light button beside Guide; the same setting as Theme in Properties |
 | A faint line follows the pointer across the timeline | Move the pointer over the chart; the date under it is shown at the top |
 | Smooth animation | Bars, cards and panels glide to their new place; switched off if the computer asks for reduced motion |
 | The right panel is adjustable | Drag the divider on its left edge, or focus it and use the arrow keys |

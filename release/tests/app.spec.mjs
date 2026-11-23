@@ -276,20 +276,46 @@ test("an older roadmap file is brought up to date on import", async ({ page }) =
   expect(s.activities.map(a => a.start)).toEqual(["2026-01-01", ""]);
 });
 
-test("Help opens in its own window with the steps for every chapter", async ({ page, context }) => {
+test("Guide opens a large dialog at the top, with the steps for every chapter and videos in the app's theme", async ({ page }) => {
   await open(page);
   await expect(page.locator("#pt-props")).toHaveText("Properties");
-  const [help] = await Promise.all([context.waitForEvent("page"), page.click("#helpBtn")]);
-  await help.waitForLoadState();
-  await expect(help.locator("h1")).toHaveText("Roadmap Builder help");
-  await expect(help.locator(".gstep")).toHaveCount(5);
-  await expect(help.locator(".gstep ol li").first()).toBeVisible();
-  // The videos are rendered later in the release build; where they exist each chapter has one, with subtitles.
-  if (await help.locator(".gstep video").count()) {
-    await expect(help.locator(".gstep video")).toHaveCount(5);
-    await expect(help.locator('.gstep video track[kind="subtitles"]')).toHaveCount(5);
+  // The Guide button is the last one on the toolbar, after the light / dark switch.
+  expect(await page.evaluate(() => [...document.querySelectorAll(".tools button")].filter(b => !b.closest(".menu") && b.offsetParent).slice(-2).map(b => b.id))).toEqual(["themeBtn", "helpBtn"]);
+  await page.click("#helpBtn");
+  const g = page.locator("#card.guide");
+  await expect(g.locator("h2")).toContainText("Guide");
+  await expect(g.locator(".gstep")).toHaveCount(5);
+  await expect(g.locator(".gstep ol li").first()).toBeVisible();
+  await expect(g.locator("#helpTake")).toContainText("Download the offline copy");
+  const box = await g.boundingBox();
+  expect(box.y).toBeLessThan(30);                       // at the top of the window
+  expect(box.width).toBeGreaterThan(1000);              // and big
+  // The videos are rendered later in the release build; where they exist each chapter has one, in the app's theme.
+  const has = await g.locator(".gstep video").count();
+  if (has) {
+    await expect(g.locator(".gstep video")).toHaveCount(5);
+    await expect(g.locator('.gstep video track[kind="subtitles"]')).toHaveCount(5);
+    expect(await g.locator(".gstep video source").first().getAttribute("src")).toContain("-light.mp4");
   }
-  await expect(help.locator("#helpTake")).toContainText("Download the offline copy");
+  await page.keyboard.press("Escape");
+  await expect(page.locator("#sheet")).toBeHidden();
+  if (has) {
+    await page.click("#themeBtn");
+    await page.click("#helpBtn");
+    expect(await g.locator(".gstep video source").first().getAttribute("src")).toContain("-dark.mp4");
+  }
+});
+
+test("the toolbar switches between light and dark", async ({ page }) => {
+  await open(page);
+  const theme = () => page.evaluate(() => document.documentElement.getAttribute("data-theme"));
+  await expect(page.locator("#themeBtn")).toContainText("Dark");
+  await page.click("#themeBtn");
+  expect(await theme()).toBe("dark");
+  await expect(page.locator("#themeBtn")).toContainText("Light");
+  expect((await state(page)).settings.theme).toBe("dark");
+  await page.click("#themeBtn");
+  expect(await theme()).toBe("light");
 });
 
 test("the app is installable: it has a manifest, an icon and an offline helper", async ({ page, request }) => {
@@ -310,8 +336,8 @@ test("the app works when opened straight from a folder", async ({ page }) => {
   await page.keyboard.type("From a folder");
   await page.keyboard.press("Enter");
   expect((await state(page)).activities).toHaveLength(37);
-  await page.goto(new URL("../../app/help.html", import.meta.url).href);
-  await expect(page.locator(".gstep")).toHaveCount(5);
+  await page.click("#helpBtn");
+  await expect(page.locator("#card.guide .gstep")).toHaveCount(5);
   await expect(page.locator("#helpTake")).toContainText("Download the offline copy");
 });
 

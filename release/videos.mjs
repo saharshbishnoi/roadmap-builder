@@ -62,7 +62,7 @@ const CHAPTERS = [
         const y = await h.pt(".years", 0.35); await h.dragTo(y, { x: y.x + 150, y: y.y }, 1300); await h.wait(700);
         const r = await h.pt("#r-a11 .aname"); await h.glide(r); await h.pulse(); await h.page.mouse.click(r.x, r.y, { button: "right" }); await h.wait(700);
         await h.click("#ctx button:nth-of-type(2)"); } },
-    { say: "If you ever need a reminder, the Help button opens these steps in a window of their own.", do: async h => { await h.glide(await h.pt("#helpBtn")); await h.pulse(); } }
+    { say: "If you ever need a reminder, the Guide button at the end of the toolbar opens these steps, with the videos beside them.", do: async h => { await h.glide(await h.pt("#helpBtn")); await h.pulse(); } }
   ] },
   { id: "02-rows", kicker: "Edit mode", title: "Add and edit rows", panel: false, mode: "edit", scenes: [
     { say: "Now let's change the roadmap. You will find that editing happens right where you are looking." },

@@ -1,4 +1,4 @@
-/* Content for the Help page (help.html). Rebuild it whenever the app changes: rebuild the videos in app/guide/ with a
+/* Content for the Guide dialog (the Guide button at the end of the toolbar). Rebuild it whenever the app changes: rebuild the videos in app/guide/ with a
    release build (RELEASE=1 docker compose up -d --build) and bring the steps up to date. The requirements list is in
    docs/REQUIREMENTS.md. */
 window.GUIDE=[
@@ -9,7 +9,8 @@ window.GUIDE=[
     "The schedule fills the window and scrolls on its own, up and down and sideways; the headings stay in place.",
     "Drag the year scale left or right to squeeze or stretch the timeline. Double-click it to fit the window. A faint line follows the pointer and shows the date under it.",
     "Right-click a row and choose Fit the timeline to this row: the timeline is scaled and scrolled so that row's dates fill the middle 80% of the screen.",
-    "Drag the right edge of the Workstream / activity heading to make that column wider or narrower. Right-click a row, bar, milestone, card or the empty timeline for a menu of what you can do there."]},
+    "Drag the right edge of the Workstream / activity heading to make that column wider or narrower. Right-click a row, bar, milestone, card or the empty timeline for a menu of what you can do there.",
+    "At the end of the toolbar, Dark or Light switches the theme, and Guide opens these steps in a large dialog. The videos shown match the theme you are in."]},
   {id:"rows",title:"Add and edit rows",clip:"guide/02-rows",steps:[
     "Switch to Edit. Type straight into a name or a date. Each row has a colour square, an eye to hide it, a pencil for all settings and a cross to delete.",
     "To add an activity, type a name in the highlighted Add an activity row at the end of a workstream and press Enter. Keep typing to add more. The last row adds a workstream.",

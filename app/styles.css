@@ -518,13 +518,19 @@ body.exporting .hrow{position:static}
 body.exporting #xpanel{margin-left:14px}
 body.exporting .tzoom{display:none}
 
-/* help page */
-body.helpbody{overflow:auto}
-.help{max-width:900px;margin:0 auto;padding:24px 16px 48px;display:flex;flex-direction:column;gap:16px}
-.helphead h1{margin:0 0 6px;font:700 calc(28px * var(--fz))/1.1 var(--display)}
-.helphead p{margin:0;color:var(--muted)}
-.help .gstep h2,.help .rgroup h2{margin:0;font:700 calc(17px * var(--fz))/1.2 var(--display)}
-.help .rgroup:empty{display:none}
+/* the Guide: a large dialog at the top of the window */
+.sheet.top{align-items:flex-start}
+.card.guide{width:min(1280px,100%)}
+.card.guide>h2{display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:2}
+.card.guide .gclose{background:transparent;border:0;color:inherit;font:400 24px/1 var(--body);padding:0 4px;cursor:pointer;opacity:.85}
+.card.guide .gclose:hover{opacity:1}
+.card.guide .gbody{padding:14px 16px 4px;display:flex;flex-direction:column;gap:14px}
+.card.guide .gintro{margin:0;color:var(--muted)}
+.card.guide .gstep h3,.card.guide .rgroup h3{font-size:calc(16px * var(--fz))}
+.card.guide .gstep.vid{display:grid;grid-template-columns:minmax(0,3fr) minmax(0,2fr);gap:10px 16px;align-items:start}
+.card.guide .gstep.vid h3{grid-column:1/-1}
+.card.guide .acts{position:sticky;bottom:0;padding:10px 16px;margin-top:12px;background:var(--surface);border-top:1px solid var(--line)}
+@media (max-width:820px){.card.guide .gstep.vid{grid-template-columns:1fr}}
 
 @media (max-width:1000px){
   .side.right{position:absolute;right:10px;top:10px;bottom:10px;height:auto;z-index:34;box-shadow:0 10px 30px -8px rgba(var(--shadow),.5);max-width:calc(100vw - 20px)}

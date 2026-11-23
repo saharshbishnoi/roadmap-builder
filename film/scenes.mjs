@@ -174,7 +174,7 @@ export const FILM = {
         async f => { await f.open("app/index.html"); await f.waitFor("#inner .row"); await f.click("#r-a11 .aname", { button: "right" }); await f.menu("Fit the timeline to this row"); await f.pause(500);
           await f.click("#exBtn"); await f.click('[data-act="exPng"]'); await f.waitFor("#toast", { text: ".png", frames: 900 }); },
         async f => { await f.click("#exBtn"); await f.click('[data-act="exPdfA3"]'); await f.waitFor("#toast", { text: ".pdf", frames: 900 }); },
-        async f => { await f.hover("#helpBtn"); await f.ring(); await f.open("app/help.html"); await f.waitFor(".gstep"); await f.pause(500); }
+        async f => { await f.hover("#helpBtn"); await f.ring(); await f.click("#helpBtn"); await f.waitFor("#card.guide .gstep"); await f.pause(500); }
       ],
       lines: [
         "A roadmap is only useful when other people can see it. So, finally, let's share it.",
@@ -186,7 +186,7 @@ export const FILM = {
         "If you would rather they look but not change anything, collapse what they do not need and export a view-only page. It opens exactly as you left it, with no Edit button.",
         "For a slide, fit the timeline to the part you want to talk about and export an image of this view. The picture shows just what is on your screen.",
         "For print, there is a PDF that fits the whole roadmap onto a single A3 page.",
-        "And if you ever get stuck, Help opens in its own window, with every step written down for each part of the app."
+        "And if you ever get stuck, the Guide button opens a large dialog, with every step written down for each part of the app."
       ] }
   ],
 
