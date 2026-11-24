@@ -685,6 +685,7 @@ test("Ctrl+K and Ctrl+Space open a command palette with grouped, searchable comm
   await expect(page.locator("#palIn")).toBeFocused();
   expect(await groups()).toEqual(["View", "Add", "Edit", "Show or hide", "Files", "Help"]);
   await expect(rows.first()).toHaveClass(/on/);
+  await expect(rows.first()).toHaveCSS("border-radius", "0px");
   // The same key closes it, and so does Escape; Ctrl+Space opens it too.
   await page.keyboard.press("Control+k");
   await expect(pal).toBeHidden();
