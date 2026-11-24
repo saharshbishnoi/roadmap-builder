@@ -855,6 +855,87 @@ test("dependencies: lines show on hover or for all, turn red when dates clash, a
   await expect(page.locator("#deps .dep")).toHaveCount(6);
 });
 
+test("slides: views are saved in Edit on the Slides tab, and presenting glides between them with a progress bar", async ({ page }) => {
+  await open(page, "edit");
+  // What is on screen, in months: where the timeline starts and how wide a year is drawn.
+  const view = () => page.evaluate(() => { const c = document.querySelector("#chart"), y = document.querySelector("#inner .year").getBoundingClientRect().width; return { left: Math.round(c.scrollLeft), from: Math.round(c.scrollLeft / (y / 12) * 10) / 10, year: Math.round(y) }; });
+  const slides = async () => (await state(page)).slides;
+  // How much of the progress bar is filled, as a share of its width, and how many pieces it has.
+  const bar = () => page.evaluate(() => { const b = document.querySelector("#prsBar"), f = document.querySelector("#prsFill"); return Math.round(f.getBoundingClientRect().width / b.getBoundingClientRect().width * 100) / 100; });
+  // The sample has four. Start clean and make two in Edit mode.
+  await page.click("#pt-slides");
+  await expect(page.locator("#tabSlides .scard")).toHaveCount(4);
+  for (let i = 0; i < 4; i++) await page.locator("#tabSlides .del").first().click();
+  expect(await slides()).toHaveLength(0);
+  await page.click('[data-act="zfit"]');
+  await page.click("#slAdd");
+  await page.keyboard.type("Everything");
+  await page.keyboard.press("Enter");
+  await page.click('[data-act="zin"]'); await page.click('[data-act="zin"]'); await page.click('[data-act="zin"]');
+  await settle(page);
+  await page.evaluate(() => { document.querySelector("#chart").scrollLeft = 400; });
+  await page.locator("#g-p2 .caret").click();
+  await page.click("#slAdd");
+  await page.keyboard.type("Close up");
+  await page.keyboard.press("Enter");
+  const s2 = (await slides())[1];
+  await page.locator("#ce-v-" + s2.id + "-note").click();
+  await page.keyboard.type("Biscuits are folded away.");
+  await page.keyboard.press("Enter");
+  let all = await slides();
+  expect(all.map(v => [v.title, v.note])).toEqual([["Everything", ""], ["Close up", "Biscuits are folded away."]]);
+  expect(all[1].collapsed).toEqual(["p2"]);
+  expect(all[1].span).toBeLessThan(all[0].span);
+  expect(all[1].from).toBeGreaterThan(all[0].from);
+  const want = Math.round(all[1].from * 10) / 10;
+  // The glide time is set here, and slides can be reordered.
+  await page.selectOption("#t-slideSecs", "0.5");
+  expect((await state(page)).settings.slideSecs).toBe(0.5);
+  // In View mode the cards cannot be changed; Present starts at the first slide.
+  await page.click("#modeView");
+  await expect(page.locator("#slAdd")).toHaveCount(0);
+  await expect(page.locator("#tabSlides [contenteditable=true]")).toHaveCount(0);
+  await expect(page.locator("#tabSlides .snote")).toHaveCount(1);
+  await page.click("#presentBtn");
+  await expect(page.locator("body")).toHaveClass(/presenting/);
+  await expect(page.locator("#prsBar")).toBeVisible();
+  expect((await page.locator("#prsBar").boundingBox()).height).toBeLessThanOrEqual(4);
+  await expect(page.locator("#prsBar i")).toHaveCount(2);
+  await expect.poll(bar).toBe(0.5);
+  await expect(page.locator("#prsCount")).toHaveText("1 / 2");
+  await expect.poll(async () => (await view()).left).toBe(0);
+  expect((await state(page)).phases[1].collapsed).toBe(false);
+  // Right arrow glides to the next view; it passes through views in between rather than jumping.
+  await page.keyboard.press("ArrowRight");
+  await page.waitForTimeout(200);
+  const mid = await view(), part = await bar();
+  expect(part, "the bar glides too").toBeGreaterThan(0.5);
+  expect(part).toBeLessThan(1);
+  expect(mid.from).toBeGreaterThan(0);
+  expect(mid.from).toBeLessThan(want);
+  await expect.poll(async () => Math.abs((await view()).from - want)).toBeLessThan(0.2);   // the same months as were saved, whatever the window width
+  const wide = (await view()).year;
+  await expect.poll(bar).toBe(1);
+  await expect(page.locator("#prsTitle")).toHaveText("Close up");
+  await expect(page.locator("#sc-" + s2.id)).toHaveClass(/now/);
+  expect((await state(page)).phases[1].collapsed).toBe(true);
+  // And back again; clicking a card goes straight to it.
+  await page.keyboard.press("ArrowLeft");
+  await expect.poll(async () => (await view()).left).toBe(0);
+  expect((await view()).year).toBeLessThan(wide);
+  await expect.poll(bar).toBe(0.5);
+  await page.locator("#sc-" + s2.id).click();
+  await expect(page.locator("#prsCount")).toHaveText("2 / 2");
+  // Escape, or the right-click menu, stops it.
+  await page.keyboard.press("Escape");
+  await expect(page.locator("body")).not.toHaveClass(/presenting/);
+  await expect(page.locator("#prsBar")).toBeHidden();
+  await page.click("#presentBtn");
+  await page.locator("#r-a2 .aname").click({ button: "right" });
+  await page.locator("#ctx button", { hasText: "Stop presenting" }).click();
+  await expect(page.locator("body")).not.toHaveClass(/presenting/);
+});
+
 test("the Cards heading is renamed in Properties, and the tab follows", async ({ page }) => {
   await open(page, "edit");
   await expect(page.locator("#pt-cards")).toHaveText("Guiding principles");

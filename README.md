@@ -195,6 +195,24 @@ workstream away or opens it again; a click on a bar or milestone still shows its
 target again, or Stop tracking the pointer in the right-click menu ends it. It works in View mode;
 switching to Edit ends it, and nothing about it is saved.
 
+**Slides.** A slide is a saved view of the roadmap: the zoom, the place on the timeline, the row at
+the top and which workstreams are folded, with a title and an optional description. Slides are made
+in Edit mode only, on the Slides tab of the right panel: set the roadmap up, then "Save this view as
+a slide". Each slide is a card that can be renamed in place, reordered, shown, pointed at the view
+now on screen ("Use this view") or deleted. "Glide between slides" sets how many seconds a change
+takes, from no glide to five seconds.
+
+**Presenting.** The screen on the toolbar, Present on the Slides tab, or Commands starts it at the
+first slide. The roadmap glides smoothly from one saved view to the next: right arrow, Space or
+Enter goes forward, left arrow goes back, Home and End go to the ends, and a click on a slide's card
+goes straight to it. A very thin bar across the top of the window has one piece per slide, and a
+fill that glides along it in step with the roadmap, taking the same number of seconds: the filled
+part is done and on show, the faint part is left. A small tag at the bottom
+left shows the count and title with back and forward buttons. Esc, the screen again, or Stop
+presenting in the right-click menu ends it. A slide stores months, not pixels, so it shows the same
+stretch of the timeline on any screen. Slides are kept in the roadmap file, so a standalone page,
+including a view-only one, can be presented too. Folding done by a slide stays as it is afterwards.
+
 **Commands.** Ctrl+K (Cmd+K on a Mac) or Ctrl+Space, or the Ctrl K button on the toolbar, opens a
 search box over everything the app can do, in groups: View, Add, Edit, Show or hide, Files and Help.
 Type a few letters, move with the arrow keys and press Enter. Switches say whether they are Shown

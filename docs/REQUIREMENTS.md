@@ -30,6 +30,9 @@ What the app is required to do, and where each thing is found. This list used to
 | Common functions and actions from the keyboard | Ctrl+K or Ctrl+Space, or Ctrl K on the toolbar: a search box over grouped commands (View, Add, Edit, Show or hide, Files, Help), settings and the names on the roadmap |
 | A way to present by steering with the pointer | The target on the toolbar: the timeline glides towards the edge the pointer is near, the wheel zooms, a click on a row folds its workstream. Esc or the right-click menu ends it |
 | Dependencies between activities, kept light | Edit mode: drag from the dot at the end of a bar to the row that waits for it. Lines show on hover and for the selected bar; the Links eye shows all. A line turns red when the dates clash; nothing is moved automatically |
+| Slides made by the presenter, in Edit mode only | The Slides tab of the right panel: Save this view as a slide. Each slide is a card with a title and an optional description; reorder, replace its view, or delete |
+| A presentation mode that glides between the saved views, forwards and back, over a set number of seconds | The screen on the toolbar, or Present on the Slides tab. Arrow keys, Space or a click on a card. Glide between slides sets the seconds |
+| A very small progress accent while presenting | A thin bar across the top of the window, one piece per slide, with a fill that glides in step with the roadmap: done and left |
 | Text that reads naturally, not squeezed | Open Sans for headings and text, with no letter-spacing. Other fonts under Text in Properties |
 | A modern header that takes little space, in a choice of looks | Properties, Header, Style: Label tab, Solid strip, Glass strip, Underline, Two-tone (one 28-pixel line, square corners) or Classic |
 | Add rows by typing, like a list | Add an activity row at the end of each workstream, and Add a workstream at the bottom |

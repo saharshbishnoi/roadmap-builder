@@ -12,7 +12,7 @@ const EMBED=(()=>{try{const e=document.getElementById("roadmap-data");return e?J
 const TAIL=EMBED&&EMBED.id?":"+String(EMBED.id).replace(/[^\w-]/g,""):"";
 const KEY="roadmap-app-v2"+TAIL,UIKEY="roadmap-app-ui"+TAIL;
 const VIEWONLY=!!(EMBED&&EMBED.viewOnly);   // a page exported as "view only"
-const COLL={a:"activities",k:"milestones",c:"critical",p:"phases",f:"cards",n:"panel"};
+const COLL={a:"activities",k:"milestones",c:"critical",p:"phases",f:"cards",n:"panel",v:"slides"};
 /* How the header is drawn (Properties, Header, Style). All but "classic" are one line, 28px tall, with square corners. */
 const BANNERS=["tab","strip","glass","underline","twotone","classic"];
 const MONTHS=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
@@ -80,6 +80,10 @@ function sample(){
   const C=[["Kettle on",2,9,"#3BA3C4"],["Biscuits",10,16,"#2456A6"],["Sprockets",17,24,"#E0782A"],["Custard",25,30,"#5B3FA8"],["Honk",31,36,"#B5232F"],["Pigeons",37,43,"#2C7A3D"],["Nap time",44,95,"#4A5568"]];
   return {version:4,title:"Project Wombat",tagline:"Wibble Modernisation Programme",startYear:Y,years:8,settings:{panelTitle:"Guiding principles"},
     phases:P.map(p=>({id:p[0],name:p[1],sub:p[2],color:p[3]})),activities:acts,
+    slides:[{id:"v1",title:"The whole programme",note:"Eight years on one page, every workstream folded.",from:0,span:96,row:"p1",dy:0,collapsed:["p1","p2","p3","p4","p5","p6","p7"]},
+      {id:"v2",title:"Wombats and biscuits",note:"The first two years: herding, whistling and the ceremonial tin.",from:0,span:40,row:"p1",dy:0,collapsed:["p3","p4","p5","p6","p7"]},
+      {id:"v3",title:"Sprockets to custard",note:"The busy middle, where most things wait for something else.",from:9,span:32,row:"p3",dy:0,collapsed:["p1","p2","p6","p7"]},
+      {id:"v4",title:"Pigeons, then a long nap",note:"",from:26,span:70,row:"p6",dy:0,collapsed:["p1","p2","p3","p4","p5"]}],
     milestones:K.map((k,i)=>({id:"k"+(i+1),name:k[0],date:at(k[1]),color:k[2],line:true,hover:"",details:i===0?"The kettle is the **single point of failure** for the whole programme.":""})),
     critical:C.map((c,i)=>({id:"c"+(i+1),name:c[0],start:at(c[1]),end:end(c[2]),color:c[3],hover:"",details:""})),
     cards:[{id:"f1",title:"Wombat Wrangling",badge:"1",color:"#1E88E5",date:at(52),y:28,w:236,pin:true,row:"a1",dy:-2,md:"**Start** "+fmtD(at(2))+"  \n**End** "+fmtD(end(36))+"\n\n**Key outputs**\n- Wombats herded\n- Fence painted, invisibly\n- Spaghetti untangled"},
@@ -103,10 +107,10 @@ function normalise(d){
   const font=k=>FONTS[k]&&!(v3&&k==="barlow")?k:"opensans";
   const old=!(+d.version>=3),v3=!(+d.version>=4),o={version:4,title:str(d.title)||"Untitled programme",tagline:str(d.tagline),startYear:int(d.startYear,1990,2100,new Date().getFullYear()),years:int(d.years,1,15,8),
     settings:{theme:["auto","light","dark"].indexOf(st.theme)>=0?st.theme:"auto",banner:hex(st.banner,"#14275A"),bannerInk:hex(st.bannerInk,"#FFFFFF"),accent:hex(st.accent,"#2F6FED"),today:hex(st.today,"#E11D48"),
-      showToday:bool(st.showToday,true),showCritical:bool(st.showCritical,true),showLines:bool(st.showLines,true),colStart:bool(st.colStart,true),colEnd:bool(st.colEnd,true),barName:bool(st.barName,false),barStart:bool(st.barStart,bool(st.showLabels,true)),barEnd:bool(st.barEnd,bool(st.showLabels,true)),showCards:bool(st.showCards,true),showDeps:bool(st.showDeps,false),showPanel:bool(st.showPanel,true),float3d:bool(st.float3d,true),roundCards:bool(st.roundCards,false),
+      showToday:bool(st.showToday,true),showCritical:bool(st.showCritical,true),showLines:bool(st.showLines,true),colStart:bool(st.colStart,true),colEnd:bool(st.colEnd,true),barName:bool(st.barName,false),barStart:bool(st.barStart,bool(st.showLabels,true)),barEnd:bool(st.barEnd,bool(st.showLabels,true)),showCards:bool(st.showCards,true),showDeps:bool(st.showDeps,false),slideSecs:[0,0.5,1,1.5,2,3,5].indexOf(+st.slideSecs)>=0?+st.slideSecs:1.5,showPanel:bool(st.showPanel,true),float3d:bool(st.float3d,true),roundCards:bool(st.roundCards,false),
       panelTitle:str(st.panelTitle)||"Notes",lblCritical:str(st.lblCritical)||LBL.lblCritical,lblMilestones:str(st.lblMilestones)||LBL.lblMilestones,lblActivity:str(st.lblActivity)||LBL.lblActivity,lblStart:str(st.lblStart)||LBL.lblStart,lblEnd:str(st.lblEnd)||LBL.lblEnd,panelW:int(st.panelW,240,720,340),nameW:int(st.nameW,150,800,0),fontHead:font(st.fontHead),fontBody:font(st.fontBody),bannerStyle:BANNERS.indexOf(st.bannerStyle)>=0?st.bannerStyle:"tab",
       fontHeadCustom:fontName(st.fontHeadCustom),fontBodyCustom:fontName(st.fontBodyCustom),fontScale:[90,100,110,120].indexOf(+st.fontScale)>=0?+st.fontScale:100,labelScale:int(st.labelScale,80,130,100),bannerScale:int(st.bannerScale,60,200,100),bannerFont:FONTS[st.bannerFont]?st.bannerFont:"",showChip:bool(st.showChip,true),chipExport:bool(st.chipExport,true),dateScale:int(st.dateScale,80,130,100),rowH:int(st.rowH,22,72,30),barFill:int(st.barFill,30,90,60),upper:old?false:bool(st.upper,false)},
-    phases:[],activities:[],milestones:[],critical:[],cards:[],panel:[]};
+    phases:[],activities:[],milestones:[],critical:[],cards:[],panel:[],slides:[]};
   const pmap={},amap={};
   arr(d.phases).forEach((p,i)=>{const id=nid(p.id);if(!(str(p.id) in pmap))pmap[str(p.id)]=id;o.phases.push({id:id,name:str(p.name)||"Workstream "+(i+1),sub:str(p.sub),color:hex(p.color,PALETTE[i%PALETTE.length]),collapsed:!!p.collapsed,hidden:!!p.hidden});});
   if(!o.phases.length)o.phases.push({id:nid(""),name:"Workstream 1",sub:"",color:PALETTE[0],collapsed:false});
@@ -117,6 +121,9 @@ function normalise(d){
   arr(d.critical).forEach((c,i)=>{if(!valid(c.start)||!valid(c.end)||c.end<c.start)return;o.critical.push({id:nid(c.id),name:str(c.name)||"Stage",start:c.start,end:c.end,color:hex(c.color,PALETTE[i%PALETTE.length]),hover:str(c.hover),details:str(c.details),hidden:!!c.hidden});});
   arr(d.cards).forEach((c,i)=>{o.cards.push({id:nid(c.id),title:str(c.title)||"Card",badge:str(c.badge).slice(0,4),color:hex(c.color,PALETTE[i%PALETTE.length]),date:valid(c.date)?c.date:iso(o.startYear,1,1),y:int(c.y,0,6000,20),w:int(c.w,140,640,236),md:str(c.md),hidden:!!c.hidden,pin:bool(c.pin,false),row:str(c.row),dy:int(c.dy,-400,4000,0)});});
   arr(d.panel).forEach((c,i)=>{o.panel.push({id:nid(c.id),eyebrow:str(c.eyebrow),title:str(c.title)||"Card",badge:str(c.badge).slice(0,4),color:hex(c.color,PALETTE[i%PALETTE.length]),md:str(c.md),hidden:!!c.hidden});});
+  const num=(v,lo,hi,def)=>{v=+v;return isFinite(v)&&v>=lo&&v<=hi?v:def;};
+  arr(d.slides).forEach((v,i)=>{o.slides.push({id:nid(v.id),title:str(v.title)||"Slide "+(i+1),note:str(v.note),from:num(v.from,0,o.years*12,0),span:num(v.span,1,o.years*12*4,o.years*12),
+    row:amap[str(v.row)]||pmap[str(v.row)]||"",dy:int(v.dy,0,6000,0),collapsed:(Array.isArray(v.collapsed)?v.collapsed:[]).map(x=>pmap[str(x)]).filter(Boolean)});});
   return o;
 }
 function save(){if(VIEWONLY)return;try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
@@ -333,7 +340,8 @@ function render(soft){
   document.body.classList.toggle("noanim",exporting);
   setHtml(inner,h,!exporting&&(soft||!!inner.firstChild));
 
-  renderPanel(soft);renderJson();
+  if(PRS.at>=S.slides.length)PRS.at=S.slides.length-1;if(PRS.on&&!S.slides.length)PRS.on=false;
+  renderPanel(soft);renderJson();presentDraw();
   $("#jsonBtn").classList.toggle("on",ui.json);$("#jsonBtn").setAttribute("aria-pressed",String(ui.json));
   $("#propBtn").classList.toggle("on",st.showPanel);$("#propBtn").setAttribute("aria-pressed",String(st.showPanel));
   $("#helpBtn").hidden=!!EMBED;$("#ver").textContent="v"+VERSION;$("#ver").title="Roadmap Builder version "+VERSION;
@@ -537,7 +545,7 @@ function srcFormat(){
   if(text!==ta.value){ta.value=text;const start=text.split("\n").slice(0,line-1).join("\n").length+(line>1?1:0);if(document.activeElement===ta)ta.setSelectionRange(start,start);ta.scrollTop=top;}
   srcNums(0);stt.textContent="Valid. Applied and formatted.";
 }
-function select(kind,id){sel=kind?{kind:kind,id:id}:null;if(kind){ui.panelTab=kind==="n"?"cards":"props";S.settings.showPanel=true;}liveKey="";saveUi();render();}
+function select(kind,id){sel=kind?{kind:kind,id:id}:null;if(kind){ui.panelTab=kind==="n"?"cards":kind==="v"?"slides":"props";S.settings.showPanel=true;}liveKey="";saveUi();render();}
 function editItem(kind,id){select(kind,id);}
 /* Add row (like the "Add new item" row of a list): type a name, press Enter, keep typing the next one. */
 function addRow(t){
@@ -577,13 +585,14 @@ function renderPanel(soft){
   const xp=$("#xpanel"),beside=exporting&&st.showPanel&&list.length>0;
   xp.hidden=!beside;xp.innerHTML=beside?'<h2>'+esc(st.panelTitle)+'</h2>'+cardsHtml(list,false):"";
   if(!st.showPanel||exporting)return;
-  const tab=ui.panelTab==="cards"?"cards":"props";
-  [["props","#tabProps"],["cards","#tabCards"]].forEach(t=>{const b=$("#pt-"+t[0]);b.classList.toggle("on",tab===t[0]);b.setAttribute("aria-selected",String(tab===t[0]));$(t[1]).hidden=tab!==t[0];});
-  $("#pt-cards").textContent=st.panelTitle||"Cards";
+  const tab=ui.panelTab==="cards"||ui.panelTab==="slides"?ui.panelTab:"props";
+  [["props","#tabProps"],["cards","#tabCards"],["slides","#tabSlides"]].forEach(t=>{const b=$("#pt-"+t[0]);b.classList.toggle("on",tab===t[0]);b.setAttribute("aria-selected",String(tab===t[0]));$(t[1]).hidden=tab!==t[0];});
+  $("#pt-cards").textContent=st.panelTitle||"Cards";$("#pt-slides").classList.toggle("has",S.slides.length>0);
   const forCard=!!dock&&sel.kind==="n";
   setHtml($("#propsItem"),dock&&!forCard?stripHtml("inpanel"):'<h3>Selected item</h3><p class="phint">'+(edit?'Click a bar, milestone, stage or floating card, or the pencil on a row, to edit all of its settings here.':'Switch to Edit to change the roadmap. The settings below apply in both modes.')+'</p>',true);
   setHtml($("#tabCards"),(forCard?stripHtml("inpanel"):'')+'<h2'+ceA("s:panelTitle")+'>'+esc(st.panelTitle)+'</h2>'+cardsHtml(list,edit)+
     (list.length?'':'<p class="phint">No cards yet. '+(edit?'':'Switch to Edit to add one.')+'</p>')+(edit?'<button type="button" class="btn" id="addpc" data-act="addPanel">+ Panel card</button>':''),true);
+  setHtml($("#tabSlides"),slidesHtml(edit),true);
 }
 /* The JSON live editor: a full-height panel on the left, in Edit mode. */
 function renderJson(){
@@ -811,7 +820,7 @@ async function exportVisual(kind,whole){
   const prevMode=ui.mode,chart=$("#chart"),x0=chart.scrollLeft,view=whole?null:{from:chart.scrollLeft/mw,months:Math.max(1,(chart.clientWidth-LW)/mw)};hideTip();
   try{
     if(view){freeze=true;XFROM=view.from;}     // keep the zoom exactly as it is; lines before the first month shown are left out
-    trackSet(false);ui.mode="view";exporting=true;render();await frame();render();freeze=true;document.body.classList.add("exporting");
+    trackSet(false);presentSet(false);ui.mode="view";exporting=true;render();await frame();render();freeze=true;document.body.classList.add("exporting");
     if(view){const span=Math.min(view.months,months()-view.from);chart.classList.add("xwin");chart.style.setProperty("--xoff",(view.from*mw)+"px");chart.style.width=Math.ceil(LW+span*mw+2)+"px";}
     if(document.fonts&&document.fonts.ready)await document.fonts.ready;
     await frame();
@@ -966,10 +975,12 @@ function ctxFor(e){
 document.addEventListener("contextmenu",e=>{
   const t=e.target;closeMenus();
   const stop={label:"Stop tracking the pointer",fn:()=>trackSet(false)};
+  if(PRS.on&&t.closest&&!t.closest("#capture")&&!t.closest("input,textarea,select,[contenteditable=true],video,a")){e.preventDefault();ctxOpen(e,[{label:"Next slide",fn:()=>presentStep(1)},{label:"Previous slide",fn:()=>presentStep(-1)},{label:"Stop presenting",fn:()=>presentSet(false)}]);return;}
   if(TRK.on&&t.closest&&!t.closest("#capture")&&!t.closest("input,textarea,select,[contenteditable=true],video,a")){e.preventDefault();ctxOpen(e,[stop]);return;}
   if(!t.closest||!t.closest("#capture")||t.closest("input,textarea,select,[contenteditable=true],.istrip,video,a"))return;
   let items=ctxFor(e);
-  if(TRK.on)items=[stop].concat(items.length?["-"]:[],items);
+  if(PRS.on)items=[{label:"Next slide",fn:()=>presentStep(1)},{label:"Previous slide",fn:()=>presentStep(-1)},{label:"Stop presenting",fn:()=>presentSet(false)}].concat(items.length?["-"]:[],items);
+  else if(TRK.on)items=[stop].concat(items.length?["-"]:[],items);
   else if(ui.mode!=="edit"&&t.closest("#chart"))items=items.concat(items.length?["-"]:[],[{label:"Track the pointer (for presenting)",fn:()=>trackSet(true)}]);
   if(!items.length)return;
   e.preventDefault();ctxOpen(e,items);
@@ -977,7 +988,7 @@ document.addEventListener("contextmenu",e=>{
 
 /* ---------- events ---------- */
 function closeMenus(except){document.querySelectorAll(".menu").forEach(m=>{if(m!==except)m.hidden=true;});}
-function setMode(m){ui.mode=VIEWONLY?"view":m;if(ui.mode==="edit")trackSet(false);saveUi();closeSheet();render();}
+function setMode(m){ui.mode=VIEWONLY?"view":m;if(ui.mode==="edit"){trackSet(false);presentSet(false);}saveUi();closeSheet();render();}
 (function(){const o=Object.keys(FONTS).map(k=>'<option value="'+k+'">'+FONTS[k][0]+(/^(opensans|barlow|barlowc|inter|plex|source)$/.test(k)?'':' (if installed)')+'</option>').join("");$("#t-fontHead").innerHTML=o;$("#t-fontBody").innerHTML=o;$("#t-bannerFont").innerHTML='<option value="">Same as headings</option>'+o;})();
 const ACT={
   undo:undo,addPhase:()=>addThing("p"),addKm:()=>addThing("k"),addCp:()=>addThing("c"),addCard:()=>addThing("f"),addPanel:()=>addThing("n"),
@@ -987,10 +998,81 @@ const ACT={
   exHtml:()=>exportHtml(false),exHtmlView:()=>exportHtml(true),exPngAll:()=>exportVisual("png",true),tour:openTour,tourHide:hideTour,
   randCol:randomColours,flipTheme:flipTheme,
   json:()=>{ui.json=!ui.json;saveUi();render();},srcFormat:srcFormat,props:()=>setView(()=>{S.settings.showPanel=!S.settings.showPanel;}),
-  palette:openPalette,track:()=>trackSet(!TRK.on),help:openGuide,exPng:()=>exportVisual("png"),exPdfA3:()=>exportVisual("pdfA3",true),exPdf:()=>exportVisual("pdf",true),deselect:()=>select(null),
+  palette:openPalette,track:()=>trackSet(!TRK.on),present:()=>presentSet(!PRS.on),slideAdd:slideAdd,prsPrev:()=>presentStep(-1),prsNext:()=>presentStep(1),help:openGuide,exPng:()=>exportVisual("png"),exPdfA3:()=>exportVisual("pdfA3",true),exPdf:()=>exportVisual("pdf",true),deselect:()=>select(null),
   clear:()=>{mutate(()=>{S.activities=[];S.milestones=[];S.critical=[];S.cards=[];S.panel=[];});toast("Cleared all content",true);},
   sample:()=>{mutate(()=>{S=normalise(sample());});toast("Loaded the sample roadmap",true);}
 };
+/* ---------- slides: saved views, and presenting them ----------
+   A slide is a saved view of the roadmap: where the timeline starts, how many months are across the screen, the row at
+   the top, and which workstreams are folded, with a title and an optional description. Slides are made in Edit mode,
+   on the Slides tab of the right panel. Presenting steps through them, gliding from one view to the next over the
+   number of seconds set on that tab. A thin bar across the top of the window shows how many are done and how many
+   are left. */
+const PRS={on:false,at:-1,raf:0};
+function viewNow(){
+  const c=$("#chart"),w=Math.max(120,c.clientWidth-LW);let row="",dy=Math.round(c.scrollTop);
+  ROWS.forEach(r=>{if(r.y<=c.scrollTop+.5){row=r.id;dy=Math.round(c.scrollTop-r.y);}});
+  return {from:Math.round(c.scrollLeft/mw*100)/100,span:Math.round(w/mw*100)/100,row:row,dy:dy,collapsed:S.phases.filter(p=>p.collapsed).map(p=>p.id)};
+}
+function slideAdd(){const id=uid(),n=S.slides.length+1;mutate(()=>{S.slides.push(Object.assign({id:id,title:"Slide "+n,note:""},viewNow()));});
+  const t=document.getElementById("ce-v-"+id+"-title");if(t){t.focus();const r=document.createRange();r.selectNodeContents(t);const s=getSelection();s.removeAllRanges();s.addRange(r);}}
+function slideUpdate(id){const o=find("v",id);if(!o)return;mutate(()=>{Object.assign(o,viewNow());},true);toast('"'+o.title+'" now shows this view.',true);}
+/* Glide from the view on screen to a saved one over `secs` seconds (0 jumps). Zoom is eased on a ratio so it feels even. */
+function viewGo(v,secs,done){
+  cancelAnimationFrame(PRS.raf);
+  const want={};v.collapsed.forEach(id=>{want[id]=1;});let changed=false;
+  S.phases.forEach(p=>{const f=!!want[p.id];if(!!p.collapsed!==f){p.collapsed=f;changed=true;}});
+  if(changed){save();render();}
+  const c=$("#chart"),w=Math.max(120,c.clientWidth-LW),M=months();
+  const a={span:w/mw,mid:c.scrollLeft/mw+w/mw/2,top:c.scrollTop},bs=Math.min(w/3,Math.max(w/200,v.span)),b={span:bs,mid:Math.min(M,v.from+v.span/2),top:(ROWY[v.row]||0)+v.dy};
+  const set=t=>{const span=Math.exp(Math.log(a.span)+(Math.log(b.span)-Math.log(a.span))*t),mid=a.mid+(b.mid-a.mid)*t;
+    ui.zoom="manual";mw=w/span;render(true);c.scrollLeft=Math.max(0,(mid-span/2)*mw);c.scrollTop=Math.max(0,a.top+(b.top-a.top)*t);};
+  const still=window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches,end=()=>{document.body.classList.remove("moving");set(1);if(done)done();};
+  if(!(secs>0)||still){end();return;}
+  const t0=performance.now(),dur=secs*1000;document.body.classList.add("moving");hideTip();
+  const step=now=>{const t=Math.min(1,(now-t0)/dur);if(t>=1){end();return;}set(t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2);PRS.raf=requestAnimationFrame(step);};
+  PRS.raf=requestAnimationFrame(step);
+}
+function slideShow(i,secs){
+  const v=S.slides[i];if(!v)return;PRS.at=i;
+  viewGo(v,secs==null?S.settings.slideSecs:secs);presentDraw();
+}
+function presentDraw(){
+  const n=S.slides.length,on=PRS.on&&n>0,bar=$("#prsBar"),tag=$("#prsTag"),b=$("#presentBtn");
+  document.body.classList.toggle("presenting",on);b.classList.toggle("on",on);b.setAttribute("aria-pressed",String(on));
+  bar.hidden=!on;tag.hidden=!on;if(!on)bar.innerHTML="";
+  if(on){const v=S.slides[PRS.at]||S.slides[0];
+    /* One faint piece per slide, and a fill that glides to the end of the slide on show, in step with the roadmap. */
+    if(bar.childElementCount!==n+1){bar.innerHTML='<b id="prsFill"></b>'+S.slides.map(()=>'<i></i>').join("");bar.offsetWidth;}
+    const fill=bar.firstChild;fill.style.transitionDuration=Math.max(.25,S.settings.slideSecs)+"s";fill.style.width=((PRS.at+1)/n*100)+"%";
+    bar.setAttribute("aria-label","Slide "+(PRS.at+1)+" of "+n);
+    $("#prsCount").textContent=(PRS.at+1)+" / "+n;$("#prsTitle").textContent=v.title;
+    $("#prsPrev").disabled=PRS.at<=0;$("#prsNext").disabled=PRS.at>=n-1;}
+  document.querySelectorAll("#tabSlides .scard").forEach((el,i)=>{const now=PRS.at===i&&(PRS.on||ui.mode!=="edit");el.classList.toggle("now",now);if(now&&PRS.on&&el.scrollIntoView)el.scrollIntoView({block:"nearest"});});
+}
+function presentSet(on){
+  on=!!on&&!exporting;
+  if(on&&!S.slides.length){toast(VIEWONLY?"This roadmap has no slides.":"There are no slides yet. Switch to Edit, open the Slides tab on the right and save a view.");return;}
+  if(on===PRS.on)return;
+  if(on){trackSet(false);if(ui.mode==="edit")setMode("view");closeSheet();closeMenus();PRS.on=true;if(S.settings.showPanel&&S.slides.length){ui.panelTab="slides";renderPanel();}slideShow(Math.max(0,Math.min(S.slides.length-1,PRS.at<0?0:PRS.at)));}
+  else{PRS.on=false;cancelAnimationFrame(PRS.raf);document.body.classList.remove("moving");presentDraw();}
+}
+const presentStep=d=>{if(!PRS.on)return;const i=Math.max(0,Math.min(S.slides.length-1,PRS.at+d));if(i!==PRS.at)slideShow(i);};
+function slidesHtml(edit){
+  const st=S.settings,list=S.slides;
+  let h='<h2>Slides</h2>';
+  if(edit)h+='<p class="phint">A slide is a saved view: the zoom, the place on the timeline and which workstreams are folded. Set the roadmap up as you want it shown, then save it.</p>'+
+    '<div class="pbtns"><button type="button" class="btn primary" id="slAdd" data-act="slideAdd">+ Save this view as a slide</button></div>'+
+    '<div class="pgrid"><label for="t-slideSecs">Glide between slides</label><select id="t-slideSecs" data-set="slideSecs">'+[0,0.5,1,1.5,2,3,5].map(n=>'<option value="'+n+'"'+(st.slideSecs===n?' selected':'')+'>'+(n?n+(n===1?" second":" seconds"):"No glide")+'</option>').join("")+'</select></div>';
+  else if(list.length)h+='<div class="pbtns"><button type="button" class="btn primary" id="slGo" data-act="present">'+(PRS.on?'■ Stop presenting':'▶ Present')+'</button></div>';
+  h+=list.map((v,i)=>'<article class="scard'+(PRS.at===i&&(PRS.on||!edit)?' now':'')+isSel("v",v.id)+'" id="sc-'+v.id+'" data-slide="'+i+'"'+(edit?'':' tabindex="0" role="button" aria-label="Show slide '+(i+1)+': '+esc(v.title)+'"')+'>'+
+      (edit?'<div class="cctl"><button type="button" class="mini" id="su-'+v.id+'" data-smove="-1" data-id="'+v.id+'" aria-label="Move slide up"'+(i?'':' disabled')+'>▲</button><button type="button" class="mini" id="sd-'+v.id+'" data-smove="1" data-id="'+v.id+'" aria-label="Move slide down"'+(i<list.length-1?'':' disabled')+'>▼</button>'+
+        '<button type="button" class="btn sm" id="sg-'+v.id+'" data-sgo="'+i+'" title="Show this slide\'s view">Show</button><button type="button" class="btn sm" id="sv-'+v.id+'" data-sset="'+v.id+'" title="Replace this slide\'s view with the view on screen now">Use this view</button>'+delBtn("v",v)+'</div>':'')+
+      '<span class="snum">'+(i+1)+'</span><div class="stxt"><h3'+ceA("v:"+v.id+":title","Title")+'>'+esc(v.title)+'</h3>'+
+      (v.note||edit?'<p class="snote"'+ceA("v:"+v.id+":note","Description (optional)")+'>'+esc(v.note)+'</p>':'')+'</div></article>').join("");
+  if(!list.length)h+='<p class="phint">No slides yet. '+(edit?'':'Switch to Edit to make some.')+'</p>';
+  return h;
+}
 /* ---------- dependencies: "this activity waits for that one" ----------
    Each activity lists the activities it depends on (deps). A line runs from the end of each of those to its start.
    Lines are quiet by default: they show for the bar under the pointer and for the selected bar; the Links eye shows
@@ -1045,7 +1127,7 @@ $("#chart").addEventListener("pointerover",e=>{const el=e.target.closest&&e.targ
 const TRK={on:false,x:-1,y:-1,vx:0,vy:0,zoom:null,last:0,raf:0};
 function trackSet(on){
   on=!!on&&!exporting;if(on===TRK.on)return;
-  if(on&&ui.mode==="edit")setMode("view");
+  if(on){presentSet(false);if(ui.mode==="edit")setMode("view");}
   TRK.on=on;TRK.vx=TRK.vy=0;TRK.zoom=null;hideTip();closeMenus();
   document.body.classList.toggle("tracking",on);document.body.classList.remove("gliding");
   const b=$("#trackBtn");b.classList.toggle("on",on);b.setAttribute("aria-pressed",String(on));$("#trackTag").hidden=!on;$("#trackFx").hidden=!on;
@@ -1092,6 +1174,7 @@ function palCommands(q){
   add("View","Go to today",ACT.today,{kw:"scroll now"});
   add("View",TRK.on?"Stop tracking the pointer":"Track the pointer (for presenting)",()=>trackSet(!TRK.on),{kw:"present presentation glide follow mouse smooth scroll"});
   add("View",isDark()?"Switch to the light theme":"Switch to the dark theme",flipTheme,{kw:"dark light colour mode"});
+  add("View",PRS.on?"Stop presenting":"Present the slides",()=>presentSet(!PRS.on),{note:S.slides.length?S.slides.length+(S.slides.length===1?" slide":" slides"):"No slides yet",kw:"presentation slideshow play views steps"});
   add("View","Expand every workstream",()=>setView(()=>{S.phases.forEach(p=>{p.collapsed=false;});}),{kw:"open rows"});
   add("View","Collapse every workstream",()=>setView(()=>{S.phases.forEach(p=>{p.collapsed=true;});}),{kw:"close rows summary"});
   add("View",st.showPanel?"Hide the Properties panel":"Show the Properties panel",ACT.props,{own:true,kw:"settings side cards"});
@@ -1101,6 +1184,7 @@ function palCommands(q){
   add("Add","Add a critical path stage",ACT.addCp,{e:true,kw:"new"});
   add("Add","Add a floating card",ACT.addCard,{e:true,kw:"new note"});
   add("Add","Add a panel card",ACT.addPanel,{e:true,kw:"new note"});
+  add("Add","Save this view as a slide",()=>{S.settings.showPanel=true;ui.panelTab="slides";render();slideAdd();},{e:true,kw:"new presentation step view"});
   add("Edit","Undo the last change",undo,{e:true,note:hist.length?"Ctrl+Z":"Nothing to undo"});
   add("Edit","Randomise colours",randomColours,{e:true,kw:"palette colour ideas"});
   flag("Show or hide","Critical path","showCritical");flag("Show or hide","Milestone lines","showLines");flag("Show or hide","Today line","showToday");
@@ -1126,7 +1210,7 @@ function palCommands(q){
   /* Things on the roadmap: choosing one brings it into view and opens it. */
   const items=[],go=(kind,o,what)=>{if(items.length<8&&(edit||!o.hidden)&&hit(o.name||o.title||""))items.push({group:"On the roadmap",label:o.name||o.title,note:what,fn:()=>palGo(kind,o.id)});};
   S.phases.forEach(p=>go("p",p,"Workstream"));S.activities.forEach(a=>go("a",a,a.type==="milestone"?"Milestone":"Activity"));
-  S.milestones.forEach(m=>go("k",m,"Key milestone"));S.critical.forEach(c=>go("c",c,"Critical path stage"));S.cards.forEach(c=>go("f",c,"Floating card"));
+  S.milestones.forEach(m=>go("k",m,"Key milestone"));S.critical.forEach(c=>go("c",c,"Critical path stage"));S.cards.forEach(c=>go("f",c,"Floating card"));S.slides.forEach((v,i)=>{if(items.length<8&&hit(v.title+" "+v.note))items.push({group:"On the roadmap",label:v.title,note:"Slide "+(i+1),fn:()=>slideShow(i)});});
   return res.concat(items);
 }
 function palGo(kind,id){
@@ -1208,6 +1292,7 @@ document.addEventListener("click",e=>{
   if(t.id==="sheet"){closeSheet();return;}
   if((el=t.closest("[data-eye]"))){const k=el.dataset.eye;setView(()=>{S.settings[k]=!S.settings[k];});return;}
   if((el=t.closest("[data-collapse]"))){const p=find("p",el.dataset.collapse);setView(()=>{p.collapsed=!p.collapsed;});return;}
+  if(ui.mode!=="edit"&&(el=t.closest("[data-slide]"))){slideShow(+el.dataset.slide);return;}
   /* Tracking the pointer: a click anywhere on a row folds or opens its workstream. A click on a bar or milestone still shows its details. */
   if(TRK.on&&(el=t.closest("#inner .row"))&&!t.closest("[data-tip]")){const p=find("p",el.dataset.phase);if(p){setView(()=>{p.collapsed=!p.collapsed;});return;}}
   if(ui.mode==="edit"){
@@ -1218,6 +1303,9 @@ document.addEventListener("click",e=>{
     if((el=t.closest("[data-pen]"))){const kv=el.dataset.pen.split(":");if(sel&&sel.kind===kv[0]&&sel.id===kv[1])select(null);else select(kv[0],kv[1]);return;}
     if(t.closest(".istrip,.sw,[contenteditable=true]"))return;
     if((el=t.closest("[data-addact]"))){addAct(el.dataset.addact);return;}
+    if((el=t.closest("[data-smove]"))){const id=el.dataset.id,d=+el.dataset.smove;mutate(()=>{const i=S.slides.findIndex(c=>c.id===id),j=i+d;if(j<0||j>=S.slides.length)return;const c=S.slides.splice(i,1)[0];S.slides.splice(j,0,c);});return;}
+    if((el=t.closest("[data-sset]"))){slideUpdate(el.dataset.sset);return;}
+    if((el=t.closest("[data-sgo]"))){slideShow(+el.dataset.sgo);return;}
     if((el=t.closest("[data-pmove]"))){const id=el.dataset.id,d=+el.dataset.pmove;mutate(()=>{const i=S.panel.findIndex(c=>c.id===id),j=i+d;if(j<0||j>=S.panel.length)return;const c=S.panel.splice(i,1)[0];S.panel.splice(j,0,c);});return;}
     if((el=t.closest("[data-edit]"))){const kv=el.dataset.edit.split(":");if(!(sel&&sel.kind===kv[0]&&sel.id===kv[1]))editItem(kv[0],kv[1]);}
     return;
@@ -1237,7 +1325,7 @@ document.addEventListener("change",e=>{
   if(t.id==="src"){srcFormat();return;}
   if(t.id==="srcScope"){ui.srcScope=t.value==="all"?"all":"dates";saveUi();$("#src").blur();renderJson();return;}
   if(t.dataset.toggle){const k=t.dataset.toggle;setView(()=>{S.settings[k]=t.checked;});return;}
-  if(t.dataset.set){const k=t.dataset.set;setView(()=>{const was=S.settings.rowH;S.settings[k]=/Scale$|^rowH$|^barFill$/.test(k)?+t.value:t.value;
+  if(t.dataset.set){const k=t.dataset.set;setView(()=>{const was=S.settings.rowH;S.settings[k]=/Scale$|^rowH$|^barFill$|^slideSecs$/.test(k)?+t.value:t.value;
     /* Taller or shorter rows: floating cards keep their place against the rows. */
     if(k==="rowH"&&was){const f=S.settings.rowH/was;S.cards.forEach(c=>{c.y=Math.round(c.y*f);c.dy=Math.round(c.dy*f);});}});return;}
   if(t.id==="file"){importFile(t.files[0]);t.value="";}
@@ -1265,7 +1353,7 @@ function ceCommit(el){
   if(!el.isConnected||ui.mode!=="edit")return;
   const kv=el.dataset.ce.split(":"),v=el.textContent.replace(/\s+/g," ").trim();
   if(kv[0]==="s"){const k=kv[1],nv=v||LBL[k];if(S.settings[k]!==nv)mutate(()=>{S.settings[k]=nv;},true);else el.textContent=nv;return;}
-  const o=find(kv[0],kv[1]),k=kv[2];if(!o)return;const nv=k==="eyebrow"?v:(v||"Card");
+  const o=find(kv[0],kv[1]),k=kv[2];if(!o)return;const nv=k==="eyebrow"||k==="note"?v:(v||(kv[0]==="v"?"Slide":"Card"));
   if(o[k]!==nv)mutate(()=>{o[k]=nv;},true);else el.textContent=nv;
 }
 document.addEventListener("focusout",e=>{if(e.target.dataset&&e.target.dataset.ce)ceCommit(e.target);});
@@ -1288,7 +1376,11 @@ document.addEventListener("keydown",e=>{
   if((e.ctrlKey||e.metaKey)&&!e.altKey&&!e.shiftKey&&(e.key.toLowerCase()==="k"||e.code==="Space")){e.preventDefault();if($("#pal").hidden)openPalette();else closePalette();return;}
   if(e.key==="Escape"&&!$("#pal").hidden){closePalette();return;}
   if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==="s"&&e.target.id==="src"){e.preventDefault();srcFormat();return;}
-  if(e.key==="Escape"){if(!$("#sheet").hidden)closeSheet();else if(!$("#ctx").hidden)closeMenus();else if(TRK.on)trackSet(false);else if(sel){sel=null;render();}closeMenus();return;}
+  if(e.key==="Escape"){if(!$("#sheet").hidden)closeSheet();else if(!$("#ctx").hidden)closeMenus();else if(PRS.on)presentSet(false);else if(TRK.on)trackSet(false);else if(sel){sel=null;render();}closeMenus();return;}
+  if(PRS.on&&$("#sheet").hidden&&$("#pal").hidden&&!e.target.isContentEditable&&!e.ctrlKey&&!e.metaKey&&!e.altKey&&!/^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName)){
+    const d={ArrowRight:1,ArrowDown:1,PageDown:1," ":1,Enter:1,ArrowLeft:-1,ArrowUp:-1,PageUp:-1,Backspace:-1,Home:-999,End:999}[e.key];
+    if(d){e.preventDefault();presentStep(d);return;}}
+  if((e.key==="Enter"||e.key===" ")&&e.target.matches&&e.target.matches(".scard[data-slide]")){e.preventDefault();slideShow(+e.target.dataset.slide);return;}
   if(e.key==="Enter"&&e.target.matches&&e.target.matches(".nm.add")){e.preventDefault();addRow(e.target);return;}
   if(e.key==="Enter"&&e.target.matches&&e.target.matches(".nm,[data-ce]")){e.preventDefault();e.target.blur();return;}
   if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==="z"&&!e.shiftKey&&ui.mode==="edit"&&!/^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName)&&!e.target.isContentEditable){e.preventDefault();undo();}
@@ -1339,7 +1431,7 @@ function start(data){
     return;
   }
   try{const u=JSON.parse(localStorage.getItem(UIKEY)||"{}");if(u.mode==="edit"||u.mode==="view")ui.mode=u.mode;
-    if(u.panelTab==="cards"||u.panelTab==="props")ui.panelTab=u.panelTab;ui.json=!!u.json;if(u.jsonW>=280&&u.jsonW<=900)ui.jsonW=u.jsonW;if(u.srcScope==="all")ui.srcScope="all";if(u.tipPos&&isFinite(u.tipPos.x)&&isFinite(u.tipPos.y))ui.tipPos={x:+u.tipPos.x,y:+u.tipPos.y};}catch(e){}
+    if(u.panelTab==="cards"||u.panelTab==="props"||u.panelTab==="slides")ui.panelTab=u.panelTab;ui.json=!!u.json;if(u.jsonW>=280&&u.jsonW<=900)ui.jsonW=u.jsonW;if(u.srcScope==="all")ui.srcScope="all";if(u.tipPos&&isFinite(u.tipPos.x)&&isFinite(u.tipPos.y))ui.tipPos={x:+u.tipPos.x,y:+u.tipPos.y};}catch(e){}
   S=data&&Array.isArray(data.phases)?normalise(data):(load()||normalise(EMBED&&EMBED.roadmap?EMBED.roadmap:sample()));render();
 }
 if("serviceWorker" in navigator&&/^https?:$/.test(location.protocol)&&!window.claude&&!EMBED)navigator.serviceWorker.register("sw.js").catch(()=>{});

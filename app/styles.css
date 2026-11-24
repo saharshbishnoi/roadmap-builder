@@ -631,9 +631,9 @@ body.exporting .pal{display:none}
 #trackFx .t{top:0;opacity:var(--t,0);background:linear-gradient(180deg,var(--g),transparent)}
 #trackFx .b{bottom:0;opacity:var(--b,0);background:linear-gradient(0deg,var(--g),transparent)}
 /* While the view is moving, the hover card and the pointer's date line stay out of the way, and nothing animates behind the glide. */
-body.gliding #hover,body.gliding #xline{display:none!important}
+body.gliding #hover,body.gliding #xline,body.moving #hover,body.moving #xline{display:none!important}
 body.tracking #inner .row{cursor:pointer}
-body.tracking .bar,body.tracking .cp,body.tracking .sum,body.tracking .dia,body.tracking .km,body.tracking .kline,body.tracking .tline,body.tracking .blabel,body.tracking .year,body.tracking .q,body.tracking .htrack,body.tracking .track{transition:none}
+body.tracking .bar,body.tracking .cp,body.tracking .sum,body.tracking .dia,body.tracking .km,body.tracking .kline,body.tracking .tline,body.tracking .blabel,body.tracking .year,body.tracking .q,body.tracking .htrack,body.tracking .track,body.moving .bar,body.moving .cp,body.moving .sum,body.moving .dia,body.moving .km,body.moving .kline,body.moving .tline,body.moving .blabel,body.moving .year,body.moving .q,body.moving .htrack,body.moving .track{transition:none}
 body.exporting #trackTag,body.exporting #trackFx{display:none}
 
 /* ---- dependency lines: quiet until wanted. Shown for the bar under the pointer and the selected bar; the Links eye shows all. ---- */
@@ -658,3 +658,34 @@ body.edit .bar::after{content:"";position:absolute;left:100%;top:0;bottom:0;widt
    It is dragged to a new place, or reset, in View mode. */
 body.edit #hover{pointer-events:none}
 body.edit #hover #tipFoot{display:none}
+
+/* ---- slides: the Slides tab on the right, and presenting ---- */
+.pslides{display:flex;flex-direction:column;gap:10px;padding:12px}
+.pslides>h2{margin:0;font:600 calc(14px * var(--fz))/1 var(--display);letter-spacing:var(--trk);text-transform:var(--tt);background:var(--banner);color:var(--banner-ink);padding:10px 12px}
+.pslides .phint{margin:0}.pslides .pgrid{margin:0}
+.scard{position:relative;display:flex;flex-wrap:wrap;gap:10px;align-items:flex-start;background:var(--surface);border:1px solid var(--line);border-left:5px solid color-mix(in srgb,var(--accent) 30%,var(--line));padding:9px 11px}
+.scard>.cctl{flex:0 0 100%;margin:-4px -6px -2px 0;gap:4px}
+.scard .snum{flex:none;min-width:24px;height:24px;display:flex;align-items:center;justify-content:center;font:700 calc(13px * var(--fz))/1 var(--display);background:color-mix(in srgb,var(--ink) 9%,var(--surface));color:var(--ink)}
+.scard .stxt{flex:1;min-width:0}
+.scard h3{margin:2px 0 0;font:700 calc(14.5px * var(--fz))/1.2 var(--display);overflow-wrap:anywhere}
+.scard .snote{margin:4px 0 0;color:var(--muted);font-size:calc(12.5px * var(--fz));line-height:1.4;overflow-wrap:anywhere}
+.scard [contenteditable="true"]{border-radius:2px;outline-offset:2px;min-width:4ch}
+.scard [contenteditable="true"]:hover{box-shadow:0 0 0 1px var(--line)}
+.scard [contenteditable="true"]:empty::before{content:attr(data-ph);color:var(--muted);opacity:.8}
+.scard[data-slide][role=button]{cursor:pointer}
+.scard[data-slide][role=button]:hover{border-left-color:var(--accent)}
+.scard.now{border-left-color:var(--accent);background:color-mix(in srgb,var(--accent) 9%,var(--surface))}
+.scard.now .snum{background:var(--accent);color:#fff}
+/* While presenting: a very thin bar across the top, one piece per slide. Filled pieces are done, the brightest is the one on show. */
+#prsBar{position:fixed;left:0;right:0;top:0;height:3px;z-index:95;display:flex;pointer-events:none;background:color-mix(in srgb,var(--accent) 20%,var(--paper))}
+#prsBar i{flex:1;position:relative;z-index:1;border-right:2px solid var(--paper)}
+#prsBar i:last-child{border-right:0}
+#prsBar b{position:absolute;left:0;top:0;bottom:0;width:0;background:var(--accent)}
+@media (prefers-reduced-motion:no-preference){#prsBar b{transition:width 1.5s cubic-bezier(.65,0,.35,1)}}
+#prsTag{position:fixed;left:14px;bottom:14px;z-index:45;display:flex;align-items:center;gap:6px;background:var(--accent);color:#fff;font:600 calc(12px * var(--fz))/1 var(--body);padding:5px 10px 5px 5px;box-shadow:0 8px 20px -8px rgba(var(--shadow),.6);max-width:calc(100vw - 28px)}
+#prsTag .mini{color:#fff;font-size:10px}#prsTag .mini:hover{background:rgba(255,255,255,.2);color:#fff}#prsTag .mini:disabled{opacity:.35;cursor:default;background:none}
+#prsTag #prsTitle{font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin:0 4px}
+#prsTag kbd{font:600 calc(10.5px * var(--fz))/1 var(--body);border:1px solid rgba(255,255,255,.55);border-radius:3px;padding:1px 5px}
+#prsTag .prsx{font-weight:500;opacity:.9}
+body.exporting #prsBar,body.exporting #prsTag{display:none}
+body.viewonly #pt-slides:not(.has){display:none}

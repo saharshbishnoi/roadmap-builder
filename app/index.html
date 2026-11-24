@@ -35,6 +35,7 @@
         <button type="button" class="btn sq" data-act="zin" aria-label="Zoom in">+</button>
         <button type="button" class="btn" data-act="today">Today</button>
         <button type="button" class="btn sq ico" id="trackBtn" data-act="track" aria-pressed="false" aria-label="Track the pointer, for presenting" title="Track the pointer, for presenting: move towards an edge to glide the timeline, use the wheel to zoom, click a row to fold its workstream. Esc or right-click to stop."><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="6.5"/><circle cx="12" cy="12" r="1.6" class="dot"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4"/></svg></button>
+        <button type="button" class="btn sq ico" id="presentBtn" data-act="present" aria-pressed="false" aria-label="Present the slides" title="Present the slides: glide from one saved view to the next. Arrow keys or Space to move, Esc or right-click to stop."><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4.5" width="18" height="12" rx="1"/><path d="M10 8.2v4.6l4-2.3z" class="dot"/><path d="M8 20.5h8M12 16.5v4"/></svg></button>
       </div>
       <span class="tsep"></span>
       <button type="button" class="btn eo" id="jsonBtn" data-act="json" aria-pressed="false">JSON</button>
@@ -93,6 +94,7 @@
     <div class="tabs" role="tablist" aria-label="Right panel">
       <button type="button" role="tab" class="tab" id="pt-props" data-ptab="props">Properties</button>
       <button type="button" role="tab" class="tab" id="pt-cards" data-ptab="cards">Cards</button>
+      <button type="button" role="tab" class="tab" id="pt-slides" data-ptab="slides">Slides</button>
       <button type="button" class="mini" data-act="props" aria-label="Hide this panel">×</button>
     </div>
     <div class="pbody" id="tabProps">
@@ -167,6 +169,7 @@
       </section>
     </div>
     <div class="pbody pcards" id="tabCards" hidden></div>
+    <div class="pbody pslides" id="tabSlides" hidden></div>
   </aside>
 </div>
 
@@ -179,6 +182,8 @@
   <div class="pallist" id="palList" role="listbox" aria-label="Commands"></div>
   <div class="palfoot"><span><kbd>↑</kbd><kbd>↓</kbd> move</span><span><kbd>Enter</kbd> run</span><span><kbd>Ctrl</kbd><kbd>K</kbd> or <kbd>Ctrl</kbd><kbd>Space</kbd> open and close</span></div>
 </div></div>
+<div id="prsBar" role="progressbar" hidden></div>
+<div id="prsTag" hidden><button type="button" class="mini" id="prsPrev" data-act="prsPrev" aria-label="Previous slide" title="Previous slide (left arrow)">◀</button><b id="prsCount"></b><button type="button" class="mini" id="prsNext" data-act="prsNext" aria-label="Next slide" title="Next slide (right arrow or Space)">▶</button><span id="prsTitle"></span><kbd>Esc</kbd><span class="prsx">to stop</span></div>
 <div id="trackTag" role="status" hidden>Tracking the pointer <kbd>Esc</kbd> or right-click to stop</div>
 <div id="trackFx" aria-hidden="true" hidden><i class="l"></i><i class="r"></i><i class="t"></i><i class="b"></i></div>
 <div id="toast" role="status" hidden></div>
