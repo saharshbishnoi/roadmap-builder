@@ -1,0 +1,102 @@
+WEBVTT
+
+1
+00:00:00.600 --> 00:00:02.503 line:88% align:center
+Real programmes have structure.
+
+2
+00:00:02.553 --> 00:00:04.268 line:88% align:center
+Work sits inside other work,
+
+3
+00:00:04.318 --> 00:00:06.789 line:88% align:center
+and some things have to wait for others.
+
+4
+00:00:06.839 --> 00:00:07.734 line:88% align:center
+Let's add both.
+
+5
+00:00:09.400 --> 00:00:12.499 line:88% align:center
+To put one activity under another, click its name
+
+6
+00:00:12.549 --> 00:00:15.519 line:88% align:center
+and press Control and the right square bracket.
+
+7
+00:00:15.569 --> 00:00:17.510 line:88% align:center
+The row above becomes a parent,
+
+8
+00:00:17.560 --> 00:00:20.209 line:88% align:center
+and its bar now spans the rows beneath it.
+
+9
+00:00:20.967 --> 00:00:22.579 line:88% align:center
+A parent has a small arrow.
+
+10
+00:00:22.629 --> 00:00:26.334 line:88% align:center
+Click it to fold its rows away, and again to bring them back.
+
+11
+00:00:26.384 --> 00:00:28.057 line:88% align:center
+You can go four levels deep.
+
+12
+00:00:28.800 --> 00:00:30.553 line:88% align:center
+Now for what waits for what.
+
+13
+00:00:30.603 --> 00:00:34.031 line:88% align:center
+Point at a bar, and a line shows what it is linked to.
+
+14
+00:00:34.081 --> 00:00:36.349 line:88% align:center
+The lines stay hidden until you ask,
+
+15
+00:00:36.399 --> 00:00:38.474 line:88% align:center
+so a busy roadmap stays readable.
+
+16
+00:00:39.233 --> 00:00:42.313 line:88% align:center
+The Links eye above the table shows every line at once.
+
+17
+00:00:43.067 --> 00:00:43.850 line:88% align:center
+To add a link,
+
+18
+00:00:43.900 --> 00:00:48.195 line:88% align:center
+drag from the dot at the end of a bar to the row that has to wait for it.
+
+19
+00:00:48.933 --> 00:00:51.897 line:88% align:center
+If a bar is moved so that it starts too early,
+
+20
+00:00:51.947 --> 00:00:53.142 line:88% align:center
+its line turns red.
+
+21
+00:00:53.192 --> 00:00:55.108 line:88% align:center
+Nothing else is moved for you.
+
+22
+00:00:55.158 --> 00:00:57.925 line:88% align:center
+It is a warning, and Undo puts things back.
+
+23
+00:00:58.667 --> 00:01:01.803 line:88% align:center
+And when you would rather not start from an empty page,
+
+24
+00:01:01.853 --> 00:01:04.120 line:88% align:center
+Templates gives you a simple, a typical,
+
+25
+00:01:04.170 --> 00:01:06.321 line:88% align:center
+or a complex roadmap to make your own.
+

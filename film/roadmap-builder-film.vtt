@@ -1,0 +1,1178 @@
+WEBVTT
+
+1
+00:00:01.020 --> 00:00:02.678
+Welcome to Roadmap Builder.
+
+2
+00:00:02.678 --> 00:00:04.521
+It gives you a whole programme
+
+3
+00:00:04.521 --> 00:00:06.671
+in one intuitive, interactive view,
+
+4
+00:00:06.671 --> 00:00:09.066
+and it all runs in an ordinary browser.
+
+5
+00:00:11.020 --> 00:00:13.917
+Over the next few minutes we will take the full tour,
+
+6
+00:00:13.917 --> 00:00:15.229
+in eight short chapters,
+
+7
+00:00:15.229 --> 00:00:18.618
+using a made-up programme so you can see how it fits together.
+
+8
+00:00:21.287 --> 00:00:23.601
+Let's begin with the simplest thing you can do
+
+9
+00:00:23.601 --> 00:00:25.412
+with a roadmap, which is to read it.
+
+10
+00:00:27.554 --> 00:00:29.250
+This is our sample programme.
+
+11
+00:00:29.250 --> 00:00:31.942
+Each coloured band on the left is a workstream
+
+12
+00:00:31.942 --> 00:00:33.755
+with its activities beneath it,
+
+13
+00:00:33.755 --> 00:00:35.452
+and time runs across the top,
+
+14
+00:00:35.452 --> 00:00:38.085
+so you can see at a glance what happens when.
+
+15
+00:00:39.454 --> 00:00:41.740
+When you want to know more about something,
+
+16
+00:00:41.740 --> 00:00:42.644
+just point at it.
+
+17
+00:00:42.644 --> 00:00:44.504
+A small card appears with its dates
+
+18
+00:00:44.504 --> 00:00:46.046
+and any note the author left.
+
+19
+00:00:48.887 --> 00:00:50.955
+If the card is in your way, pick it up
+
+20
+00:00:50.955 --> 00:00:51.608
+and move it.
+
+21
+00:00:51.608 --> 00:00:53.730
+It keeps opening in the spot you chose,
+
+22
+00:00:53.730 --> 00:00:55.852
+which is handy when you are presenting.
+
+23
+00:00:57.720 --> 00:00:59.724
+For the full story, click the bar.
+
+24
+00:00:59.724 --> 00:01:00.549
+A dialog opens
+
+25
+00:01:00.549 --> 00:01:03.143
+with everything written about that activity.
+
+26
+00:01:07.554 --> 00:01:10.425
+Longer programmes run off the bottom of the screen,
+
+27
+00:01:10.425 --> 00:01:12.395
+so the schedule scrolls on its own.
+
+28
+00:01:12.395 --> 00:01:13.577
+Notice that the years
+
+29
+00:01:13.577 --> 00:01:15.041
+and the headings stay put.
+
+30
+00:01:20.220 --> 00:01:22.628
+Back at the top, move across the timeline.
+
+31
+00:01:22.628 --> 00:01:24.521
+A faint line follows your pointer
+
+32
+00:01:24.521 --> 00:01:26.986
+and tells you the exact date underneath it.
+
+33
+00:01:29.554 --> 00:01:31.969
+When you only care about the big picture,
+
+34
+00:01:31.969 --> 00:01:33.265
+collapse a workstream.
+
+35
+00:01:33.265 --> 00:01:35.975
+Its activities fold away into one summary bar.
+
+36
+00:01:40.587 --> 00:01:41.419
+Open it again,
+
+37
+00:01:41.419 --> 00:01:43.737
+and try dragging the year scale itself.
+
+38
+00:01:43.737 --> 00:01:46.056
+The timeline stretches under your hand,
+
+39
+00:01:46.056 --> 00:01:48.195
+so you can zoom in on a busy period.
+
+40
+00:01:51.787 --> 00:01:54.156
+And if you want one row to fill the screen,
+
+41
+00:01:54.156 --> 00:01:55.808
+right-click it and choose fit.
+
+42
+00:01:55.808 --> 00:01:59.004
+The timeline scales so that row sits neatly in the middle.
+
+43
+00:02:02.020 --> 00:02:04.253
+There is a shortcut to everything, too.
+
+44
+00:02:04.253 --> 00:02:06.314
+Press Control K, type a word or two,
+
+45
+00:02:06.314 --> 00:02:07.631
+and pick from the list.
+
+46
+00:02:07.631 --> 00:02:09.921
+Here it takes us straight back to today.
+
+47
+00:02:12.387 --> 00:02:13.886
+Reading is only half of it.
+
+48
+00:02:13.886 --> 00:02:15.329
+Next, let's change things,
+
+49
+00:02:15.329 --> 00:02:18.992
+and you will see that editing happens right where you are looking.
+
+50
+00:02:21.954 --> 00:02:22.887
+Switch to Edit,
+
+51
+00:02:22.887 --> 00:02:25.314
+and the roadmap quietly becomes a form.
+
+52
+00:02:25.314 --> 00:02:25.936
+Every name
+
+53
+00:02:25.936 --> 00:02:29.048
+and every date turns into a field you can type in.
+
+54
+00:02:31.587 --> 00:02:33.834
+To rename an activity, click its name
+
+55
+00:02:33.834 --> 00:02:34.381
+and type.
+
+56
+00:02:34.381 --> 00:02:36.568
+There is no save button to remember.
+
+57
+00:02:36.568 --> 00:02:38.329
+The change is kept as you go.
+
+58
+00:02:39.954 --> 00:02:41.307
+Dates work the same way.
+
+59
+00:02:41.307 --> 00:02:43.054
+Change a start date in the row,
+
+60
+00:02:43.054 --> 00:02:46.437
+and you can watch the bar slide along the timeline to match.
+
+61
+00:02:50.320 --> 00:02:52.059
+Adding work is just as quick.
+
+62
+00:02:52.059 --> 00:02:54.097
+Type a name in the highlighted row
+
+63
+00:02:54.097 --> 00:02:55.057
+and press Enter,
+
+64
+00:02:55.057 --> 00:02:56.975
+then keep typing to add another.
+
+65
+00:02:56.975 --> 00:02:58.894
+It feels like filling in a list.
+
+66
+00:03:01.154 --> 00:03:03.095
+New activities start without dates,
+
+67
+00:03:03.095 --> 00:03:06.367
+because you often know the work before you know the timing.
+
+68
+00:03:06.367 --> 00:03:08.807
+When you are ready, click the row's timeline
+
+69
+00:03:08.807 --> 00:03:10.138
+and the bar lands there.
+
+70
+00:03:12.120 --> 00:03:14.810
+Sometimes you only know when something begins.
+
+71
+00:03:14.810 --> 00:03:17.032
+Give it a start date and nothing else,
+
+72
+00:03:17.032 --> 00:03:18.318
+and its bar fades out,
+
+73
+00:03:18.318 --> 00:03:21.008
+an honest way of saying the end is still open.
+
+74
+00:03:23.220 --> 00:03:26.207
+These chips decide what is written beside each bar.
+
+75
+00:03:26.207 --> 00:03:28.725
+Turn on Activity, and every bar is labelled
+
+76
+00:03:28.725 --> 00:03:29.545
+with its name.
+
+77
+00:03:31.787 --> 00:03:34.046
+And if a row is not ready to be seen,
+
+78
+00:03:34.046 --> 00:03:34.901
+click its eye.
+
+79
+00:03:34.901 --> 00:03:37.527
+The row dims here so you can still find it,
+
+80
+00:03:37.527 --> 00:03:39.664
+the eye stays exactly where it was,
+
+81
+00:03:39.664 --> 00:03:41.618
+and the row disappears from View
+
+82
+00:03:41.618 --> 00:03:43.388
+and from anything you export.
+
+83
+00:03:45.854 --> 00:03:47.773
+Quick changes happen on the chart.
+
+84
+00:03:47.773 --> 00:03:50.368
+For everything else, there is one place to go,
+
+85
+00:03:50.368 --> 00:03:51.553
+the Properties panel.
+
+86
+00:03:54.621 --> 00:03:55.387
+Click any bar,
+
+87
+00:03:55.387 --> 00:03:58.505
+and all of its settings appear in the panel on the right.
+
+88
+00:03:58.505 --> 00:04:00.310
+The details sit beside the chart,
+
+89
+00:04:00.310 --> 00:04:01.240
+not on top of it.
+
+90
+00:04:03.321 --> 00:04:04.276
+Change the colour,
+
+91
+00:04:04.276 --> 00:04:06.133
+and the bar repaints straight away,
+
+92
+00:04:06.133 --> 00:04:08.415
+so you can try a few until one looks right.
+
+93
+00:04:11.887 --> 00:04:14.240
+This is where you write the hover card too.
+
+94
+00:04:14.240 --> 00:04:16.428
+It is plain text with simple formatting,
+
+95
+00:04:16.428 --> 00:04:19.601
+and the preview underneath shows exactly how it will read.
+
+96
+00:04:24.087 --> 00:04:26.209
+Close the settings when you are done.
+
+97
+00:04:26.209 --> 00:04:29.076
+And remember you can simply drag a bar to move it.
+
+98
+00:04:29.076 --> 00:04:31.714
+It snaps to whole months, so things stay tidy.
+
+99
+00:04:34.521 --> 00:04:36.912
+Dragging an edge changes how long it runs.
+
+100
+00:04:36.912 --> 00:04:40.899
+That is often faster than typing a date when you are sketching a plan.
+
+101
+00:04:43.754 --> 00:04:45.780
+Not everything is a stretch of work.
+
+102
+00:04:45.780 --> 00:04:48.145
+Right-click a bar and make it a milestone,
+
+103
+00:04:48.145 --> 00:04:51.297
+and it becomes a single diamond on the day that matters.
+
+104
+00:04:53.621 --> 00:04:54.672
+Changed your mind?
+
+105
+00:04:54.672 --> 00:04:56.833
+Undo steps back through what you did,
+
+106
+00:04:56.833 --> 00:04:58.060
+one change at a time,
+
+107
+00:04:58.060 --> 00:04:59.695
+so it is safe to experiment.
+
+108
+00:05:03.787 --> 00:05:05.671
+When you want more room for the chart,
+
+109
+00:05:05.671 --> 00:05:07.802
+the Properties button tucks the panel away,
+
+110
+00:05:07.802 --> 00:05:09.587
+and brings it back when you need it.
+
+111
+00:05:12.821 --> 00:05:14.970
+Further down, set the size of the labels
+
+112
+00:05:14.970 --> 00:05:16.475
+and of the dates separately.
+
+113
+00:05:16.475 --> 00:05:18.786
+Here the names grow while the dates shrink,
+
+114
+00:05:18.786 --> 00:05:21.097
+which suits a screen at the back of a room.
+
+115
+00:05:24.687 --> 00:05:26.404
+The header has its own settings.
+
+116
+00:05:26.404 --> 00:05:27.744
+Choose a size and a font,
+
+117
+00:05:27.744 --> 00:05:29.032
+and the heading follows.
+
+118
+00:05:31.187 --> 00:05:33.705
+There is a date chip in the corner of the header.
+
+119
+00:05:33.705 --> 00:05:35.863
+If you would rather not show it, untick it
+
+120
+00:05:35.863 --> 00:05:36.634
+and it is gone.
+
+121
+00:05:39.754 --> 00:05:41.740
+Bring it back, and look at Timeline.
+
+122
+00:05:41.740 --> 00:05:43.670
+Ask for six years instead of eight,
+
+123
+00:05:43.670 --> 00:05:45.600
+and the whole scale redraws to fit.
+
+124
+00:05:48.054 --> 00:05:49.585
+A roadmap is more than bars.
+
+125
+00:05:49.585 --> 00:05:52.209
+Let's look at the notes you can add around them,
+
+126
+00:05:52.209 --> 00:05:54.724
+and at making the whole thing look like yours.
+
+127
+00:05:58.721 --> 00:06:01.742
+Floating cards are notes that sit on top of the chart.
+
+128
+00:06:01.742 --> 00:06:04.260
+Drag one to wherever it tells the story best.
+
+129
+00:06:08.921 --> 00:06:11.291
+Each card is pinned to the row it sits on.
+
+130
+00:06:11.291 --> 00:06:13.831
+Watch as we hide two rows and switch to View.
+
+131
+00:06:13.831 --> 00:06:15.750
+The cards move up with their rows,
+
+132
+00:06:15.750 --> 00:06:17.951
+so they still point at the right thing.
+
+133
+00:06:22.687 --> 00:06:23.464
+Back in Edit,
+
+134
+00:06:23.464 --> 00:06:26.092
+there is a second kind of card on the right,
+
+135
+00:06:26.092 --> 00:06:28.242
+good for principles or key messages.
+
+136
+00:06:28.242 --> 00:06:30.332
+Click a title and simply retype it.
+
+137
+00:06:34.187 --> 00:06:36.506
+The pencil opens the rest of the card.
+
+138
+00:06:36.506 --> 00:06:39.617
+The text uses the same simple formatting as before,
+
+139
+00:06:39.617 --> 00:06:41.630
+and the card updates as you type.
+
+140
+00:06:47.487 --> 00:06:50.310
+The heading of this group is yours to name as well.
+
+141
+00:06:50.310 --> 00:06:51.638
+Rename it in Properties,
+
+142
+00:06:51.638 --> 00:06:53.797
+and the tab at the top changes with it.
+
+143
+00:06:57.587 --> 00:06:59.439
+Rows can be shorter or taller.
+
+144
+00:06:59.439 --> 00:07:01.413
+Compact fits more on the screen,
+
+145
+00:07:01.413 --> 00:07:02.401
+and a taller row
+
+146
+00:07:02.401 --> 00:07:05.980
+with thicker bars makes a simple view for a few big items.
+
+147
+00:07:10.154 --> 00:07:12.292
+The header comes in several styles.
+
+148
+00:07:12.292 --> 00:07:14.186
+Each one is a single slim line,
+
+149
+00:07:14.186 --> 00:07:16.079
+so the roadmap keeps the space.
+
+150
+00:07:18.121 --> 00:07:19.133
+Now for the look.
+
+151
+00:07:19.133 --> 00:07:21.811
+Tick rounded cards, and every corner softens.
+
+152
+00:07:21.811 --> 00:07:24.668
+It is a small change that shifts the whole feel.
+
+153
+00:07:26.654 --> 00:07:27.906
+Prefer a dark screen?
+
+154
+00:07:27.906 --> 00:07:28.919
+Switch the theme,
+
+155
+00:07:28.919 --> 00:07:30.766
+and the entire roadmap follows.
+
+156
+00:07:33.087 --> 00:07:35.733
+And when you are not sure what colours to use,
+
+157
+00:07:35.733 --> 00:07:37.170
+let the app suggest some.
+
+158
+00:07:37.170 --> 00:07:39.988
+Randomise colours gives every workstream a fresh,
+
+159
+00:07:39.988 --> 00:07:40.850
+matched colour.
+
+160
+00:07:44.487 --> 00:07:46.380
+Press it again for another idea,
+
+161
+00:07:46.380 --> 00:07:47.799
+then flip back to light.
+
+162
+00:07:47.799 --> 00:07:50.164
+Each set is chosen to read well in both,
+
+163
+00:07:50.164 --> 00:07:52.825
+and Undo takes you back to where you started.
+
+164
+00:07:55.288 --> 00:07:58.213
+Sometimes it is quicker to edit a plan as text.
+
+165
+00:07:58.213 --> 00:08:00.578
+For that, there is a live JSON editor.
+
+166
+00:08:03.855 --> 00:08:04.338
+Open it,
+
+167
+00:08:04.338 --> 00:08:06.815
+and it takes the left side of the screen.
+
+168
+00:08:06.815 --> 00:08:08.930
+Every activity is one numbered line
+
+169
+00:08:08.930 --> 00:08:10.561
+with its start and its end,
+
+170
+00:08:10.561 --> 00:08:12.616
+so the whole plan is easy to scan.
+
+171
+00:08:15.955 --> 00:08:17.067
+Retype an end date,
+
+172
+00:08:17.067 --> 00:08:19.760
+and the bar on the right shortens as you type.
+
+173
+00:08:19.760 --> 00:08:22.219
+The two views are always the same roadmap.
+
+174
+00:08:24.821 --> 00:08:26.283
+Names work the same way.
+
+175
+00:08:26.283 --> 00:08:27.258
+Change one here,
+
+176
+00:08:27.258 --> 00:08:29.085
+and its row updates beside it.
+
+177
+00:08:33.188 --> 00:08:35.231
+To add an activity, just add a line.
+
+178
+00:08:35.231 --> 00:08:37.444
+A moment later it appears on the chart,
+
+179
+00:08:37.444 --> 00:08:39.430
+in the workstream you put it under.
+
+180
+00:08:42.221 --> 00:08:43.641
+Typing mistakes happen.
+
+181
+00:08:43.641 --> 00:08:45.678
+When they do, nothing is changed.
+
+182
+00:08:45.678 --> 00:08:47.468
+The editor says what is wrong
+
+183
+00:08:47.468 --> 00:08:48.641
+and marks the line,
+
+184
+00:08:48.641 --> 00:08:51.234
+so your roadmap is never left half broken.
+
+185
+00:08:52.221 --> 00:08:54.218
+Put it right, and the message clears.
+
+186
+00:08:54.218 --> 00:08:56.484
+The roadmap and the text are back in step.
+
+187
+00:08:57.621 --> 00:08:59.404
+Press Control S to tidy up.
+
+188
+00:08:59.404 --> 00:09:01.649
+The text is laid out neatly again,
+
+189
+00:09:01.649 --> 00:09:04.422
+and the line we added is given its own id.
+
+190
+00:09:07.521 --> 00:09:08.796
+Cards are in here too.
+
+191
+00:09:08.796 --> 00:09:10.360
+Retype a title in the text,
+
+192
+00:09:10.360 --> 00:09:12.850
+and the card on the chart changes to match.
+
+193
+00:09:15.322 --> 00:09:17.190
+Real programmes have structure.
+
+194
+00:09:17.190 --> 00:09:18.878
+Work sits inside other work,
+
+195
+00:09:18.878 --> 00:09:21.289
+and some things have to wait for others.
+
+196
+00:09:21.289 --> 00:09:23.037
+Roadmap Builder handles both.
+
+197
+00:09:28.055 --> 00:09:30.063
+To put one activity under another,
+
+198
+00:09:30.063 --> 00:09:31.953
+click its name and press Control
+
+199
+00:09:31.953 --> 00:09:33.666
+and the right square bracket.
+
+200
+00:09:33.666 --> 00:09:35.496
+The row above becomes a parent,
+
+201
+00:09:35.496 --> 00:09:37.977
+and its bar now spans the rows beneath it.
+
+202
+00:09:41.689 --> 00:09:43.963
+A parent has a small arrow of its own.
+
+203
+00:09:43.963 --> 00:09:46.656
+Fold its rows away when you want the summary,
+
+204
+00:09:46.656 --> 00:09:49.349
+and open them again when you want the detail.
+
+205
+00:09:49.349 --> 00:09:51.025
+You can go four levels deep.
+
+206
+00:09:53.355 --> 00:09:55.071
+Now for what waits for what.
+
+207
+00:09:55.071 --> 00:09:55.990
+Point at a bar,
+
+208
+00:09:55.990 --> 00:09:58.318
+and a line shows what it is linked to.
+
+209
+00:09:58.318 --> 00:10:00.524
+The lines stay hidden until you ask,
+
+210
+00:10:00.524 --> 00:10:02.545
+so a busy roadmap stays readable.
+
+211
+00:10:04.955 --> 00:10:06.763
+When you do want the whole picture,
+
+212
+00:10:06.763 --> 00:10:09.604
+the Links eye above the table shows every line at once.
+
+213
+00:10:14.355 --> 00:10:15.196
+To add a link,
+
+214
+00:10:15.196 --> 00:10:19.579
+drag from the dot at the end of a bar to the row that has to wait for it.
+
+215
+00:10:19.579 --> 00:10:20.960
+An arrow joins the two.
+
+216
+00:10:24.722 --> 00:10:29.091
+Now watch what happens if that activity is moved so it starts too early.
+
+217
+00:10:29.091 --> 00:10:30.244
+The line turns red.
+
+218
+00:10:30.244 --> 00:10:32.065
+Nothing else is moved for you.
+
+219
+00:10:32.065 --> 00:10:33.764
+It is a warning, not a rule.
+
+220
+00:10:35.989 --> 00:10:38.278
+Undo puts it back, and the warning clears.
+
+221
+00:10:42.789 --> 00:10:45.636
+And you do not have to start from an empty page.
+
+222
+00:10:45.636 --> 00:10:47.831
+Templates offers a simple, a typical,
+
+223
+00:10:47.831 --> 00:10:49.136
+and a complex roadmap.
+
+224
+00:10:49.136 --> 00:10:50.560
+This is the complex one,
+
+225
+00:10:50.560 --> 00:10:52.220
+with three levels of nesting
+
+226
+00:10:52.220 --> 00:10:54.178
+and linked activities throughout.
+
+227
+00:10:56.656 --> 00:10:58.854
+A roadmap earns its keep in a meeting.
+
+228
+00:10:58.854 --> 00:11:00.937
+So here are two ways to present one.
+
+229
+00:11:07.123 --> 00:11:09.295
+The first is to steer with the pointer.
+
+230
+00:11:09.295 --> 00:11:11.133
+Select the target on the toolbar.
+
+231
+00:11:11.133 --> 00:11:13.807
+While the pointer is in the middle of the chart,
+
+232
+00:11:13.807 --> 00:11:14.587
+nothing moves.
+
+233
+00:11:20.189 --> 00:11:21.426
+Move towards an edge,
+
+234
+00:11:21.426 --> 00:11:23.370
+and the timeline glides that way,
+
+235
+00:11:23.370 --> 00:11:24.902
+faster the closer you get.
+
+236
+00:11:24.902 --> 00:11:26.316
+Come back to the middle,
+
+237
+00:11:26.316 --> 00:11:27.671
+and it eases to a stop.
+
+238
+00:11:31.789 --> 00:11:34.030
+The second way is to prepare slides.
+
+239
+00:11:34.030 --> 00:11:35.835
+Press Escape, switch to Edit,
+
+240
+00:11:35.835 --> 00:11:37.329
+and open the Slides tab.
+
+241
+00:11:37.329 --> 00:11:40.192
+Each card here is a saved view of the roadmap.
+
+242
+00:11:43.323 --> 00:11:45.902
+Set the roadmap up the way you want it seen,
+
+243
+00:11:45.902 --> 00:11:47.661
+then save that view as a slide
+
+244
+00:11:47.661 --> 00:11:48.833
+and give it a title.
+
+245
+00:11:48.833 --> 00:11:50.357
+A description is optional.
+
+246
+00:11:55.856 --> 00:11:56.609
+Back in View,
+
+247
+00:11:56.609 --> 00:11:58.521
+select the screen on the toolbar.
+
+248
+00:11:58.521 --> 00:12:01.013
+The presentation starts at the first slide,
+
+249
+00:12:01.013 --> 00:12:04.780
+and a thin bar across the very top shows how far through you are.
+
+250
+00:12:10.323 --> 00:12:11.837
+The right arrow moves on,
+
+251
+00:12:11.837 --> 00:12:15.712
+and the roadmap glides smoothly from one saved view to the next,
+
+252
+00:12:15.712 --> 00:12:18.317
+folding and opening workstreams as it goes.
+
+253
+00:12:21.256 --> 00:12:22.646
+The left arrow goes back,
+
+254
+00:12:22.646 --> 00:12:24.369
+and the bar at the top follows.
+
+255
+00:12:27.323 --> 00:12:28.903
+When the meeting is over,
+
+256
+00:12:28.903 --> 00:12:30.610
+export the slides as a PDF.
+
+257
+00:12:30.610 --> 00:12:32.633
+You get one page for each slide,
+
+258
+00:12:32.633 --> 00:12:35.477
+with its description as a caption underneath.
+
+259
+00:12:37.956 --> 00:12:41.265
+A roadmap is only useful when other people can see it.
+
+260
+00:12:41.265 --> 00:12:42.980
+So, finally, let's share it.
+
+261
+00:12:45.889 --> 00:12:47.840
+Everything you need is under Export.
+
+262
+00:12:47.840 --> 00:12:49.249
+There are several formats,
+
+263
+00:12:49.249 --> 00:12:50.712
+depending on who it is for.
+
+264
+00:12:52.256 --> 00:12:54.375
+The roadmap file is your master copy.
+
+265
+00:12:54.375 --> 00:12:55.521
+It holds everything,
+
+266
+00:12:55.521 --> 00:12:57.239
+and it is what you would keep,
+
+267
+00:12:57.239 --> 00:13:00.275
+or hand to a colleague who wants to carry on editing.
+
+268
+00:13:02.756 --> 00:13:05.124
+For someone who just needs to open it,
+
+269
+00:13:05.124 --> 00:13:06.682
+export a standalone page.
+
+270
+00:13:06.682 --> 00:13:09.112
+That is the whole app and this roadmap,
+
+271
+00:13:09.112 --> 00:13:10.733
+packed into a single file.
+
+272
+00:13:11.756 --> 00:13:13.938
+Here is that file, opened on its own.
+
+273
+00:13:13.938 --> 00:13:15.649
+There is no server behind it,
+
+274
+00:13:15.649 --> 00:13:17.006
+and nothing to install.
+
+275
+00:13:18.523 --> 00:13:20.178
+And it is still the real thing.
+
+276
+00:13:20.178 --> 00:13:21.300
+The hover cards work,
+
+277
+00:13:21.300 --> 00:13:24.504
+and the person you sent it to can explore it for themselves.
+
+278
+00:13:30.023 --> 00:13:33.201
+If you would rather they look but not change anything,
+
+279
+00:13:33.201 --> 00:13:34.967
+collapse what they do not need
+
+280
+00:13:34.967 --> 00:13:36.615
+and export a view-only page.
+
+281
+00:13:36.615 --> 00:13:38.498
+It opens exactly as you left it,
+
+282
+00:13:38.498 --> 00:13:39.675
+with no Edit button.
+
+283
+00:13:46.056 --> 00:13:46.749
+For a slide,
+
+284
+00:13:46.749 --> 00:13:49.692
+fit the timeline to the part you want to talk about
+
+285
+00:13:49.692 --> 00:13:51.597
+and export an image of this view.
+
+286
+00:13:51.597 --> 00:13:54.251
+The picture shows just what is on your screen.
+
+287
+00:13:56.956 --> 00:13:57.638
+For print,
+
+288
+00:13:57.638 --> 00:14:02.073
+there is a PDF that fits the whole roadmap onto a single A3 page.
+
+289
+00:14:04.856 --> 00:14:06.379
+And if you ever get stuck,
+
+290
+00:14:06.379 --> 00:14:08.605
+the Guide button opens a large dialog,
+
+291
+00:14:08.605 --> 00:14:11.768
+with every step written down for each part of the app.
+
+292
+00:14:14.223 --> 00:14:15.553
+That is Roadmap Builder.
+
+293
+00:14:15.553 --> 00:14:17.381
+Your whole programme in one view,
+
+294
+00:14:17.381 --> 00:14:19.542
+ready to read, to change, and to share.
+

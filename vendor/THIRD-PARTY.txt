@@ -1,0 +1,6 @@
+Third-party libraries (unmodified). They are fetched from npm by the Docker build (assets/package.json), not kept in git:
+- marked 12.0.2 (MIT)
+- dompurify 3.5.0 ((MPL-2.0 OR Apache-2.0))
+- html-to-image 1.11.11 (MIT)
+- jspdf 2.5.1 (MIT)
+- Open Sans, Barlow, Barlow Condensed, Inter, IBM Plex Sans and Source Sans 3 fonts via Fontsource (each under the SIL Open Font License 1.1; licence texts in fonts/)

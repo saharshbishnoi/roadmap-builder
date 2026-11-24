@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Roadmap Builder</title>
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self' data:; connect-src 'self' data: blob:; media-src 'self' blob:; object-src 'none'; base-uri 'self'">
+<meta name="theme-color" content="#14275A">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body class="rb">
+<div class="app" id="work">
+
+  <aside class="side left" id="jsonPanel" aria-label="JSON live editor" hidden>
+    <div class="shead"><b>JSON live editor</b><button type="button" class="mini" data-act="json" aria-label="Close the JSON editor">×</button></div>
+    <div class="srcbar"><label for="srcScope">Show</label><select id="srcScope"><option value="dates">Activities, dates and cards</option><option value="all">Whole roadmap</option></select><span class="spacer"></span><button type="button" class="btn sm" id="srcFmt" data-act="srcFormat" title="Apply the text and lay it out again, one item per line. Ctrl+S does the same.">Format</button></div>
+    <p class="phint" id="srcHelp"></p>
+    <div class="srcwrap"><div class="srcnum" id="srcNum" aria-hidden="true"></div><textarea id="src" spellcheck="false" wrap="off" aria-label="Roadmap JSON"></textarea></div>
+    <p class="status" id="srcStatus">In step with the roadmap.</p>
+  </aside>
+  <div class="resizer" id="rzJson" role="separator" aria-orientation="vertical" aria-label="Resize the JSON editor" tabindex="0" hidden></div>
+
+  <main class="centre">
+    <div class="tools" role="toolbar" aria-label="Roadmap tools">
+      <div class="seg" role="group" aria-label="Mode">
+        <button type="button" class="segb" id="modeView" data-mode="view">View</button>
+        <button type="button" class="segb" id="modeEdit" data-mode="edit">Edit</button>
+      </div>
+      <button type="button" class="btn eo" id="undo" data-act="undo">Undo</button>
+      <div class="grp" aria-label="Zoom">
+        <button type="button" class="btn sq" data-act="zout" aria-label="Zoom out">−</button>
+        <button type="button" class="btn" data-act="zfit">Fit</button>
+        <button type="button" class="btn sq" data-act="zin" aria-label="Zoom in">+</button>
+        <button type="button" class="btn" data-act="today">Today</button>
+        <button type="button" class="btn sq ico" id="trackBtn" data-act="track" aria-pressed="false" aria-label="Track the pointer, for presenting" title="Track the pointer, for presenting: move towards an edge to glide the timeline, use the wheel to zoom, click a row to fold its workstream. Esc or right-click to stop."><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="6.5"/><circle cx="12" cy="12" r="1.6" class="dot"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4"/></svg></button>
+        <button type="button" class="btn sq ico" id="presentBtn" data-act="present" aria-pressed="false" aria-label="Present the slides" title="Present the slides: glide from one saved view to the next. Arrow keys or Space to move, Esc or right-click to stop."><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4.5" width="18" height="12" rx="1"/><path d="M10 8.2v4.6l4-2.3z" class="dot"/><path d="M8 20.5h8M12 16.5v4"/></svg></button>
+      </div>
+      <span class="tsep"></span>
+      <button type="button" class="btn eo" id="jsonBtn" data-act="json" aria-pressed="false">JSON</button>
+      <button type="button" class="btn" id="propBtn" data-act="props" aria-pressed="false">Properties</button>
+      <button type="button" class="btn" id="tourBtn" data-act="tour" hidden>▶ Tour</button>
+      <span class="tsep"></span>
+      <div class="menuwrap" id="tplWrap">
+        <button type="button" class="btn" id="tplBtn" data-menu="tplMenu" aria-haspopup="true" title="Start from a ready-made roadmap">Templates ▾</button>
+        <div class="menu wide" id="tplMenu" hidden>
+          <button type="button" data-act="tplSimple"><b>Simple</b><small>A website relaunch: three workstreams, ten activities</small></button>
+          <button type="button" data-act="tplTypical"><b>Typical</b><small>A product launch: five workstreams, one level of nesting, a critical path</small></button>
+          <button type="button" data-act="tplComplex"><b>Complex</b><small>A transformation programme: seven workstreams, three levels, linked activities, slides</small></button>
+          <button type="button" data-act="sample"><b>Sample</b><small>Project Wombat, the roadmap the app starts with</small></button>
+          <p class="mnote">A template replaces the roadmap on screen. Undo brings yours back.</p>
+        </div>
+      </div>
+      <button type="button" class="btn" data-act="import">Import</button>
+      <div class="menuwrap">
+        <button type="button" class="btn primary" id="exBtn" data-menu="exMenu" aria-haspopup="true">Export ▾</button>
+        <div class="menu right" id="exMenu" hidden>
+          <button type="button" data-act="exJson">Roadmap file (.json)</button>
+          <button type="button" data-act="exHtml">Standalone page (.html)</button>
+          <button type="button" data-act="exHtmlView">Standalone page, view only (.html)</button>
+          <button type="button" data-act="exCsv">Activity list (.csv)</button>
+          <button type="button" data-act="exPng">Image of this view (.png)</button>
+          <button type="button" data-act="exPngAll">Image, whole timeline (.png)</button>
+          <button type="button" data-act="exPdfA3">PDF, A3 landscape</button>
+          <button type="button" data-act="exPdf">PDF, exact size</button>
+          <button type="button" data-act="exSlides">Slides as a PDF, one page each</button>
+        </div>
+      </div>
+      <span class="tsep"></span>
+      <div class="menuwrap" id="moreWrap" hidden>
+        <button type="button" class="btn sq" id="moreBtn" data-menu="moreMenu" aria-haspopup="true" aria-label="More tools" title="More tools">…</button>
+        <div class="menu right" id="moreMenu" hidden></div>
+      </div>
+      <button type="button" class="btn kbd" id="palBtn" data-act="palette" aria-haspopup="dialog" title="Commands: search everything the app can do. Ctrl+K or Ctrl+Space">Ctrl K</button>
+      <button type="button" class="btn" id="themeBtn" data-act="flipTheme" aria-label="Switch between light and dark">Dark</button>
+      <button type="button" class="btn" id="helpBtn" data-act="help" aria-haspopup="dialog">Guide</button>
+      <span class="ver" id="ver"></span>
+      <input id="file" type="file" accept=".json,.csv,application/json,text/csv" hidden>
+    </div>
+
+    <div class="tourbar" id="tourBar" hidden>
+      <button type="button" class="tourplay" data-act="tour" aria-label="Watch the full tour"><img id="tourPoster" alt=""><span aria-hidden="true">▶</span></button>
+      <div class="tourtxt"><b>New here? Watch the full tour.</b><span>Eight chapters, with subtitles.</span></div>
+      <button type="button" class="btn primary" data-act="tour">Watch the tour</button>
+      <button type="button" class="btn" data-act="tourHide" aria-label="Hide this">Not now</button>
+    </div>
+
+    <div id="capture">
+      <header class="banner">
+        <div class="btitle">
+          <h1 id="title" spellcheck="false"></h1>
+          <div class="tag" id="tagline" spellcheck="false"></div>
+        </div>
+        <div class="bside">
+          <span id="todayeye"></span>
+          <div class="todaychip" id="todaychip"></div>
+        </div>
+      </header>
+      <div class="stage" id="stage">
+        <div class="chart" id="chart"><div class="inner" id="inner"></div></div>
+        <aside class="panel" id="xpanel" hidden></aside>
+      </div>
+    </div>
+  </main>
+
+  <div class="resizer" id="rzPanel" role="separator" aria-orientation="vertical" aria-label="Resize the properties panel" tabindex="0"></div>
+  <aside class="side right" id="panel" aria-label="Properties and cards">
+    <div class="tabs" role="tablist" aria-label="Right panel">
+      <button type="button" role="tab" class="tab" id="pt-props" data-ptab="props">Properties</button>
+      <button type="button" role="tab" class="tab" id="pt-cards" data-ptab="cards">Cards</button>
+      <button type="button" role="tab" class="tab" id="pt-slides" data-ptab="slides">Slides</button>
+      <button type="button" class="mini" data-act="props" aria-label="Hide this panel">×</button>
+    </div>
+    <div class="pbody" id="tabProps">
+      <section class="psec" id="propsItem"></section>
+      <section class="psec eo">
+        <h3>Add</h3>
+        <div class="pbtns">
+          <button type="button" class="btn sm" data-act="addPhase">+ Workstream</button>
+          <button type="button" class="btn sm" data-act="addKm">+ Key milestone</button>
+          <button type="button" class="btn sm" data-act="addCp">+ Critical path stage</button>
+          <button type="button" class="btn sm" data-act="addCard">+ Floating card</button>
+          <button type="button" class="btn sm" data-act="addPanel">+ Panel card</button>
+        </div>
+      </section>
+      <section class="psec">
+        <h3>Text</h3>
+        <div class="pgrid">
+          <label for="t-fontHead">Heading font</label><select id="t-fontHead" data-set="fontHead"></select>
+          <label class="eo" for="r-fontHeadCustom">or installed</label><input class="eo" type="text" id="r-fontHeadCustom" data-road="fontHeadCustom" placeholder="font name">
+          <label for="t-fontBody">Text font</label><select id="t-fontBody" data-set="fontBody"></select>
+          <label class="eo" for="r-fontBodyCustom">or installed</label><input class="eo" type="text" id="r-fontBodyCustom" data-road="fontBodyCustom" placeholder="font name">
+          <label for="t-fontScale">Text size</label><select id="t-fontScale" data-set="fontScale"><option value="90">Small</option><option value="100">Standard</option><option value="110">Large</option><option value="120">Extra large</option></select>
+          <label for="t-labelScale">Label size</label><select id="t-labelScale" data-set="labelScale"><option value="80">80%</option><option value="90">90%</option><option value="100">100%</option><option value="110">110%</option><option value="120">120%</option><option value="130">130%</option></select>
+          <label for="t-dateScale">Date size</label><select id="t-dateScale" data-set="dateScale"><option value="80">80%</option><option value="90">90%</option><option value="100">100%</option><option value="110">110%</option><option value="120">120%</option><option value="130">130%</option></select>
+        </div>
+        <label class="pchk" for="t-upper"><input type="checkbox" id="t-upper" data-toggle="upper"> Headings in capitals</label>
+      </section>
+      <section class="psec">
+        <h3>Display</h3>
+        <div class="pgrid">
+          <label for="t-theme">Theme</label><select id="t-theme" data-set="theme"><option value="auto">Match system</option><option value="light">Light</option><option value="dark">Dark</option></select>
+          <label for="t-rowH">Row height</label><select id="t-rowH" data-set="rowH"><option value="24">Compact</option><option value="30">Standard</option><option value="38">Comfortable</option><option value="48">Tall</option><option value="60">Extra tall</option></select>
+          <label for="t-barFill">Bar thickness</label><select id="t-barFill" data-set="barFill"><option value="40">Thin</option><option value="60">Standard</option><option value="80">Thick</option></select>
+          <label class="eo" for="r-accent">Highlight</label><input class="eo" type="color" id="r-accent" data-road="accent">
+        </div>
+        <div class="pbtns">
+          <button type="button" class="btn sm eo" id="randCol" data-act="randCol" title="A fresh, matched set of colours for the header and every workstream. Undo brings the old ones back.">Randomise colours</button>
+          <button type="button" class="btn sm" id="flipTheme" data-act="flipTheme" title="Switch between the light and the dark theme">Light / dark</button>
+        </div>
+        <label class="pchk" for="t-showDeps"><input type="checkbox" id="t-showDeps" data-toggle="showDeps"> Show all dependency lines</label>
+        <label class="pchk" for="t-showCards"><input type="checkbox" id="t-showCards" data-toggle="showCards"> Floating cards</label>
+        <label class="pchk" for="t-roundCards"><input type="checkbox" id="t-roundCards" data-toggle="roundCards"> Rounded cards</label>
+        <label class="pchk" for="t-float3d"><input type="checkbox" id="t-float3d" data-toggle="float3d"> 3D card effect</label>
+      </section>
+      <section class="psec">
+        <h3>Header</h3>
+        <div class="pgrid">
+          <label for="t-bannerStyle">Style</label><select id="t-bannerStyle" data-set="bannerStyle"><option value="tab">Label tab</option><option value="strip">Solid strip</option><option value="glass">Glass strip</option><option value="underline">Underline</option><option value="twotone">Two-tone</option><option value="classic">Classic, two lines</option></select>
+          <label for="t-bannerScale">Size</label><select id="t-bannerScale" data-set="bannerScale"><option value="80">Compact</option><option value="100">Standard</option><option value="125">Large</option><option value="150">Extra large</option></select>
+          <label for="t-bannerFont">Font</label><select id="t-bannerFont" data-set="bannerFont"></select>
+          <label class="eo" for="r-banner">Colour</label><input class="eo" type="color" id="r-banner" data-road="banner">
+          <label class="eo" for="r-bannerInk">Text colour</label><input class="eo" type="color" id="r-bannerInk" data-road="bannerInk">
+          <label class="eo" for="r-panelTitle">Cards heading</label><input class="eo" type="text" id="r-panelTitle" data-road="panelTitle" placeholder="Cards">
+        </div>
+        <label class="pchk" for="t-showChip"><input type="checkbox" id="t-showChip" data-toggle="showChip"> Date chip on the right</label>
+        <label class="pchk" for="t-chipExport"><input type="checkbox" id="t-chipExport" data-toggle="chipExport"> Keep the date chip in exports</label>
+      </section>
+      <section class="psec eo">
+        <h3>Timeline</h3>
+        <div class="pgrid">
+          <label for="r-startYear">Start year</label><input type="number" id="r-startYear" data-road="startYear" min="1990" max="2100">
+          <label for="r-years">Years shown</label><input type="number" id="r-years" data-road="years" min="1" max="15">
+          <label for="r-today">Today line</label><input type="color" id="r-today" data-road="today">
+        </div>
+      </section>
+      <section class="psec eo">
+        <h3>Roadmap</h3>
+        <div class="pbtns">
+          <button type="button" class="btn sm" data-act="sample">Load sample roadmap</button>
+          <button type="button" class="btn sm danger" data-act="clear">Clear all content</button>
+        </div>
+      </section>
+    </div>
+    <div class="pbody pcards" id="tabCards" hidden></div>
+    <div class="pbody pslides" id="tabSlides" hidden></div>
+  </aside>
+</div>
+
+<div class="sheet" id="sheet" hidden><div class="card" role="dialog" aria-modal="true" aria-labelledby="sheetTitle" id="card"></div></div>
+<div id="hover" hidden></div>
+<div id="xline" hidden><span></span></div>
+<div class="menu" id="ctx" role="menu" aria-label="Actions for this item" hidden></div>
+<div class="pal" id="pal" hidden><div class="palbox" role="dialog" aria-modal="true" aria-label="Commands">
+  <div class="palhead"><input type="text" id="palIn" role="combobox" aria-expanded="true" aria-controls="palList" aria-autocomplete="list" autocomplete="off" spellcheck="false" placeholder="Search commands, or type a name on the roadmap" aria-label="Search commands"><kbd>Esc</kbd></div>
+  <div class="pallist" id="palList" role="listbox" aria-label="Commands"></div>
+  <div class="palfoot"><span><kbd>↑</kbd><kbd>↓</kbd> move</span><span><kbd>Enter</kbd> run</span><span><kbd>Ctrl</kbd><kbd>K</kbd> or <kbd>Ctrl</kbd><kbd>Space</kbd> open and close</span></div>
+</div></div>
+<div id="prsBar" role="progressbar" hidden></div>
+<div id="prsTag" hidden><button type="button" class="mini" id="prsPrev" data-act="prsPrev" aria-label="Previous slide" title="Previous slide (left arrow)">◀</button><b id="prsCount"></b><button type="button" class="mini" id="prsNext" data-act="prsNext" aria-label="Next slide" title="Next slide (right arrow or Space)">▶</button><span id="prsTitle"></span><kbd>Esc</kbd><span class="prsx">to stop</span></div>
+<div id="trackTag" role="status" hidden>Tracking the pointer <kbd>Esc</kbd> or right-click to stop</div>
+<div id="trackFx" aria-hidden="true" hidden><i class="l"></i><i class="r"></i><i class="t"></i><i class="b"></i></div>
+<div id="toast" role="status" hidden></div>
+
+<script src="vendor/marked.min.js"></script>
+<script src="vendor/purify.min.js"></script>
+<script src="vendor/html-to-image.js"></script>
+<script src="vendor/jspdf.umd.min.js"></script>
+<script src="guide.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
