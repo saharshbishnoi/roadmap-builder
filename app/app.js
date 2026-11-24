@@ -807,7 +807,7 @@ async function exportVisual(kind,whole){
   const prevMode=ui.mode,chart=$("#chart"),x0=chart.scrollLeft,view=whole?null:{from:chart.scrollLeft/mw,months:Math.max(1,(chart.clientWidth-LW)/mw)};hideTip();
   try{
     if(view){freeze=true;XFROM=view.from;}     // keep the zoom exactly as it is; lines before the first month shown are left out
-    ui.mode="view";exporting=true;render();await frame();render();freeze=true;document.body.classList.add("exporting");
+    trackSet(false);ui.mode="view";exporting=true;render();await frame();render();freeze=true;document.body.classList.add("exporting");
     if(view){const span=Math.min(view.months,months()-view.from);chart.classList.add("xwin");chart.style.setProperty("--xoff",(view.from*mw)+"px");chart.style.width=Math.ceil(LW+span*mw+2)+"px";}
     if(document.fonts&&document.fonts.ready)await document.fonts.ready;
     await frame();
@@ -957,14 +957,19 @@ function ctxFor(e){
 }
 document.addEventListener("contextmenu",e=>{
   const t=e.target;closeMenus();
+  const stop={label:"Stop tracking the pointer",fn:()=>trackSet(false)};
+  if(TRK.on&&t.closest&&!t.closest("#capture")&&!t.closest("input,textarea,select,[contenteditable=true],video,a")){e.preventDefault();ctxOpen(e,[stop]);return;}
   if(!t.closest||!t.closest("#capture")||t.closest("input,textarea,select,[contenteditable=true],.istrip,video,a"))return;
-  const items=ctxFor(e);if(!items.length)return;
+  let items=ctxFor(e);
+  if(TRK.on)items=[stop].concat(items.length?["-"]:[],items);
+  else if(ui.mode!=="edit"&&t.closest("#chart"))items=items.concat(items.length?["-"]:[],[{label:"Track the pointer (for presenting)",fn:()=>trackSet(true)}]);
+  if(!items.length)return;
   e.preventDefault();ctxOpen(e,items);
 });
 
 /* ---------- events ---------- */
 function closeMenus(except){document.querySelectorAll(".menu").forEach(m=>{if(m!==except)m.hidden=true;});}
-function setMode(m){ui.mode=VIEWONLY?"view":m;saveUi();closeSheet();render();}
+function setMode(m){ui.mode=VIEWONLY?"view":m;if(ui.mode==="edit")trackSet(false);saveUi();closeSheet();render();}
 (function(){const o=Object.keys(FONTS).map(k=>'<option value="'+k+'">'+FONTS[k][0]+(/^(opensans|barlow|barlowc|inter|plex|source)$/.test(k)?'':' (if installed)')+'</option>').join("");$("#t-fontHead").innerHTML=o;$("#t-fontBody").innerHTML=o;$("#t-bannerFont").innerHTML='<option value="">Same as headings</option>'+o;})();
 const ACT={
   undo:undo,addPhase:()=>addThing("p"),addKm:()=>addThing("k"),addCp:()=>addThing("c"),addCard:()=>addThing("f"),addPanel:()=>addThing("n"),
@@ -974,10 +979,49 @@ const ACT={
   exHtml:()=>exportHtml(false),exHtmlView:()=>exportHtml(true),exPngAll:()=>exportVisual("png",true),tour:openTour,tourHide:hideTour,
   randCol:randomColours,flipTheme:flipTheme,
   json:()=>{ui.json=!ui.json;saveUi();render();},srcFormat:srcFormat,props:()=>setView(()=>{S.settings.showPanel=!S.settings.showPanel;}),
-  palette:openPalette,help:openGuide,exPng:()=>exportVisual("png"),exPdfA3:()=>exportVisual("pdfA3",true),exPdf:()=>exportVisual("pdf",true),deselect:()=>select(null),
+  palette:openPalette,track:()=>trackSet(!TRK.on),help:openGuide,exPng:()=>exportVisual("png"),exPdfA3:()=>exportVisual("pdfA3",true),exPdf:()=>exportVisual("pdf",true),deselect:()=>select(null),
   clear:()=>{mutate(()=>{S.activities=[];S.milestones=[];S.critical=[];S.cards=[];S.panel=[];});toast("Cleared all content",true);},
   sample:()=>{mutate(()=>{S=normalise(sample());});toast("Loaded the sample roadmap",true);}
 };
+/* ---------- pointer tracking: a way to present (the target on the toolbar) ----------
+   The pointer steers the view. The middle of the chart is a rest zone. Towards an edge the timeline glides that way,
+   faster the closer the pointer gets, and eases to a stop when the pointer comes back. The wheel zooms the timeline
+   around the pointer. A click on a row folds or opens its workstream; a click on a bar still shows its details.
+   It is left with Escape, the toolbar button, or the right-click menu. Nothing about it is saved. */
+const TRK={on:false,x:-1,y:-1,vx:0,vy:0,zoom:null,last:0,raf:0};
+function trackSet(on){
+  on=!!on&&!exporting;if(on===TRK.on)return;
+  if(on&&ui.mode==="edit")setMode("view");
+  TRK.on=on;TRK.vx=TRK.vy=0;TRK.zoom=null;hideTip();closeMenus();
+  document.body.classList.toggle("tracking",on);document.body.classList.remove("gliding");
+  const b=$("#trackBtn");b.classList.toggle("on",on);b.setAttribute("aria-pressed",String(on));$("#trackTag").hidden=!on;$("#trackFx").hidden=!on;
+  cancelAnimationFrame(TRK.raf);if(on){TRK.last=performance.now();TRK.raf=requestAnimationFrame(trackFrame);}
+}
+function trackFrame(now){
+  if(!TRK.on)return;
+  const dt=Math.min(.05,Math.max(0,(now-TRK.last)/1000));TRK.last=now;
+  const c=$("#chart"),r=c.getBoundingClientRect(),L=r.left+LW,T=r.top+$(".hrow").getBoundingClientRect().height,zx=Math.max(40,(r.right-L)*.2),zy=Math.max(30,(r.bottom-T)*.22);
+  const x=TRK.x,y=TRK.y,busy=dragging||exporting||!$("#sheet").hidden||!$("#pal").hidden||!$("#ctx").hidden,inside=!busy&&x>=r.left&&x<=r.right&&y>=r.top&&y<=r.bottom;
+  const d=v=>{v=Math.max(0,Math.min(1,v));return v*v*(3-2*v);};   // how far into an edge zone, eased
+  const e={l:inside&&x>L?d((L+zx-x)/zx):0,r:inside?d((x-(r.right-zx))/zx):0,t:inside&&y>T?d((T+zy-y)/zy):0,b:inside?d((y-(r.bottom-zy))/zy):0};
+  const k=Math.min(1,dt*4.5);TRK.vx+=((e.r-e.l)*620-TRK.vx)*k;TRK.vy+=((e.b-e.t)*420-TRK.vy)*k;
+  if(Math.abs(TRK.vx)>.5)c.scrollLeft+=TRK.vx*dt;if(Math.abs(TRK.vy)>.5)c.scrollTop+=TRK.vy*dt;
+  if(TRK.zoom!=null&&!busy){
+    const near=Math.abs(TRK.zoom-mw)<.02,n=near?TRK.zoom:mw+(TRK.zoom-mw)*Math.min(1,dt*7),ax=Math.max(0,Math.min(r.right-L,x-L)),m0=(ax+c.scrollLeft)/mw;
+    ui.zoom="manual";mw=n;render(true);c.scrollLeft=Math.max(0,m0*mw-ax);if(near)TRK.zoom=null;
+  }
+  document.body.classList.toggle("gliding",Math.abs(TRK.vx)>8||Math.abs(TRK.vy)>8||TRK.zoom!=null);
+  const fx=$("#trackFx").style;fx.left=L+"px";fx.top=T+"px";fx.width=Math.max(0,r.right-L)+"px";fx.height=Math.max(0,r.bottom-T)+"px";
+  fx.setProperty("--l",e.l.toFixed(3));fx.setProperty("--r",e.r.toFixed(3));fx.setProperty("--t",e.t.toFixed(3));fx.setProperty("--b",e.b.toFixed(3));
+  TRK.raf=requestAnimationFrame(trackFrame);
+}
+window.addEventListener("pointermove",e=>{TRK.x=e.clientX;TRK.y=e.clientY;},true);
+document.addEventListener("pointerleave",()=>{TRK.x=TRK.y=-1;});
+$("#chart").addEventListener("wheel",e=>{
+  if(!TRK.on)return;e.preventDefault();
+  const dy=Math.max(-160,Math.min(160,e.deltaY*(e.deltaMode===1?32:1)));   // a mouse wheel notch or a trackpad's small steps
+  TRK.zoom=Math.min(200,Math.max(3,(TRK.zoom==null?mw:TRK.zoom)*Math.exp(-dy/420)));
+},{passive:false});
 /* ---------- command palette (Ctrl+K or Ctrl+Space) ----------
    One searchable list of what the app can do, in groups. With nothing typed it lists the common commands; typing also
    searches the less common ones (row heights, header styles) and the items on the roadmap. */
@@ -992,6 +1036,7 @@ function palCommands(q){
   add("View","Fit the timeline to the window",ACT.zfit,{kw:"zoom reset"});
   add("View","Zoom in",ACT.zin);add("View","Zoom out",ACT.zout);
   add("View","Go to today",ACT.today,{kw:"scroll now"});
+  add("View",TRK.on?"Stop tracking the pointer":"Track the pointer (for presenting)",()=>trackSet(!TRK.on),{kw:"present presentation glide follow mouse smooth scroll"});
   add("View",isDark()?"Switch to the light theme":"Switch to the dark theme",flipTheme,{kw:"dark light colour mode"});
   add("View","Expand every workstream",()=>setView(()=>{S.phases.forEach(p=>{p.collapsed=false;});}),{kw:"open rows"});
   add("View","Collapse every workstream",()=>setView(()=>{S.phases.forEach(p=>{p.collapsed=true;});}),{kw:"close rows summary"});
@@ -1108,6 +1153,8 @@ document.addEventListener("click",e=>{
   if(t.id==="sheet"){closeSheet();return;}
   if((el=t.closest("[data-eye]"))){const k=el.dataset.eye;setView(()=>{S.settings[k]=!S.settings[k];});return;}
   if((el=t.closest("[data-collapse]"))){const p=find("p",el.dataset.collapse);setView(()=>{p.collapsed=!p.collapsed;});return;}
+  /* Tracking the pointer: a click anywhere on a row folds or opens its workstream. A click on a bar or milestone still shows its details. */
+  if(TRK.on&&(el=t.closest("#inner .row"))&&!t.closest("[data-tip]")){const p=find("p",el.dataset.phase);if(p){setView(()=>{p.collapsed=!p.collapsed;});return;}}
   if(ui.mode==="edit"){
     if((el=t.closest("[data-place]"))){placeAct(el.dataset.place,Math.floor((e.clientX-el.getBoundingClientRect().left)/mw));return;}
     if((el=t.closest("[data-pin]"))){const c=find("f",el.dataset.pin);if(c)mutate(()=>{const top=cardTop(c);c.pin=!c.pin;anchorCard(c,top);},true);return;}
@@ -1186,7 +1233,7 @@ document.addEventListener("keydown",e=>{
   if((e.ctrlKey||e.metaKey)&&!e.altKey&&!e.shiftKey&&(e.key.toLowerCase()==="k"||e.code==="Space")){e.preventDefault();if($("#pal").hidden)openPalette();else closePalette();return;}
   if(e.key==="Escape"&&!$("#pal").hidden){closePalette();return;}
   if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==="s"&&e.target.id==="src"){e.preventDefault();srcFormat();return;}
-  if(e.key==="Escape"){if(!$("#sheet").hidden)closeSheet();else if(sel){sel=null;render();}closeMenus();return;}
+  if(e.key==="Escape"){if(!$("#sheet").hidden)closeSheet();else if(!$("#ctx").hidden)closeMenus();else if(TRK.on)trackSet(false);else if(sel){sel=null;render();}closeMenus();return;}
   if(e.key==="Enter"&&e.target.matches&&e.target.matches(".nm.add")){e.preventDefault();addRow(e.target);return;}
   if(e.key==="Enter"&&e.target.matches&&e.target.matches(".nm,[data-ce]")){e.preventDefault();e.target.blur();return;}
   if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==="z"&&!e.shiftKey&&ui.mode==="edit"&&!/^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName)&&!e.target.isContentEditable){e.preventDefault();undo();}

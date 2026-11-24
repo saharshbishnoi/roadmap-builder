@@ -617,3 +617,21 @@ body.round .palbox{border-radius:10px;overflow:hidden}
 .btn.kbd{height:auto;padding:4px 7px;margin:0;cursor:pointer}
 .btn.kbd:hover{color:var(--ink);border-color:var(--muted)}
 body.exporting .pal{display:none}
+
+/* ---- pointer tracking (the target on the toolbar): the tag that says it is on, and a glow at the edge that is pulling ---- */
+.btn.ico svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;vertical-align:-3px}
+.btn.ico svg .dot{fill:currentColor;stroke:none}
+#trackTag{position:fixed;left:14px;bottom:14px;z-index:45;background:var(--accent);color:#fff;font:600 calc(12px * var(--fz))/1 var(--body);padding:8px 11px;box-shadow:0 8px 20px -8px rgba(var(--shadow),.6);pointer-events:none}
+#trackTag kbd{font:600 calc(10.5px * var(--fz))/1 var(--body);border:1px solid rgba(255,255,255,.55);border-radius:3px;padding:1px 5px;margin:0 3px 0 8px}
+#trackFx{position:fixed;z-index:6;pointer-events:none;overflow:hidden}
+#trackFx i{position:absolute;--g:color-mix(in srgb,var(--accent) 30%,transparent)}
+#trackFx .l,#trackFx .r{top:0;bottom:0;width:110px}#trackFx .t,#trackFx .b{left:0;right:0;height:80px}
+#trackFx .l{left:0;opacity:var(--l,0);background:linear-gradient(90deg,var(--g),transparent)}
+#trackFx .r{right:0;opacity:var(--r,0);background:linear-gradient(270deg,var(--g),transparent)}
+#trackFx .t{top:0;opacity:var(--t,0);background:linear-gradient(180deg,var(--g),transparent)}
+#trackFx .b{bottom:0;opacity:var(--b,0);background:linear-gradient(0deg,var(--g),transparent)}
+/* While the view is moving, the hover card and the pointer's date line stay out of the way, and nothing animates behind the glide. */
+body.gliding #hover,body.gliding #xline{display:none!important}
+body.tracking #inner .row{cursor:pointer}
+body.tracking .bar,body.tracking .cp,body.tracking .sum,body.tracking .dia,body.tracking .km,body.tracking .kline,body.tracking .tline,body.tracking .blabel,body.tracking .year,body.tracking .q,body.tracking .htrack,body.tracking .track{transition:none}
+body.exporting #trackTag,body.exporting #trackFx{display:none}

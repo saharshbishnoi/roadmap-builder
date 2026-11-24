@@ -177,6 +177,15 @@ Compact fits more rows in the same space; Tall with Thick bars gives a simple vi
 Floating cards keep their place against the rows. Any height from 22 to 72 pixels (`rowH`) and any
 thickness from 30 to 90 percent (`barFill`) can be typed in the JSON editor, under Whole roadmap.
 
+**Presenting with the pointer.** The target on the toolbar, beside Today, switches pointer tracking
+on (also in the right-click menu and in Commands). The pointer then steers the view. The middle of
+the chart is a rest zone. Towards any edge the timeline glides that way, faster the closer the
+pointer gets, and eases to a stop when the pointer comes back; a soft glow shows which edge is
+pulling. The scroll wheel zooms the timeline smoothly around the pointer. A click on a row folds its
+workstream away or opens it again; a click on a bar or milestone still shows its details. Esc, the
+target again, or Stop tracking the pointer in the right-click menu ends it. It works in View mode;
+switching to Edit ends it, and nothing about it is saved.
+
 **Commands.** Ctrl+K (Cmd+K on a Mac) or Ctrl+Space, or the Ctrl K button on the toolbar, opens a
 search box over everything the app can do, in groups: View, Add, Edit, Show or hide, Files and Help.
 Type a few letters, move with the arrow keys and press Enter. Switches say whether they are Shown

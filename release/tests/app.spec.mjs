@@ -731,6 +731,75 @@ test("Ctrl+K and Ctrl+Space open a command palette with grouped, searchable comm
   await expect(page.locator("#palList .pale")).toContainText("Nothing matches");
 });
 
+test("pointer tracking: the timeline glides towards an edge, the wheel zooms, a row click folds, Esc or right-click stops", async ({ page }) => {
+  await open(page);
+  const scroll = () => page.evaluate(() => { const c = document.querySelector("#chart"); return [Math.round(c.scrollLeft), Math.round(c.scrollTop)]; });
+  const yearW = () => page.evaluate(() => document.querySelector("#inner .year").getBoundingClientRect().width);
+  const on = () => page.evaluate(() => document.body.classList.contains("tracking"));
+  await page.click('[data-act="zin"]'); await page.click('[data-act="zin"]'); await page.click('[data-act="zin"]');
+  await settle(page);
+  const box = await page.locator("#chart").boundingBox(), midX = box.x + box.width * 0.6, midY = box.y + box.height * 0.55;
+  // Off: the pointer at the edge does nothing.
+  await page.mouse.move(box.x + box.width - 12, midY);
+  await page.waitForTimeout(400);
+  expect(await scroll()).toEqual([0, 0]);
+  // On, from the toolbar.
+  await page.mouse.move(midX, midY);
+  await page.click("#trackBtn");
+  await expect(page.locator("#trackBtn")).toHaveAttribute("aria-pressed", "true");
+  await expect(page.locator("#trackTag")).toBeVisible();
+  await page.mouse.move(midX, midY);
+  await page.waitForTimeout(500);
+  expect(await scroll(), "the middle is a rest zone").toEqual([0, 0]);
+  await page.mouse.move(box.x + box.width - 12, midY, { steps: 5 });
+  await expect.poll(async () => (await scroll())[0]).toBeGreaterThan(150);
+  await page.mouse.move(midX, box.y + box.height - 8, { steps: 5 });
+  await expect.poll(async () => (await scroll())[1]).toBeGreaterThan(60);
+  // Back in the middle it comes to rest.
+  await page.mouse.move(midX, midY, { steps: 5 });
+  await page.waitForTimeout(1500);
+  const rest = await scroll();
+  await page.waitForTimeout(400);
+  expect(await scroll()).toEqual(rest);
+  // The wheel zooms the timeline instead of scrolling it.
+  const w0 = await yearW();
+  await page.mouse.wheel(0, -300);
+  await expect.poll(yearW).toBeGreaterThan(w0 * 1.3);
+  // A click on a row folds its workstream; a click on a bar still opens its details.
+  const headBottom = await page.evaluate(() => document.querySelector("#inner .hrow").getBoundingClientRect().bottom);
+  await page.mouse.move(midX, headBottom + 10, { steps: 4 });
+  await expect.poll(async () => (await scroll())[1]).toBe(0);
+  await page.mouse.move(midX, midY, { steps: 4 });
+  await page.waitForTimeout(900);
+  const first = (await state(page)).phases[0].id;
+  await page.locator("#r-a2 .aname").click();
+  expect((await state(page)).phases[0].collapsed).toBe(true);
+  await expect(page.locator("#sheet")).toBeHidden();
+  await page.locator("#g-" + first + " .gname").click();
+  expect((await state(page)).phases[0].collapsed).toBe(false);
+  await page.locator("#b-a4").click({ force: true });
+  await expect(page.locator("#sheet")).toBeVisible();
+  // Escape closes the dialog first, then leaves tracking.
+  await page.keyboard.press("Escape");
+  await expect(page.locator("#sheet")).toBeHidden();
+  expect(await on()).toBe(true);
+  await page.keyboard.press("Escape");
+  expect(await on()).toBe(false);
+  await expect(page.locator("#trackTag")).toBeHidden();
+  await expect(page.locator("#trackBtn")).toHaveAttribute("aria-pressed", "false");
+  // The right-click menu starts it and stops it; switching to Edit stops it too.
+  await page.locator("#r-a2 .aname").click({ button: "right" });
+  await page.locator("#ctx button", { hasText: "Track the pointer" }).click();
+  expect(await on()).toBe(true);
+  await page.locator("#r-a2 .aname").click({ button: "right" });
+  await expect(page.locator("#ctx button").first()).toHaveText("Stop tracking the pointer");
+  await page.locator("#ctx button").first().click();
+  expect(await on()).toBe(false);
+  await page.click("#trackBtn");
+  await page.click("#modeEdit");
+  expect(await on()).toBe(false);
+});
+
 test("the Cards heading is renamed in Properties, and the tab follows", async ({ page }) => {
   await open(page, "edit");
   await expect(page.locator("#pt-cards")).toHaveText("Guiding principles");
