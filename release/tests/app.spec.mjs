@@ -800,6 +800,61 @@ test("pointer tracking: the timeline glides towards an edge, the wheel zooms, a 
   expect(await on()).toBe(false);
 });
 
+test("dependencies: lines show on hover or for all, turn red when dates clash, and are made by dragging", async ({ page }) => {
+  await open(page);
+  const op = id => page.locator("#" + id).evaluate(e => getComputedStyle(e).opacity);
+  // The sample has a few links. They are drawn but quiet until a bar is under the pointer.
+  await expect(page.locator("#deps .dep")).toHaveCount(7);
+  expect((await act(page, "a12")).deps).toEqual(["a16"]);
+  expect(await op("dp-a16-a12")).toBe("0");
+  await page.locator("#b-a16").hover({ force: true });
+  await expect(page.locator("#dp-a16-a12")).toHaveClass(/hot/);
+  await expect.poll(() => op("dp-a16-a12")).toBe("1");
+  expect(await op("dp-a13-a15")).toBe("0");
+  await page.mouse.move(5, 5);
+  // Edit mode: the Links eye shows them all.
+  await page.click("#modeEdit");
+  await settle(page);
+  await page.click("#ey-showDeps");
+  await expect(page.locator("#deps")).toHaveClass(/all/);
+  await expect.poll(() => op("dp-a13-a15")).toBe("1");
+  await page.click("#ey-showDeps");
+  // Drag from the dot at the end of a bar to another row to link them.
+  await page.locator("#b-a8").hover({ force: true });
+  const dot = await page.locator("#b-a8 .lk").boundingBox(), row = await page.locator("#r-a5 .track").boundingBox();
+  await page.mouse.move(dot.x + dot.width / 2, dot.y + dot.height / 2);
+  await page.mouse.down();
+  await page.mouse.move(row.x + 300, row.y + row.height / 2, { steps: 8 });
+  await expect(page.locator("#r-a5")).toHaveClass(/lkto/);
+  await page.mouse.up();
+  expect((await act(page, "a5")).deps).toEqual(["a8"]);
+  await expect(page.locator("#dp-a8-a5")).not.toHaveClass(/bad/);
+  // A link that would go round in a circle, or to itself, is refused.
+  await page.locator("#b-a5").hover({ force: true });
+  const dot2 = await page.locator("#b-a5 .lk").boundingBox(), row2 = await page.locator("#r-a8 .track").boundingBox();
+  await page.mouse.move(dot2.x + dot2.width / 2, dot2.y + dot2.height / 2);
+  await page.mouse.down();
+  await page.mouse.move(row2.x + 300, row2.y + row2.height / 2, { steps: 8 });
+  await page.mouse.up();
+  await expect(page.locator("#toast")).toContainText("round in a circle");
+  expect((await act(page, "a8")).deps).toEqual([]);
+  // Moving the waiting activity to start before the other ends turns the line red, and it shows while editing. Nothing else moves.
+  const before = await act(page, "a8");
+  await page.fill("#ds-a5", before.start);
+  await page.locator("#ds-a5").blur();
+  await expect(page.locator("#dp-a8-a5")).toHaveClass(/bad/);
+  await page.mouse.move(5, 5);
+  await expect.poll(() => op("dp-a8-a5")).toBe("1");
+  expect(await act(page, "a8")).toEqual(before);
+  // The right-click menu removes a link; deleting an activity removes its links.
+  await page.locator("#r-a5 .track").click({ button: "right", position: { x: 6, y: 12 } });
+  await page.locator("#ctx button", { hasText: "Remove the link from" }).click();
+  expect((await act(page, "a5")).deps).toEqual([]);
+  await page.click("#dl-a16");
+  expect((await act(page, "a12")).deps).toEqual([]);
+  await expect(page.locator("#deps .dep")).toHaveCount(6);
+});
+
 test("the Cards heading is renamed in Properties, and the tab follows", async ({ page }) => {
   await open(page, "edit");
   await expect(page.locator("#pt-cards")).toHaveText("Guiding principles");

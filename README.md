@@ -161,13 +161,22 @@ choose "Fit the timeline to this row" to scale and scroll the timeline so that r
   dotted handle to reorder rows or move a row to another workstream.
 - Right-click a row, bar, milestone, stage, card or the empty timeline for a menu that fits what
   is under the pointer.
+- **Dependencies.** Point at a bar and drag from the dot at its end to the row that has to wait
+  for it; a line with an arrow joins the two. With one bar selected, right-clicking another also
+  offers "Depends on". Lines are quiet: they show for the bar under the pointer and for the
+  selected bar, in both modes, and the Links eye above the table (or "Show all dependency lines"
+  under Display) shows them all. A line turns red and dashed when an activity starts before the
+  one it waits for has ended; in Edit mode such lines are always on show. Nothing is moved for
+  you: the lines only warn. A link that would go round in a circle is refused. Remove a link from
+  the right-click menu of either activity. In the roadmap file each activity lists what it waits
+  for in `deps`.
 - **Floating cards** can be pinned to the row they sit on (the pin on the card). A pinned card moves
   with its row, so it is still in the right place when rows are hidden in View mode. Unpinned, it
   stays a fixed distance from the top.
 
 **Properties panel** (right): the selected item, Add (workstream, key milestone, critical path
 stage, floating card, panel card), Text (fonts, text size, and separate sizes for labels and for
-dates), Display (theme, row height, bar thickness, floating cards, rounded cards, 3D effect), Header (style, size and font of the
+dates), Display (theme, row height, bar thickness, dependency lines, floating cards, rounded cards, 3D effect), Header (style, size and font of the
 heading, its colours, the name of the Cards tab, and the date chip), Timeline (start year, years
 shown, today line colour) and, on its Cards tab, the panel cards.
 

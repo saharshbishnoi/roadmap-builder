@@ -25,7 +25,9 @@ window.GUIDE=[
     "In Edit mode, click a bar, milestone or stage, or the pencil on a row, to edit all of its settings at the top of the panel. The chart updates as you type, and each burst of typing is one Undo step.",
     "Write the hover card and the click dialog in Markdown. The preview sits under each box.",
     "Under Text, set the fonts, the overall text size, and the size of labels and of dates separately. Open Sans is the font to begin with.",
-    "Drag a bar to move it, drag either end to resize it, and drag the dotted handle to reorder rows."]},
+    "Drag a bar to move it, drag either end to resize it, and drag the dotted handle to reorder rows.",
+    "To say that one activity waits for another, point at the first bar in Edit mode and drag from the dot at its end to the row that has to wait. A line with an arrow joins them. Lines stay out of the way: they show for the bar under the pointer and for the selected bar, and the Links eye above the table shows them all.",
+    "A line turns red and dashed when an activity starts before the one it waits for has ended. Nothing is moved for you; the line is a warning. To remove a link, right-click either activity and choose Remove the link."]},
   {id:"cards",title:"Cards and display",clip:"guide/04-cards",steps:[
     "Add a floating card or a panel card from Add, in the Properties panel. Edit a card title in place; the pencil opens the rest in the panel.",
     "Drag a floating card anywhere over the chart, and drag its right edge to change its width.",

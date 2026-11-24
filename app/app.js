@@ -71,6 +71,7 @@ function sample(){
     [6,"Wave template & pigeon briefing",30,9],[6,"Flock 1: rooftop",31,13],[6,"Flock 2: bandstand",31,9],[6,"Flock 3: chip shop",28,7],[6,"Flock 4: statue",36,6],[6,"Pigeon training & breadcrumbs online",35,7],
     [7,"Communal snoozing",41,55],[7,"Hammock operation",44,52],[7,"Continuous pillow improvement",47,47]];
   const acts=A.map((a,i)=>({id:"a"+(i+1),phase:"p"+a[0],name:a[1],type:a[3]?"bar":"milestone",start:at(a[2],a[3]?1:15),end:a[3]?end(a[2]+a[3]-1):at(a[2],15),color:"",hover:"",details:""}));
+  [[8,3],[16,12],[13,15],[20,17],[22,27],[23,25],[31,33]].forEach(l=>{acts[l[1]-1].deps=["a"+l[0]];});   // a few "waits for" links
   acts[0].hover="Wombats are **nocturnal**. Bring a torch.";
   acts[0].details="## Herding plan\n\n- [x] Buy carrots\n- [ ] Locate wombats\n- [ ] Open Shed A\n\n| Shed | Capacity |\n|---|---|\n| A | 12 wombats |\n| B | 3 wombats and a goose |\n\n> Nobody has ever successfully herded a wombat.";
   acts[3].hover="Progress so far: one spreadsheet can *hum*.";
@@ -102,15 +103,16 @@ function normalise(d){
   const font=k=>FONTS[k]&&!(v3&&k==="barlow")?k:"opensans";
   const old=!(+d.version>=3),v3=!(+d.version>=4),o={version:4,title:str(d.title)||"Untitled programme",tagline:str(d.tagline),startYear:int(d.startYear,1990,2100,new Date().getFullYear()),years:int(d.years,1,15,8),
     settings:{theme:["auto","light","dark"].indexOf(st.theme)>=0?st.theme:"auto",banner:hex(st.banner,"#14275A"),bannerInk:hex(st.bannerInk,"#FFFFFF"),accent:hex(st.accent,"#2F6FED"),today:hex(st.today,"#E11D48"),
-      showToday:bool(st.showToday,true),showCritical:bool(st.showCritical,true),showLines:bool(st.showLines,true),colStart:bool(st.colStart,true),colEnd:bool(st.colEnd,true),barName:bool(st.barName,false),barStart:bool(st.barStart,bool(st.showLabels,true)),barEnd:bool(st.barEnd,bool(st.showLabels,true)),showCards:bool(st.showCards,true),showPanel:bool(st.showPanel,true),float3d:bool(st.float3d,true),roundCards:bool(st.roundCards,false),
+      showToday:bool(st.showToday,true),showCritical:bool(st.showCritical,true),showLines:bool(st.showLines,true),colStart:bool(st.colStart,true),colEnd:bool(st.colEnd,true),barName:bool(st.barName,false),barStart:bool(st.barStart,bool(st.showLabels,true)),barEnd:bool(st.barEnd,bool(st.showLabels,true)),showCards:bool(st.showCards,true),showDeps:bool(st.showDeps,false),showPanel:bool(st.showPanel,true),float3d:bool(st.float3d,true),roundCards:bool(st.roundCards,false),
       panelTitle:str(st.panelTitle)||"Notes",lblCritical:str(st.lblCritical)||LBL.lblCritical,lblMilestones:str(st.lblMilestones)||LBL.lblMilestones,lblActivity:str(st.lblActivity)||LBL.lblActivity,lblStart:str(st.lblStart)||LBL.lblStart,lblEnd:str(st.lblEnd)||LBL.lblEnd,panelW:int(st.panelW,240,720,340),nameW:int(st.nameW,150,800,0),fontHead:font(st.fontHead),fontBody:font(st.fontBody),bannerStyle:BANNERS.indexOf(st.bannerStyle)>=0?st.bannerStyle:"tab",
       fontHeadCustom:fontName(st.fontHeadCustom),fontBodyCustom:fontName(st.fontBodyCustom),fontScale:[90,100,110,120].indexOf(+st.fontScale)>=0?+st.fontScale:100,labelScale:int(st.labelScale,80,130,100),bannerScale:int(st.bannerScale,60,200,100),bannerFont:FONTS[st.bannerFont]?st.bannerFont:"",showChip:bool(st.showChip,true),chipExport:bool(st.chipExport,true),dateScale:int(st.dateScale,80,130,100),rowH:int(st.rowH,22,72,30),barFill:int(st.barFill,30,90,60),upper:old?false:bool(st.upper,false)},
     phases:[],activities:[],milestones:[],critical:[],cards:[],panel:[]};
-  const pmap={};
+  const pmap={},amap={};
   arr(d.phases).forEach((p,i)=>{const id=nid(p.id);if(!(str(p.id) in pmap))pmap[str(p.id)]=id;o.phases.push({id:id,name:str(p.name)||"Workstream "+(i+1),sub:str(p.sub),color:hex(p.color,PALETTE[i%PALETTE.length]),collapsed:!!p.collapsed,hidden:!!p.hidden});});
   if(!o.phases.length)o.phases.push({id:nid(""),name:"Workstream 1",sub:"",color:PALETTE[0],collapsed:false});
   arr(d.activities).forEach(a=>{const ms=a.type==="milestone",start=valid(a.start)?a.start:"";let end=valid(a.end)?a.end:"";if(start&&end&&end<start)end=start;
-    o.activities.push({id:nid(a.id),phase:pmap[str(a.phase)]||o.phases[0].id,name:str(a.name)||"Untitled",type:ms?"milestone":"bar",start:start,end:ms?start:end,color:hex(a.color,""),hover:str(a.hover),details:str(a.details),hidden:!!a.hidden});});
+    o.activities.push({id:nid(a.id),phase:pmap[str(a.phase)]||o.phases[0].id,name:str(a.name)||"Untitled",type:ms?"milestone":"bar",start:start,end:ms?start:end,color:hex(a.color,""),hover:str(a.hover),details:str(a.details),hidden:!!a.hidden,deps:Array.isArray(a.deps)?a.deps.map(str):[]});amap[str(a.id)]=o.activities[o.activities.length-1].id;});
+  o.activities.forEach(a=>{const own=a.id;a.deps=a.deps.map(x=>amap[x]).filter((x,i,l)=>x&&x!==own&&l.indexOf(x)===i);});
   arr(d.milestones).forEach(m=>{if(valid(m.date))o.milestones.push({id:nid(m.id),name:str(m.name)||"Milestone",date:m.date,color:hex(m.color,"#C8102E"),line:bool(m.line,true),hover:str(m.hover),details:str(m.details),hidden:!!m.hidden});});
   arr(d.critical).forEach((c,i)=>{if(!valid(c.start)||!valid(c.end)||c.end<c.start)return;o.critical.push({id:nid(c.id),name:str(c.name)||"Stage",start:c.start,end:c.end,color:hex(c.color,PALETTE[i%PALETTE.length]),hover:str(c.hover),details:str(c.details),hidden:!!c.hidden});});
   arr(d.cards).forEach((c,i)=>{o.cards.push({id:nid(c.id),title:str(c.title)||"Card",badge:str(c.badge).slice(0,4),color:hex(c.color,PALETTE[i%PALETTE.length]),date:valid(c.date)?c.date:iso(o.startYear,1,1),y:int(c.y,0,6000,20),w:int(c.w,140,640,236),md:str(c.md),hidden:!!c.hidden,pin:bool(c.pin,false),row:str(c.row),dy:int(c.dy,-400,4000,0)});});
@@ -225,7 +227,7 @@ function markHtml(a,color,sc){
   if(g.off==="l")return '<span class="off">◂ '+spanTxt(a,fmtMY)+'</span>';
   if(g.off==="r")return '<span class="off r">'+spanTxt(a,fmtMY)+' ▸</span>';
   const flip=g.r+6+est>tw;
-  return '<div class="bar'+(g.fade?' '+g.fade:'')+sc+'" id="b-'+a.id+'" data-id="'+a.id+'"'+tip+' tabindex="0" role="button" aria-label="'+esc(a.name)+', '+spanTxt(a,fmtD)+'" style="left:'+g.l+'px;width:'+g.w+'px;--bc:'+color+'">'+(g.fade?'':'<i class="hl"></i><i class="hr"></i>')+'</div>'+
+  return '<div class="bar'+(g.fade?' '+g.fade:'')+sc+'" id="b-'+a.id+'" data-id="'+a.id+'"'+tip+' tabindex="0" role="button" aria-label="'+esc(a.name)+', '+spanTxt(a,fmtD)+'" style="left:'+g.l+'px;width:'+g.w+'px;--bc:'+color+'">'+(g.fade?'':'<i class="hl"></i><i class="hr"></i>')+(editing()?'<i class="lk" data-lk="'+a.id+'" title="Drag to the activity that has to wait for this one"></i>':'')+'</div>'+
     (txt?'<span class="blabel" style="'+(flip?'right:'+(tw-g.l+6):'left:'+(g.r+6))+'px">'+esc(txt)+'</span>':'');
 }
 /* The full settings of the selected item, drawn directly under (or inside) the item. */
@@ -260,7 +262,7 @@ function render(soft){
 
   const chip=(k,txt)=>'<button type="button" class="chipb'+(st[k]?' on':'')+'" id="ey-'+k+'" data-eye="'+k+'" aria-pressed="'+!!st[k]+'" title="'+(st[k]?'Hide the ':'Show the ')+txt.toLowerCase()+' beside each bar">'+txt+'</button>';
   let h='<div class="hrow"><div class="corner">'+
-    (edit?'<div class="lane-l brow"><span class="lcap">Show beside bars</span>'+chip("barName","Activity")+chip("barStart","Start")+chip("barEnd","End")+'</div>':'')+
+    (edit?'<div class="lane-l brow"><span class="lcap">Show beside bars</span>'+chip("barName","Activity")+chip("barStart","Start")+chip("barEnd","End")+eyeS("showDeps","all dependency lines","Links")+'</div>':'')+
     (showCp?'<div class="lane-l cpl'+(st.showCritical?'':' ghost')+'">'+(edit?'<button type="button" class="mini" id="addcp" data-act="addCp" title="Add a critical path stage" aria-label="Add a critical path stage">+</button>':'')+
       '<span class="ltxt"'+ceA("s:lblCritical")+'>'+esc(st.lblCritical)+'</span>'+(edit?eyeS("showCritical","the critical path"):'')+'</div>':'')+
     '<div class="lane-l kml">'+(edit?'<button type="button" class="mini" id="addkm" data-act="addKm" title="Add a key milestone" aria-label="Add a key milestone">+</button>':'')+
@@ -319,6 +321,7 @@ function render(soft){
   if(st.showLines||edit)kms.forEach(m=>{if(m.line&&!(XFROM!=null&&pos(m.date)<XFROM))h+='<div class="kline'+(st.showLines&&!m.hidden?'':' ghost')+'" style="left:'+off+(pos(m.date)*mw)+'px);--c:'+m.color+'"></div>';});
   const tp=pos(todayIso());
   if((st.showToday||edit)&&tp>=0&&tp<=M&&!(XFROM!=null&&tp<XFROM))h+='<div class="tline'+(st.showToday?'':' ghost')+'" style="left:'+off+(tp*mw)+'px)"><span>Today '+fmtS(todayIso())+'</span></div>';
+  h+=depsHtml(yy);
   if(st.showCards||edit){h+='<div class="fcards'+(st.showCards?'':' ghost')+'">';
     S.cards.forEach(c=>{if(c.hidden&&!edit)return;const x=Math.min(M,Math.max(0,pos(c.date)))*mw;
       h+='<article class="fcard fx3d'+(c.hidden?' ghost':'')+isSel("f",c.id)+'" id="fc-'+c.id+'" data-fc="'+c.id+'" style="left:'+x+'px;top:'+cardTop(c)+'px;width:'+c.w+'px;--c:'+c.color+';--ci:'+ink(c.color)+'">'+
@@ -554,7 +557,8 @@ function dupItem(kind,id){
 function delItem(kind,id){
   if(kind==="p"&&S.phases.length<2){const e=$("#f-err");if(e){e.textContent="A roadmap needs at least one workstream.";e.hidden=false;}return;}
   const o=find(kind,id);if(!o)return;if(sel&&sel.id===id)sel=null;
-  mutate(()=>{S[COLL[kind]]=S[COLL[kind]].filter(x=>x.id!==id);if(kind==="p")S.activities=S.activities.filter(a=>a.phase!==id);});
+  mutate(()=>{S[COLL[kind]]=S[COLL[kind]].filter(x=>x.id!==id);if(kind==="p")S.activities=S.activities.filter(a=>a.phase!==id);
+    if(kind==="a"||kind==="p"){const live={};S.activities.forEach(a=>{live[a.id]=1;});S.activities.forEach(a=>{a.deps=(a.deps||[]).filter(x=>live[x]);});}});
   toast('Deleted "'+(o.name||o.title)+'"',true);
 }
 function movePhase(id,d){mutate(()=>{const i=S.phases.findIndex(p=>p.id===id),j=i+d;if(j<0||j>=S.phases.length)return;const p=S.phases.splice(i,1)[0];S.phases.splice(j,0,p);});}
@@ -932,6 +936,10 @@ function ctxFor(e){
       if(onTime&&o.type==="milestone")it.push({label:"Move to "+when(),fn:()=>mutate(()=>{o.start=o.end=mStart(mi);})});
       it.push(o.type==="bar"?{label:"Make it a milestone",fn:()=>mutate(()=>{o.type="milestone";o.start=o.end=o.start||o.end;})}:{label:"Make it a bar",fn:()=>mutate(()=>{o.type="bar";if(o.start)o.end=mEndOf(o.start);})});
       if(o.start||o.end)it.push({label:"Clear its dates",fn:()=>mutate(()=>{o.start=o.end="";})});
+      const picked=sel&&sel.kind==="a"&&sel.id!==id?find("a",sel.id):null;
+      if(picked&&(o.deps||[]).indexOf(picked.id)<0)it.push({label:'Depends on "'+picked.name+'"',fn:()=>addDep(picked.id,id)});
+      (o.deps||[]).forEach(fid=>{const f=find("a",fid);if(f)it.push({label:'Remove the link from "'+f.name+'"',fn:()=>removeDep(fid,id)});});
+      S.activities.forEach(x=>{if((x.deps||[]).indexOf(id)>=0)it.push({label:'Remove the link to "'+x.name+'"',fn:()=>removeDep(id,x.id)});});
     }
     if(kind==="p")it.push({label:"Add an activity",fn:()=>addAct(id)},{label:o.collapsed?"Expand":"Collapse",fn:()=>setView(()=>{o.collapsed=!o.collapsed;})},{label:"Move up",fn:()=>movePhase(id,-1)},{label:"Move down",fn:()=>movePhase(id,1)});
     if(kind==="k")it.push({label:o.line?"Hide its vertical line":"Show its vertical line",fn:()=>mutate(()=>{o.line=!o.line;})});
@@ -983,6 +991,52 @@ const ACT={
   clear:()=>{mutate(()=>{S.activities=[];S.milestones=[];S.critical=[];S.cards=[];S.panel=[];});toast("Cleared all content",true);},
   sample:()=>{mutate(()=>{S=normalise(sample());});toast("Loaded the sample roadmap",true);}
 };
+/* ---------- dependencies: "this activity waits for that one" ----------
+   Each activity lists the activities it depends on (deps). A line runs from the end of each of those to its start.
+   Lines are quiet by default: they show for the bar under the pointer and for the selected bar; the Links eye shows
+   them all. A line turns red when the activity starts before the one it depends on has ended. Nothing is moved for
+   you: the lines only warn. */
+let depHover="";
+function depEnds(a){
+  if(a.type==="milestone"){if(!a.start)return null;const p=pos(a.start);if(p<0||p>months())return null;return {l:p*mw-7,r:p*mw+7};}
+  const g=geomA(a);return g&&!g.off?{l:g.l,r:g.r}:null;
+}
+const depLate=(from,to)=>!!(to.start&&from.end&&to.start<from.end);
+function depsHtml(height){
+  const RH=S.settings.rowH,drawn={},edit=editing();ROWS.forEach(r=>{drawn[r.id]=1;});let h="";
+  S.activities.forEach(b=>{if(!b.deps||!b.deps.length||!drawn[b.id])return;const B=depEnds(b);if(!B)return;
+    b.deps.forEach(fid=>{const a=find("a",fid);if(!a||!drawn[a.id])return;const A=depEnds(a);if(!A)return;
+      const x1=A.r,y1=ROWY[a.id]+RH/2,x2=B.l,y2=ROWY[b.id]+RH/2,g=9,r=n=>Math.round(n*10)/10;
+      const d=(x2>=x1+2*g?"M"+r(x1)+" "+y1+"H"+r(x1+g)+"V"+y2+"H"+r(x2)
+              :"M"+r(x1)+" "+y1+"H"+r(x1+g)+"V"+(y1+(y2>y1?1:-1)*RH/2)+"H"+r(x2-g)+"V"+y2+"H"+r(x2))+"M"+r(x2-5)+" "+(y2-3.5)+"L"+r(x2)+" "+y2+"L"+r(x2-5)+" "+(y2+3.5);
+      const hot=!exporting&&(depHover===a.id||depHover===b.id||(sel&&sel.kind==="a"&&(sel.id===a.id||sel.id===b.id)));
+      h+='<path id="dp-'+a.id+'-'+b.id+'" class="dep'+(depLate(a,b)?' bad':'')+(hot?' hot':'')+'" data-a="'+a.id+'" data-b="'+b.id+'" d="'+d+'"></path>';});});
+  return '<svg class="deps'+(S.settings.showDeps?' all':'')+(edit?' warn':'')+'" id="deps" style="height:'+height+'px" aria-hidden="true">'+h+'</svg>';
+}
+/* Does `id` already wait, directly or through others, for `on`? Used to refuse a link that would go round in a circle. */
+function depReaches(id,on,seen){seen=seen||{};if(id===on)return true;if(seen[id])return false;seen[id]=1;const a=find("a",id);return !!a&&(a.deps||[]).some(d=>depReaches(d,on,seen));}
+function addDep(fromId,toId){
+  const from=find("a",fromId),to=find("a",toId);if(!from||!to)return;
+  if(fromId===toId){toast("An activity cannot depend on itself.");return;}
+  if((to.deps||[]).indexOf(fromId)>=0){toast('"'+to.name+'" already depends on "'+from.name+'".');return;}
+  if(depReaches(fromId,toId)){toast('That would go round in a circle: "'+from.name+'" already waits for "'+to.name+'".');return;}
+  mutate(()=>{to.deps=(to.deps||[]).concat(fromId);});
+  toast(depLate(from,to)?'Linked, but "'+to.name+'" starts before "'+from.name+'" ends.':'"'+to.name+'" now depends on "'+from.name+'".',true);
+}
+function removeDep(fromId,toId){const to=find("a",toId);if(to)mutate(()=>{to.deps=(to.deps||[]).filter(d=>d!==fromId);});}
+/* Edit mode: drag from the dot at the end of a bar to the row that has to wait for it. */
+function linkDrag(e,dot){
+  const from=dot.dataset.lk,r=dot.getBoundingClientRect(),x0=r.left+r.width/2,y0=r.top+r.height/2;let line=null,over=null;
+  const rowAt=ev=>{const t=document.elementFromPoint(ev.clientX,ev.clientY),row=t&&t.closest?t.closest("#inner .row[data-id]"):null;return row&&row.dataset.id!==from?row:null;};
+  const mark=row=>{if(over===row)return;if(over)over.classList.remove("lkto");over=row;if(over)over.classList.add("lkto");};
+  drag(e,dot,{move:(dx,dy,ev)=>{
+      if(!line){line=document.createElementNS("http://www.w3.org/2000/svg","svg");line.id="lkline";line.innerHTML="<path></path>";document.body.appendChild(line);}
+      line.firstChild.setAttribute("d","M"+x0+" "+y0+"L"+ev.clientX+" "+ev.clientY);mark(rowAt(ev));},
+    end:ev=>{const row=rowAt(ev);mark(null);if(line)line.remove();if(row)addDep(from,row.dataset.id);else render();},
+    click:()=>toast("Drag from this dot to the activity that has to wait for this one.")});
+}
+$("#chart").addEventListener("pointerover",e=>{const el=e.target.closest&&e.target.closest(".bar[data-id],.dia[data-id]"),id=el?el.dataset.id:"";if(id===depHover||dragging)return;depHover=id;
+  document.querySelectorAll("#deps .dep").forEach(p=>{p.classList.toggle("hot",!!id&&(p.dataset.a===id||p.dataset.b===id)||!!(sel&&sel.kind==="a"&&(p.dataset.a===sel.id||p.dataset.b===sel.id)));});});
 /* ---------- pointer tracking: a way to present (the target on the toolbar) ----------
    The pointer steers the view. The middle of the chart is a rest zone. Towards an edge the timeline glides that way,
    faster the closer the pointer gets, and eases to a stop when the pointer comes back. The wheel zooms the timeline
@@ -1050,7 +1104,7 @@ function palCommands(q){
   add("Edit","Undo the last change",undo,{e:true,note:hist.length?"Ctrl+Z":"Nothing to undo"});
   add("Edit","Randomise colours",randomColours,{e:true,kw:"palette colour ideas"});
   flag("Show or hide","Critical path","showCritical");flag("Show or hide","Milestone lines","showLines");flag("Show or hide","Today line","showToday");
-  flag("Show or hide","Start date column","colStart");flag("Show or hide","End date column","colEnd");flag("Show or hide","Floating cards","showCards");
+  flag("Show or hide","Start date column","colStart");flag("Show or hide","End date column","colEnd");flag("Show or hide","Floating cards","showCards");flag("Show or hide","All dependency lines","showDeps",{note:st.showDeps?"Shown":"On hover only",kw:"links arrows waits show hide toggle"});
   flag("Show or hide","Activity names beside bars","barName",{kw:"labels show hide toggle"});flag("Show or hide","Start dates beside bars","barStart",{kw:"labels show hide toggle"});flag("Show or hide","End dates beside bars","barEnd",{kw:"labels show hide toggle"});
   [[24,"Compact"],[30,"Standard"],[38,"Comfortable"],[48,"Tall"],[60,"Extra tall"]].forEach(r=>add("Appearance","Row height: "+r[1],pick("t-rowH",String(r[0])),{own:true,deep:true,note:st.rowH===r[0]?"Current":"",kw:"rows spacing padding thicker"}));
   [[40,"Thin"],[60,"Standard"],[80,"Thick"]].forEach(r=>add("Appearance","Bar thickness: "+r[1],pick("t-barFill",String(r[0])),{own:true,deep:true,note:st.barFill===r[0]?"Current":"",kw:"bars padding"}));
@@ -1120,6 +1174,7 @@ $("#chart").addEventListener("pointerdown",e=>{
   if(ui.mode!=="edit")return;const t=e.target;let el;
   if(t.closest(".istrip,.cctl,[contenteditable=true],input,button,label"))return;
   if((el=t.closest(".grip"))){rowDrag(e,el.closest(".row"));return;}
+  if(t.classList.contains("lk")){linkDrag(e,t);return;}
   if((el=t.closest(".bar"))){spanDrag(e,el,"a",t.classList.contains("hl")?"l":t.classList.contains("hr")?"r":"m");return;}
   if((el=t.closest(".dia"))){spanDrag(e,el,"a","m");return;}
   if((el=t.closest(".cp"))){spanDrag(e,el,"c",t.classList.contains("hl")?"l":t.classList.contains("hr")?"r":"m");return;}
