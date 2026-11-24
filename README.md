@@ -147,6 +147,9 @@ choose "Fit the timeline to this row" to scale and scroll the timeline so that r
   column heading. There is no Save button. Each burst of typing is one Undo step.
 - Each row and card has a colour square, an eye to hide or show it, a pencil and (where it applies)
   a cross to delete. Hidden things stay dimmed in Edit mode and disappear in View mode and exports.
+- Every eye stays in the same place: solid when the thing is shown, a faint outline when it is hidden.
+  A hidden date column or a switched-off set of floating cards keeps its place in Edit mode, dimmed,
+  so nothing moves and nothing is out of reach.
 - The pencil, or a click on a bar, milestone or stage, opens all of that item's settings at the top
   of the Properties panel, including its two Markdown cards: hover and click.
 - Type a name in the highlighted "Add an activity" row at the end of a workstream and press Enter
@@ -164,9 +167,18 @@ choose "Fit the timeline to this row" to scale and scroll the timeline so that r
 
 **Properties panel** (right): the selected item, Add (workstream, key milestone, critical path
 stage, floating card, panel card), Text (fonts, text size, and separate sizes for labels and for
-dates), Display (theme, floating cards, rounded cards, 3D effect), Header (size and font of the
+dates), Display (theme, row height, bar thickness, floating cards, rounded cards, 3D effect), Header (size and font of the
 heading, its colours, the name of the Cards tab, and the date chip), Timeline (start year, years
 shown, today line colour) and, on its Cards tab, the panel cards.
+
+**Row height.** Under Display, Row height sets how tall every row is: Compact, Standard, Comfortable,
+Tall or Extra tall. Bar thickness sets how much of the row the bar fills: Thin, Standard or Thick.
+Compact fits more rows in the same space; Tall with Thick bars gives a simple view of a few rows.
+Floating cards keep their place against the rows. Any height from 22 to 72 pixels (`rowH`) and any
+thickness from 30 to 90 percent (`barFill`) can be typed in the JSON editor, under Whole roadmap.
+
+**Version.** The version of the app is shown at the end of the toolbar, beside Guide. It is set in
+`app/app.js` (`VERSION`); the release pipeline refuses a tag that does not match it.
 
 **Colour ideas.** Under Display, Randomise colours gives the header, the highlight and every
 workstream a fresh, matched set of colours built around one random hue, chosen to read on both

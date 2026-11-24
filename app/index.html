@@ -57,6 +57,7 @@
       <span class="tsep"></span>
       <button type="button" class="btn" id="themeBtn" data-act="flipTheme" aria-label="Switch between light and dark">Dark</button>
       <button type="button" class="btn" id="helpBtn" data-act="help" aria-haspopup="dialog">Guide</button>
+      <span class="ver" id="ver"></span>
       <input id="file" type="file" accept=".json,.csv,application/json,text/csv" hidden>
     </div>
 
@@ -121,6 +122,8 @@
         <h3>Display</h3>
         <div class="pgrid">
           <label for="t-theme">Theme</label><select id="t-theme" data-set="theme"><option value="auto">Match system</option><option value="light">Light</option><option value="dark">Dark</option></select>
+          <label for="t-rowH">Row height</label><select id="t-rowH" data-set="rowH"><option value="24">Compact</option><option value="30">Standard</option><option value="38">Comfortable</option><option value="48">Tall</option><option value="60">Extra tall</option></select>
+          <label for="t-barFill">Bar thickness</label><select id="t-barFill" data-set="barFill"><option value="40">Thin</option><option value="60">Standard</option><option value="80">Thick</option></select>
           <label class="eo" for="r-accent">Highlight</label><input class="eo" type="color" id="r-accent" data-road="accent">
         </div>
         <div class="pbtns">

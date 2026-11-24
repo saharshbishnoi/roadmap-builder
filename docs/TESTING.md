@@ -7,7 +7,7 @@ the Playwright documentation are given where they help.
 
 | Kind | Where | Tool | When it runs |
 |---|---|---|---|
-| Browser tests of the app | `release/tests/app.spec.mjs` (38 tests) | [Playwright Test](https://playwright.dev/docs/intro), headless Chromium | Every release build and every tagged release; on demand locally |
+| Browser tests of the app | `release/tests/app.spec.mjs` (42 tests) | [Playwright Test](https://playwright.dev/docs/intro), headless Chromium | Every release build and every tagged release; on demand locally |
 | Guide videos as a check | `release/videos.mjs` | [Playwright library](https://playwright.dev/docs/library) | Every release build. It drives the real app through every chapter and stops if a control is missing |
 | Product film as a check | `film/scenes.mjs`, `film/record.mjs` | [Puppeteer](https://pptr.dev/) | When the film is recorded. It stops at the scene and step that failed, saves a screenshot in `film/out/failures`, and lists page errors in `film/out/report.json` |
 | Build checks | `assets/standalone.mjs`, `Dockerfile` | Node, sha256sum | Every build: the standalone template checks itself, and the voice model is checked against pinned checksums |

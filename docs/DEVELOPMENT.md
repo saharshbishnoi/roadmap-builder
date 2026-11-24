@@ -133,6 +133,9 @@ Notes:
   takes one to two hours on GitHub's machines. The workflow can also be started by hand from the Actions
   tab. Pushing to `main` alone starts nothing.
 - **Versions.** Tags are `vMAJOR.MINOR.PATCH`. A tag is never moved; a fix gets a new patch number.
+  The app shows its version at the end of the toolbar. It comes from `VERSION` at the top of
+  `app/app.js`: change it in the commit that prepares a release. The pipeline's first step stops a
+  tagged run if the tag and `VERSION` differ.
 - **Internet.** Every build needs it (npm, base images; a release build also the browser image and the
   voice model). The running app needs none.
 

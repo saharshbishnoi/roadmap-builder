@@ -115,6 +115,9 @@ body.edit .vo{display:none!important}
 .chead .c-name{flex:1;min-width:0;padding:0 12px}
 .dcol{flex:none;text-align:right;padding-right:8px;font-size:calc(11px * var(--fz));color:var(--muted);white-space:nowrap;overflow:hidden}
 .dcol.min{width:26px;padding:0}
+/* Edit mode: a hidden date column keeps its place and is dimmed; its dates can still be typed. */
+.nos .row .dcol.s,.noe .row .dcol.e,.nos .chead .dcol.s>span,.noe .chead .dcol.e>span,.fcards.ghost .fcard>:not(.cctl){opacity:.35}
+.ver{flex:none;font:600 calc(11px * var(--fz))/1 var(--body);color:var(--muted);padding:0 4px;white-space:nowrap;user-select:all}
 .chead .dcol{color:inherit;font-size:calc(12px * var(--fz));display:flex;align-items:center;justify-content:flex-end;gap:2px;padding-right:4px}
 .bsp{flex:none;width:78px}
 .htrack{flex:none;width:var(--tw);position:relative}
@@ -134,19 +137,19 @@ body.edit .vo{display:none!important}
 .q{flex:none;width:calc(var(--mw)*3);display:flex;align-items:center;justify-content:center;font-size:calc(10px * var(--fz));color:var(--muted);border-left:1px solid var(--grid);overflow:hidden}
 .q.m{width:var(--mw)}
 
-.row{display:flex;height:30px;border-bottom:1px solid var(--surface)}
+.row{display:flex;height:var(--rowh,30px);border-bottom:1px solid var(--surface)}
 .row.dragging{opacity:.35}
 .rleft{position:sticky;left:0;z-index:5;flex:none;width:var(--leftw);display:flex;align-items:center;gap:4px;padding:0 0 0 22px;background:color-mix(in srgb,var(--pc) 10%,var(--surface))}
 .grow .rleft{padding-left:2px;background:color-mix(in srgb,var(--pc) 24%,var(--surface))}
 .track{position:relative;flex:none;width:var(--tw);background-color:color-mix(in srgb,var(--pc) 6%,var(--surface));background-image:linear-gradient(to right,var(--grid) 1px,transparent 1px);background-size:calc(var(--mw)*12) 100%}
 .grow .track{background-color:color-mix(in srgb,var(--pc) 15%,var(--surface))}
-.caret{flex:none;width:22px;height:24px;border:0;background:transparent;cursor:pointer;color:var(--ink);padding:0;font-size:calc(11px * var(--fz));border-radius:3px}
+.caret{flex:none;width:22px;height:min(24px,calc(var(--rowh,30px) - 2px));border:0;background:transparent;cursor:pointer;color:var(--ink);padding:0;font-size:calc(11px * var(--fz));border-radius:3px}
 .caret:hover{background:var(--surface)}
 .chip{flex:none;min-width:20px;height:20px;border-radius:4px;display:flex;align-items:center;justify-content:center;font:700 calc(13px * var(--fz))/1 var(--display);background:var(--pc)}
 .gname{font:700 calc(14px * var(--fz))/1.1 var(--display);letter-spacing:.05em;text-transform:var(--tt);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .gsub{flex:1;min-width:0;font-size:calc(11px * var(--fz));color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .aname{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:0 5px;cursor:pointer}
-.grip{flex:none;width:16px;height:100%;cursor:grab;touch-action:none;background:radial-gradient(circle,var(--muted) 1.1px,transparent 1.4px) 50% 50%/6px 6px;background-clip:content-box;padding:8px 2px;opacity:.6;margin-left:-18px}
+.grip{flex:none;width:16px;height:100%;cursor:grab;touch-action:none;background:radial-gradient(circle,var(--muted) 1.1px,transparent 1.4px) 50% 50%/6px 6px;background-clip:content-box;padding:calc((var(--rowh,30px) - 14px)/2) 2px;opacity:.6;margin-left:-18px}
 .grip:hover{opacity:1}
 .nm{flex:1;min-width:0;background:transparent;border:1px solid transparent;border-radius:3px;padding:3px 5px;text-overflow:ellipsis}
 .nm.g{font:700 calc(14px * var(--fz))/1.1 var(--display);letter-spacing:.05em;text-transform:var(--tt)}
@@ -155,9 +158,9 @@ body.edit .vo{display:none!important}
 .mini{flex:none;width:22px;height:22px;border:0;background:transparent;border-radius:3px;cursor:pointer;color:var(--muted);font-weight:700;padding:0}
 .mini.dots{letter-spacing:1px;padding-bottom:6px}
 .mini:hover{background:var(--surface);color:var(--ink)}
-.bar{position:absolute;top:6px;height:18px;border-radius:9px;background:var(--bc);box-shadow:inset 0 -2px 0 rgba(0,0,0,.16);cursor:pointer}
-.sum{position:absolute;top:11px;height:8px;background:var(--pc);border-radius:2px;clip-path:polygon(0 0,100% 0,100% 100%,calc(100% - 5px) 55%,5px 55%,0 100%)}
-.dia{position:absolute;top:9px;width:12px;height:12px;margin-left:-6px;background:var(--bc);transform:rotate(45deg);cursor:pointer;box-shadow:0 0 0 1.5px var(--surface)}
+.bar{position:absolute;top:calc((var(--rowh,30px) - var(--barh,18px))/2);height:var(--barh,18px);border-radius:calc(var(--barh,18px)/2);background:var(--bc);box-shadow:inset 0 -2px 0 rgba(0,0,0,.16);cursor:pointer}
+.sum{position:absolute;top:calc((var(--rowh,30px) - var(--sumh))/2);--sumh:clamp(6px,calc(var(--barh,18px)*.45),14px);height:var(--sumh);background:var(--pc);border-radius:2px;clip-path:polygon(0 0,100% 0,100% 100%,calc(100% - 5px) 55%,5px 55%,0 100%)}
+.dia{--d:clamp(8px,calc(var(--barh,18px)*.667),16px);position:absolute;top:calc((var(--rowh,30px) - var(--d))/2);width:var(--d);height:var(--d);margin-left:calc(var(--d)/-2);background:var(--bc);transform:rotate(45deg);cursor:pointer;box-shadow:0 0 0 1.5px var(--surface)}
 .blabel{position:absolute;top:0;height:100%;display:flex;align-items:center;font-size:calc(11px * var(--fz));color:var(--muted);white-space:nowrap;pointer-events:none}
 .off{position:absolute;top:0;height:100%;display:flex;align-items:center;font-size:calc(11px * var(--fz));color:var(--muted);padding:0 6px}
 .off.r{right:0}
@@ -291,8 +294,11 @@ body.exporting .fx3d{transform:none!important}
 
 /* inline controls on the elements (Edit mode) */
 .eye{flex:none;display:inline-flex;align-items:center;justify-content:center;gap:3px;height:22px;min-width:22px;border:0;background:transparent;border-radius:3px;cursor:pointer;color:inherit;padding:0 3px;font:500 calc(11px * var(--fz))/1 var(--body);letter-spacing:0;text-transform:none}
-.eye svg{flex:none;width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round}
-.eye.off{opacity:.5}
+.eye svg{flex:none;width:15px;height:15px;fill:currentColor;stroke:currentColor;stroke-width:1.6;stroke-linejoin:round}
+/* Shown: a solid eye. Hidden: the same eye in the same place, see-through. */
+.eye.shut{opacity:.45}
+.eye.shut svg{fill:none}
+.eye.shut span{text-decoration:line-through}
 .eye:hover{opacity:1;background:color-mix(in srgb,currentColor 16%,transparent)}
 .lgrp{display:flex;align-items:center;gap:1px;margin-right:auto;letter-spacing:0;text-transform:none;color:var(--ink)}
 .lcap{color:var(--muted);font:500 calc(11px * var(--fz))/1 var(--body);margin-right:2px}
@@ -304,7 +310,7 @@ body.exporting .fx3d{transform:none!important}
 .sw.chip{width:auto;border:0}
 .nm.g{flex:1.3}
 .nm.sub{font-size:calc(11px * var(--fz));color:var(--muted)}
-.din{height:24px;background:transparent;border:1px solid transparent;border-radius:3px;padding:2px;color:var(--ink);text-align:left}
+.din{height:min(24px,calc(var(--rowh,30px) - 2px));background:transparent;border:1px solid transparent;border-radius:3px;padding:2px;color:var(--ink);text-align:left}
 .din:hover{border-color:var(--line)}
 .din:focus{background:var(--surface);border-color:var(--accent);outline:none}
 .din::-webkit-calendar-picker-indicator{margin:0;padding:0;width:12px;height:12px;opacity:.6;cursor:pointer}

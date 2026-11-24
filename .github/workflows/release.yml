@@ -24,6 +24,12 @@ jobs:
     timeout-minutes: 240
     steps:
       - uses: actions/checkout@v4
+      # The app shows its version on the toolbar; it has to be the version being released.
+      - name: Check that the tag matches the version in the app
+        if: github.ref_type == 'tag'
+        run: |
+          v=$(sed -n 's/^const VERSION="\(.*\)";$/\1/p' app/app.js)
+          [ "v$v" = "${{ github.ref_name }}" ] || { echo "app/app.js says version $v but the tag is ${{ github.ref_name }}. Change VERSION in app/app.js, or tag v$v."; exit 1; }
       - name: Release build in Docker (tests, guide videos, site, zip)
         run: docker buildx build --build-arg RELEASE=1 --target dist --output type=local,dest=dist .
       - name: Record the product film (4K)

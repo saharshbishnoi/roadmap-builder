@@ -10,9 +10,10 @@ window.GUIDE=[
     "Drag the year scale left or right to squeeze or stretch the timeline. Double-click it to fit the window. A faint line follows the pointer and shows the date under it.",
     "Right-click a row and choose Fit the timeline to this row: the timeline is scaled and scrolled so that row's dates fill the middle 80% of the screen.",
     "Drag the right edge of the Workstream / activity heading to make that column wider or narrower. Right-click a row, bar, milestone, card or the empty timeline for a menu of what you can do there.",
-    "At the end of the toolbar, Dark or Light switches the theme, and Guide opens these steps in a large dialog. The videos shown match the theme you are in."]},
+    "At the end of the toolbar, Dark or Light switches the theme, and Guide opens these steps in a large dialog. The videos shown match the theme you are in. The version of the app is shown beside Guide."]},
   {id:"rows",title:"Add and edit rows",clip:"guide/02-rows",steps:[
     "Switch to Edit. Type straight into a name or a date. Each row has a colour square, an eye to hide it, a pencil for all settings and a cross to delete.",
+    "Every eye stays in the same place. A solid eye means shown; a faint outline means hidden. Hidden rows, columns and cards stay on screen in Edit mode, dimmed, so they can still be changed; they disappear in View mode and in exports.",
     "To add an activity, type a name in the highlighted Add an activity row at the end of a workstream and press Enter. Keep typing to add more. The last row adds a workstream.",
     "A new row has no dates. Type them, or click on its timeline to place it. With only a start date the bar fades out; with only an end date it fades in.",
     "The chips above the table choose what is written beside each bar: Activity, Start and End. A filled chip is on.",
@@ -29,6 +30,7 @@ window.GUIDE=[
     "Use the pin on a floating card to keep it on the row it sits on. A pinned card moves with its row, so it stays in the right place when rows are hidden in View mode. Unpinned, it stays a fixed distance from the top.",
     "Panel cards are on the Cards tab of the right panel. Lane headings, column headings and the Cards heading are edited in place.",
     "Under Display, Randomise colours gives the header and every workstream a fresh, matched set of colours; press it again for another idea, and use Light / dark to check each one in both themes. Undo brings the old colours back.",
+    "Under Display, Row height makes every row shorter or taller, from Compact to Extra tall, and Bar thickness sets how much of the row the bar fills. Use Compact to fit more on a page, or Tall with Thick bars for a simple view with a few rows.",
     "Under Display, set the theme and rounded or square cards. Under Header, set the size and font of the heading, its colours, the name of the Cards tab, and whether the date chip on the right is shown and kept in exports. Under Timeline, set the start year and the number of years."]},
   {id:"json",title:"JSON and files",clip:"guide/05-json",steps:[
     "In Edit mode, select JSON in the toolbar. The editor opens as a full-height panel on the left, with one line per activity and its start and end.",

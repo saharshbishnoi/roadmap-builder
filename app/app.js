@@ -3,6 +3,9 @@
    the browser (localStorage) and in the files you export and import. */
 (function(){
 "use strict";
+/* The version shown at the end of the toolbar. Change it here when a release is prepared; the release pipeline
+   refuses a tag that does not match it. */
+const VERSION="1.5.0";
 const PALETTE=["#1E88E5","#2E8B2E","#7E57C2","#F07C1F","#D49B00","#12909A","#4A5568","#C2185B","#6D4C41","#3949AB"];
 /* A standalone page (Export > Standalone page) carries its roadmap inside the file and keeps its own working copy. */
 const EMBED=(()=>{try{const e=document.getElementById("roadmap-data");return e?JSON.parse(e.textContent):null;}catch(x){return null;}})();
@@ -97,7 +100,7 @@ function normalise(d){
     settings:{theme:["auto","light","dark"].indexOf(st.theme)>=0?st.theme:"auto",banner:hex(st.banner,"#14275A"),bannerInk:hex(st.bannerInk,"#FFFFFF"),accent:hex(st.accent,"#2F6FED"),today:hex(st.today,"#E11D48"),
       showToday:bool(st.showToday,true),showCritical:bool(st.showCritical,true),showLines:bool(st.showLines,true),colStart:bool(st.colStart,true),colEnd:bool(st.colEnd,true),barName:bool(st.barName,false),barStart:bool(st.barStart,bool(st.showLabels,true)),barEnd:bool(st.barEnd,bool(st.showLabels,true)),showCards:bool(st.showCards,true),showPanel:bool(st.showPanel,true),float3d:bool(st.float3d,true),roundCards:bool(st.roundCards,false),
       panelTitle:str(st.panelTitle)||"Notes",lblCritical:str(st.lblCritical)||LBL.lblCritical,lblMilestones:str(st.lblMilestones)||LBL.lblMilestones,lblActivity:str(st.lblActivity)||LBL.lblActivity,lblStart:str(st.lblStart)||LBL.lblStart,lblEnd:str(st.lblEnd)||LBL.lblEnd,panelW:int(st.panelW,240,720,340),nameW:int(st.nameW,150,800,0),fontHead:FONTS[st.fontHead]?st.fontHead:"barlow",fontBody:FONTS[st.fontBody]?st.fontBody:"barlow",
-      fontHeadCustom:fontName(st.fontHeadCustom),fontBodyCustom:fontName(st.fontBodyCustom),fontScale:[90,100,110,120].indexOf(+st.fontScale)>=0?+st.fontScale:100,labelScale:int(st.labelScale,80,130,100),bannerScale:int(st.bannerScale,60,200,100),bannerFont:FONTS[st.bannerFont]?st.bannerFont:"",showChip:bool(st.showChip,true),chipExport:bool(st.chipExport,true),dateScale:int(st.dateScale,80,130,100),upper:old?false:bool(st.upper,false)},
+      fontHeadCustom:fontName(st.fontHeadCustom),fontBodyCustom:fontName(st.fontBodyCustom),fontScale:[90,100,110,120].indexOf(+st.fontScale)>=0?+st.fontScale:100,labelScale:int(st.labelScale,80,130,100),bannerScale:int(st.bannerScale,60,200,100),bannerFont:FONTS[st.bannerFont]?st.bannerFont:"",showChip:bool(st.showChip,true),chipExport:bool(st.chipExport,true),dateScale:int(st.dateScale,80,130,100),rowH:int(st.rowH,22,72,30),barFill:int(st.barFill,30,90,60),upper:old?false:bool(st.upper,false)},
     phases:[],activities:[],milestones:[],critical:[],cards:[],panel:[]};
   const pmap={};
   arr(d.phases).forEach((p,i)=>{const id=nid(p.id);if(!(str(p.id) in pmap))pmap[str(p.id)]=id;o.phases.push({id:id,name:str(p.name)||"Workstream "+(i+1),sub:str(p.sub),color:hex(p.color,PALETTE[i%PALETTE.length]),collapsed:!!p.collapsed,hidden:!!p.hidden});});
@@ -131,18 +134,20 @@ function md(src){
 
 /* ---------- render ---------- */
 const LBL={lblCritical:"Critical path",lblMilestones:"Key milestones",lblActivity:"Workstream / activity",lblStart:"Start",lblEnd:"End",panelTitle:"Notes"};
-const EYE='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.6-6.5 10-6.5S22 12 22 12s-3.6 6.5-10 6.5S2 12 2 12z"/><circle cx="12" cy="12" r="2.8"/></svg>';
-const EYEOFF='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.6-6.5 10-6.5S22 12 22 12s-3.6 6.5-10 6.5S2 12 2 12z"/><path d="M4 20L20 4"/></svg>';
+/* One eye for both states, so it never changes shape or place: filled when the thing is shown, a faint outline when hidden. */
+const EYE='<svg viewBox="0 0 24 24" aria-hidden="true"><path fill-rule="evenodd" d="M2 12s3.6-6.5 10-6.5S22 12 22 12s-3.6 6.5-10 6.5S2 12 2 12zM12 8.8a3.2 3.2 0 1 0 0 6.4a3.2 3.2 0 0 0 0-6.4z"/></svg>';
+
 let LW=380,COLS={s:0,e:0},ROWY={},ROWS=[],XFROM=null;   // XFROM: first month shown, while exporting the current view
 const PIN='<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3h6l-1 6 4 4H6l4-4-1-6z"/><path d="M12 13v8"/></svg>';
 /* Floating cards: either placed freely (a distance from the top), or pinned to a row plus an offset. */
 const cardTop=c=>c.pin&&ROWY[c.row]!=null?ROWY[c.row]+c.dy:c.y;
 function anchorCard(c,y){let r=ROWS[0];ROWS.forEach(x=>{if(x.y<=y)r=x;});c.y=Math.max(0,Math.round(y));if(r){c.row=r.id;c.dy=Math.round(y-r.y);}}
 const leftW=()=>LW;
-/* Width of the sticky left block: the name column plus whichever date columns are switched on. */
+/* Width of the sticky left block: the name column plus whichever date columns are switched on. In Edit mode a
+   hidden date column keeps its place and is dimmed, so the controls beside it do not move. */
 function layout(edit){
   const w=window.innerWidth,st=S.settings,small=w<=760&&!exporting,cw=Math.round((edit?104:68)*st.fontScale/100*st.dateScale/100);
-  COLS={s:st.colStart&&!small?cw:0,e:st.colEnd&&!small?cw:0};
+  const keep=edit&&!exporting;COLS={s:(st.colStart||keep)&&!small?cw:0,e:(st.colEnd||keep)&&!small?cw:0};
   LW=(st.nameW&&!small?st.nameW:small?(edit?250:176):w<=1180&&!exporting?(edit?300:200):(edit?330:244))+COLS.s+COLS.e;
 }
 function fitMw(){const c=$("#chart");return Math.max(8,Math.floor(((c.clientWidth-leftW()-1)/months())*100)/100);}
@@ -152,6 +157,7 @@ function applyTheme(){
   const st=S.settings,stack=(k,c)=>(c?'"'+c+'",':"")+(FONTS[k]||FONTS.barlow)[1];
   r.style.setProperty("--display",stack(st.fontHead,st.fontHeadCustom));r.style.setProperty("--body",stack(st.fontBody,st.fontBodyCustom));
   r.style.setProperty("--fz",String(st.fontScale/100));r.style.setProperty("--lz",String(st.labelScale/100));r.style.setProperty("--bz",String(st.bannerScale/100));r.style.setProperty("--bfont",st.bannerFont?FONTS[st.bannerFont][1]:stack(st.fontHead,st.fontHeadCustom));r.style.setProperty("--dz",String(st.dateScale/100));r.style.setProperty("--tt",st.upper?"uppercase":"none");
+  r.style.setProperty("--rowh",st.rowH+"px");r.style.setProperty("--barh",Math.max(6,Math.round(st.rowH*st.barFill/100))+"px");
   r.style.setProperty("--banner",S.settings.banner);r.style.setProperty("--banner-ink",S.settings.bannerInk);r.style.setProperty("--accent",S.settings.accent);r.style.setProperty("--today",S.settings.today);
 }
 function spanGeom(o){const M=months(),ps=pos(o.start),pe=posEnd(o.end);if(pe<=0)return {off:"l"};if(ps>=M)return {off:"r"};const l=Math.max(0,ps)*mw,r=Math.min(M,pe)*mw;return {l:l,r:r,w:Math.max(4,r-l)};}
@@ -187,7 +193,7 @@ function setHtml(el,h,soft){if(!soft){el.innerHTML=h;return;}const t=document.cr
 const editing=()=>ui.mode==="edit"&&!exporting;
 const nameOf=o=>esc(o.name||o.title);
 const ceA=(key,ph)=>editing()?' id="ce-'+key.replace(/:/g,"-")+'" contenteditable="true" spellcheck="false" data-ce="'+key+'"'+(ph?' data-ph="'+ph+'"':''):'';
-const eyeBtn=(on,attr,id,what,txt)=>'<button type="button" class="eye'+(on?'':' off')+'" id="'+id+'" '+attr+' aria-pressed="'+on+'" title="'+(on?'Hide ':'Show ')+what+'" aria-label="'+(on?'Hide ':'Show ')+what+'">'+(on?EYE:EYEOFF)+(txt?'<span>'+txt+'</span>':'')+'</button>';
+const eyeBtn=(on,attr,id,what,txt)=>'<button type="button" class="eye'+(on?'':' shut')+'" id="'+id+'" '+attr+' aria-pressed="'+on+'" title="'+(on?'Hide ':'Show ')+what+'" aria-label="'+(on?'Hide ':'Show ')+what+'">'+EYE+(txt?'<span>'+txt+'</span>':'')+'</button>';
 const eyeS=(k,what,txt)=>eyeBtn(!!S.settings[k],'data-eye="'+k+'"',"ey-"+k,what,txt);
 const eyeI=(kind,o)=>eyeBtn(!o.hidden,'data-hide="'+kind+':'+o.id+'"',"eh-"+o.id,nameOf(o));
 const penBtn=(kind,o)=>'<button type="button" class="mini pen'+(sel&&sel.kind===kind&&sel.id===o.id?' on':'')+'" id="pe-'+o.id+'" data-pen="'+kind+':'+o.id+'" title="All settings, shown here" aria-label="Edit '+nameOf(o)+'">✎</button>';
@@ -239,6 +245,7 @@ function render(soft){
   $("#work").style.setProperty("--panelw",st.panelW+"px");$("#work").style.setProperty("--jsonw",ui.jsonW+"px");
   layout(edit);
   const chart=$("#chart");chart.style.setProperty("--leftw",LW+"px");
+  chart.classList.toggle("nos",edit&&!st.colStart);chart.classList.toggle("noe",edit&&!st.colEnd);
   if(ui.zoom==="fit"&&!freeze)mw=fitMw();
   const tw=M*mw,inner=$("#inner"),showCp=st.showCritical||edit,cph=showCp?32:0;
   inner.style.setProperty("--mw",mw+"px");inner.style.setProperty("--tw",tw+"px");inner.style.setProperty("--vw",chart.clientWidth+"px");
@@ -271,13 +278,13 @@ function render(soft){
 
   /* Where each row sits, top to bottom. A row that is not shown (hidden in View mode, or inside a collapsed
      workstream) maps to where the next shown row is, so a card pinned to it stays in a sensible place. */
-  let pn=0,yy=0;ROWY={};ROWS=[];
+  let pn=0,yy=0;const RH=st.rowH;ROWY={};ROWS=[];
   S.phases.forEach(p=>{
     const mine=S.activities.filter(a=>a.phase===p.id);
     if(p.hidden&&!edit){ROWY[p.id]=yy;mine.forEach(a=>{ROWY[a.id]=yy;});return;}
-    ROWY[p.id]=yy;ROWS.push({id:p.id,y:yy});yy+=30;
-    mine.forEach(a=>{ROWY[a.id]=yy;if(!p.collapsed&&(edit||!a.hidden)){ROWS.push({id:a.id,y:yy});yy+=30;}});
-    if(edit&&!p.collapsed)yy+=30;
+    ROWY[p.id]=yy;ROWS.push({id:p.id,y:yy});yy+=RH;
+    mine.forEach(a=>{ROWY[a.id]=yy;if(!p.collapsed&&(edit||!a.hidden)){ROWS.push({id:a.id,y:yy});yy+=RH;}});
+    if(edit&&!p.collapsed)yy+=RH;
     pn++;
     const acts=S.activities.filter(a=>a.phase===p.id&&(edit||!a.hidden));let sum="",ds="",de="";
     const dts=[];acts.forEach(a=>{if(a.start)dts.push(a.start);if(a.end)dts.push(a.end);});dts.sort();
@@ -307,7 +314,7 @@ function render(soft){
   if(st.showLines||edit)kms.forEach(m=>{if(m.line&&!(XFROM!=null&&pos(m.date)<XFROM))h+='<div class="kline'+(st.showLines&&!m.hidden?'':' ghost')+'" style="left:'+off+(pos(m.date)*mw)+'px);--c:'+m.color+'"></div>';});
   const tp=pos(todayIso());
   if((st.showToday||edit)&&tp>=0&&tp<=M&&!(XFROM!=null&&tp<XFROM))h+='<div class="tline'+(st.showToday?'':' ghost')+'" style="left:'+off+(tp*mw)+'px)"><span>Today '+fmtS(todayIso())+'</span></div>';
-  if(st.showCards){h+='<div class="fcards">';
+  if(st.showCards||edit){h+='<div class="fcards'+(st.showCards?'':' ghost')+'">';
     S.cards.forEach(c=>{if(c.hidden&&!edit)return;const x=Math.min(M,Math.max(0,pos(c.date)))*mw;
       h+='<article class="fcard fx3d'+(c.hidden?' ghost':'')+isSel("f",c.id)+'" id="fc-'+c.id+'" data-fc="'+c.id+'" style="left:'+x+'px;top:'+cardTop(c)+'px;width:'+c.w+'px;--c:'+c.color+';--ci:'+ink(c.color)+'">'+
         (edit?'<div class="cctl"><button type="button" class="mini pinb'+(c.pin?' on':'')+'" id="pi-'+c.id+'" data-pin="'+c.id+'" aria-pressed="'+!!c.pin+'" title="'+(c.pin?'Pinned to its row: it follows the row when rows are hidden. Click to place it freely.':'Placed freely. Click to pin it to the row it sits on.')+'" aria-label="'+(c.pin?'Unpin ':'Pin ')+nameOf(c)+'">'+PIN+'</button>'+swatch("f",c,c.color)+eyeI("f",c)+penBtn("f",c)+delBtn("f",c)+'</div>':'')+
@@ -321,7 +328,7 @@ function render(soft){
   renderPanel(soft);renderJson();
   $("#jsonBtn").classList.toggle("on",ui.json);$("#jsonBtn").setAttribute("aria-pressed",String(ui.json));
   $("#propBtn").classList.toggle("on",st.showPanel);$("#propBtn").setAttribute("aria-pressed",String(st.showPanel));
-  $("#helpBtn").hidden=!!EMBED;
+  $("#helpBtn").hidden=!!EMBED;$("#ver").textContent="v"+VERSION;$("#ver").title="Roadmap Builder version "+VERSION;
   {const d=isDark(),b=$("#themeBtn");b.textContent=d?"☀ Light":"☾ Dark";b.title=d?"Switch to the light theme":"Switch to the dark theme";}
 
   const t=$("#title"),g=$("#tagline");
@@ -1038,7 +1045,9 @@ document.addEventListener("change",e=>{
   if(t.id==="src"){srcFormat();return;}
   if(t.id==="srcScope"){ui.srcScope=t.value==="all"?"all":"dates";saveUi();$("#src").blur();renderJson();return;}
   if(t.dataset.toggle){const k=t.dataset.toggle;setView(()=>{S.settings[k]=t.checked;});return;}
-  if(t.dataset.set){const k=t.dataset.set;setView(()=>{S.settings[k]=/Scale$/.test(k)?+t.value:t.value;});return;}
+  if(t.dataset.set){const k=t.dataset.set;setView(()=>{const was=S.settings.rowH;S.settings[k]=/Scale$|^rowH$|^barFill$/.test(k)?+t.value:t.value;
+    /* Taller or shorter rows: floating cards keep their place against the rows. */
+    if(k==="rowH"&&was){const f=S.settings.rowH/was;S.cards.forEach(c=>{c.y=Math.round(c.y*f);c.dy=Math.round(c.dy*f);});}});return;}
   if(t.id==="file"){importFile(t.files[0]);t.value="";}
 });
 function dockInput(e){
@@ -1143,5 +1152,5 @@ checkFilm();checkGuide();
 const hot=window.claude&&window.claude.hot;
 if(hot&&typeof hot.snapshot==="function"){try{hot.snapshot(()=>S);}catch(e){}}
 if(hot&&typeof hot.ready==="function")hot.ready(start);else start((hot&&hot.data)||{});
-window.__roadmap={get state(){return S;},importText:importText,toCSV:toCSV};
+window.__roadmap={version:VERSION,get state(){return S;},importText:importText,toCSV:toCSV};
 })();

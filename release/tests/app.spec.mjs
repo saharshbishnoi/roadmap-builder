@@ -147,10 +147,73 @@ test("the chips choose what is written beside each bar", async ({ page }) => {
 test("the Start and End columns can be hidden and shown", async ({ page }) => {
   await open(page, "edit");
   await expect(page.locator("#ds-a1")).toBeVisible();
+  // In Edit mode a hidden column keeps its place, dimmed, so no control moves and its dates can still be typed.
+  const spots = () => page.evaluate(() => ["#ey-colStart", "#ey-colEnd", "#eh-a1", "#pe-a1", "#de-a1"].map(q => Math.round(document.querySelector(q).getBoundingClientRect().left)));
+  const before = await spots();
   await page.click("#ey-colStart");
-  await expect(page.locator("#ds-a1")).toHaveCount(0);
-  await page.click("#ey-colStart");
+  await settle(page);
   await expect(page.locator("#ds-a1")).toBeVisible();
+  await expect(page.locator("#ey-colStart")).toHaveClass(/shut/);
+  await expect(page.locator("#chart")).toHaveClass(/nos/);
+  expect(await spots()).toEqual(before);
+  // In View mode the column is gone.
+  await page.click("#modeView");
+  await expect(page.locator("#r-a1 .dcol.s")).toHaveCount(0);
+  await expect(page.locator("#r-a1 .dcol.e")).toHaveCount(1);
+  await page.click("#modeEdit");
+  await page.click("#ey-colStart");
+  await expect(page.locator("#ey-colStart")).not.toHaveClass(/shut/);
+  await expect(page.locator("#chart")).not.toHaveClass(/nos/);
+});
+
+test("the eye on a row stays where it is when the row is hidden", async ({ page }) => {
+  await open(page, "edit");
+  const box = async () => { const b = await page.locator("#eh-a1").boundingBox(); return [Math.round(b.x), Math.round(b.y), Math.round(b.width)]; };
+  const before = await box();
+  await page.click("#eh-a1");
+  await expect(page.locator("#eh-a1")).toHaveClass(/shut/);
+  await expect(page.locator("#eh-a1")).toHaveAttribute("aria-pressed", "false");
+  expect(await box()).toEqual(before);
+  expect((await act(page, "a1")).hidden).toBe(true);
+});
+
+test("floating cards that are switched off stay reachable in Edit mode", async ({ page }) => {
+  await open(page, "edit");
+  const n = await page.locator("#inner .fcard").count();
+  expect(n).toBeGreaterThan(0);
+  await page.uncheck("#t-showCards");
+  await expect(page.locator("#inner .fcards")).toHaveClass(/ghost/);
+  await expect(page.locator("#inner .fcard")).toHaveCount(n);
+  await page.click("#modeView");
+  await expect(page.locator("#inner .fcard")).toHaveCount(0);
+});
+
+test("row height and bar thickness can be changed", async ({ page }) => {
+  await open(page, "edit");
+  const size = async q => { const b = await page.locator(q).boundingBox(); return Math.round(b.height); };
+  expect(await size("#r-a1")).toBe(30);
+  expect(await size("#b-a1")).toBe(18);
+  await page.selectOption("#t-rowH", "48");
+  await settle(page);
+  expect(await size("#r-a1")).toBe(48);
+  expect(await size("#b-a1")).toBe(29);
+  await page.selectOption("#t-barFill", "80");
+  await settle(page);
+  expect(await size("#b-a1")).toBe(38);
+  await page.selectOption("#t-rowH", "24");
+  await settle(page);
+  expect(await size("#r-a1")).toBe(24);
+  const st = (await state(page)).settings;
+  expect([st.rowH, st.barFill]).toEqual([24, 80]);
+  // The bar stays in the middle of its row.
+  const r = await page.locator("#r-a1").boundingBox(), b = await page.locator("#b-a1").boundingBox();
+  expect(Math.abs((r.y + r.height / 2) - (b.y + b.height / 2))).toBeLessThanOrEqual(1);
+});
+
+test("the version is shown at the end of the toolbar", async ({ page }) => {
+  await open(page);
+  await expect(page.locator("#ver")).toHaveText(/^v\d+\.\d+\.\d+$/);
+  expect(await page.locator("#ver").textContent()).toBe("v" + await page.evaluate(() => window.__roadmap.version));
 });
 
 test("the JSON editor applies valid edits live and refuses invalid ones", async ({ page }) => {
