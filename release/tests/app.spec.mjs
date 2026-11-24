@@ -936,6 +936,81 @@ test("slides: views are saved in Edit on the Slides tab, and presenting glides b
   await expect(page.locator("body")).not.toHaveClass(/presenting/);
 });
 
+test("nesting: activities sit in levels, parents fold and take their dates from the rows beneath", async ({ page }) => {
+  await open(page, "edit");
+  const lv = async () => (await state(page)).activities.filter(a => a.phase === "p1").map(a => a.level).join("");
+  expect(await lv()).toBe("000000");
+  // Ctrl+] puts the row being typed in under the row above; the first row cannot be indented.
+  await page.click("#n-a2");
+  await page.keyboard.press("Control+]");
+  expect(await lv()).toBe("010000");
+  await page.click("#n-a3");
+  await page.keyboard.press("Control+]");
+  await page.click("#n-a3");
+  await page.keyboard.press("Control+]");
+  expect(await lv()).toBe("012000");
+  await page.click("#n-a3");
+  await page.keyboard.press("Control+]");
+  await expect(page.locator("#toast")).toContainText("already one level below");
+  expect(await lv(), "one level below the row above at most").toBe("012000");
+  await page.click("#n-a1");
+  await page.keyboard.press("Control+]");
+  await expect(page.locator("#toast")).toContainText("top level");
+  // The parent shows a bracket over its children, and their earliest and latest dates; it has no date boxes of its own.
+  await expect(page.locator("#r-a1")).toHaveClass(/par/);
+  await expect(page.locator("#b-a1")).toHaveClass(/asum/);
+  await expect(page.locator("#ds-a1")).toHaveCount(0);
+  const a3 = await act(page, "a3");
+  const want = d => new Date(d + "T00:00:00").toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "2-digit" });
+  await expect(page.locator("#r-a1 .dcol.s")).toHaveText(want(a3.start));
+  await expect(page.locator("#r-a1 .dcol.e")).toHaveText(want(a3.end));
+  // The right-click menu moves a row back up a level; then the arrow folds a parent and everything beneath it.
+  await page.locator("#r-a3 .track").click({ button: "right", position: { x: 6, y: 12 } });
+  await page.locator("#ctx button", { hasText: "Outdent" }).click();
+  expect(await lv()).toBe("011000");
+  await page.click("#ac-a1");
+  await expect(page.locator("#r-a2")).toHaveCount(0);
+  await expect(page.locator("#r-a3")).toHaveCount(0);
+  await expect(page.locator("#r-a4")).toHaveCount(1);
+  await page.click("#modeView");
+  await expect(page.locator("#r-a2")).toHaveCount(0);
+  await page.click("#ac-a1");
+  await expect(page.locator("#r-a3")).toHaveCount(1);
+  // Outdenting a parent takes its rows with it; the levels survive a save and reload.
+  await page.click("#modeEdit");
+  await page.click("#n-a2");
+  await page.keyboard.press("Control+[");
+  expect(await lv()).toBe("001000");
+  await page.reload();
+  await expect(page.locator("#inner .row").first()).toBeVisible();
+  expect(await lv()).toBe("001000");
+});
+
+test("templates: simple, typical and complex roadmaps load from the toolbar, and Undo brings the old one back", async ({ page }) => {
+  await open(page);
+  const sum = async () => { const s = await state(page); return { title: s.title, ws: s.phases.length, acts: s.activities.length, depth: Math.max(...s.activities.map(a => a.level)), links: s.activities.reduce((n, a) => n + a.deps.length, 0), slides: s.slides.length }; };
+  await page.click("#tplBtn");
+  await expect(page.locator("#tplMenu button b")).toHaveText(["Simple", "Typical", "Complex", "Sample"]);
+  await page.click('[data-act="tplSimple"]');
+  expect(await sum()).toEqual({ title: "Website relaunch", ws: 3, acts: 10, depth: 0, links: 6, slides: 0 });
+  await page.click("#tplBtn");
+  await page.click('[data-act="tplTypical"]');
+  expect(await sum()).toMatchObject({ title: "Product launch programme", ws: 5, depth: 1, slides: 3 });
+  await page.click("#tplBtn");
+  await page.click('[data-act="tplComplex"]');
+  const c = await sum();
+  expect(c).toMatchObject({ title: "Digital transformation programme", ws: 7, depth: 2, slides: 5 });
+  expect(c.acts).toBeGreaterThan(60);
+  expect(c.links).toBeGreaterThan(25);
+  // No template starts with a clash between linked activities, and every link is drawn.
+  await expect(page.locator("#deps .dep.bad")).toHaveCount(0);
+  await expect(page.locator("#deps .dep")).toHaveCount(c.links);
+  await expect(page.locator("#inner .row.par").first()).toBeVisible();
+  // Undo steps back through them to the roadmap that was there.
+  await page.click("#toastUndo");
+  expect((await sum()).title).toBe("Product launch programme");
+});
+
 test("the Cards heading is renamed in Properties, and the tab follows", async ({ page }) => {
   await open(page, "edit");
   await expect(page.locator("#pt-cards")).toHaveText("Guiding principles");

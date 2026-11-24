@@ -115,18 +115,19 @@ function normalise(d){
   arr(d.phases).forEach((p,i)=>{const id=nid(p.id);if(!(str(p.id) in pmap))pmap[str(p.id)]=id;o.phases.push({id:id,name:str(p.name)||"Workstream "+(i+1),sub:str(p.sub),color:hex(p.color,PALETTE[i%PALETTE.length]),collapsed:!!p.collapsed,hidden:!!p.hidden});});
   if(!o.phases.length)o.phases.push({id:nid(""),name:"Workstream 1",sub:"",color:PALETTE[0],collapsed:false});
   arr(d.activities).forEach(a=>{const ms=a.type==="milestone",start=valid(a.start)?a.start:"";let end=valid(a.end)?a.end:"";if(start&&end&&end<start)end=start;
-    o.activities.push({id:nid(a.id),phase:pmap[str(a.phase)]||o.phases[0].id,name:str(a.name)||"Untitled",type:ms?"milestone":"bar",start:start,end:ms?start:end,color:hex(a.color,""),hover:str(a.hover),details:str(a.details),hidden:!!a.hidden,deps:Array.isArray(a.deps)?a.deps.map(str):[]});amap[str(a.id)]=o.activities[o.activities.length-1].id;});
+    o.activities.push({id:nid(a.id),phase:pmap[str(a.phase)]||o.phases[0].id,name:str(a.name)||"Untitled",type:ms?"milestone":"bar",start:start,end:ms?start:end,color:hex(a.color,""),hover:str(a.hover),details:str(a.details),hidden:!!a.hidden,level:int(a.level,0,MAXLV,0),collapsed:!!a.collapsed,deps:Array.isArray(a.deps)?a.deps.map(str):[]});amap[str(a.id)]=o.activities[o.activities.length-1].id;});
   o.activities.forEach(a=>{const own=a.id;a.deps=a.deps.map(x=>amap[x]).filter((x,i,l)=>x&&x!==own&&l.indexOf(x)===i);});
   arr(d.milestones).forEach(m=>{if(valid(m.date))o.milestones.push({id:nid(m.id),name:str(m.name)||"Milestone",date:m.date,color:hex(m.color,"#C8102E"),line:bool(m.line,true),hover:str(m.hover),details:str(m.details),hidden:!!m.hidden});});
   arr(d.critical).forEach((c,i)=>{if(!valid(c.start)||!valid(c.end)||c.end<c.start)return;o.critical.push({id:nid(c.id),name:str(c.name)||"Stage",start:c.start,end:c.end,color:hex(c.color,PALETTE[i%PALETTE.length]),hover:str(c.hover),details:str(c.details),hidden:!!c.hidden});});
   arr(d.cards).forEach((c,i)=>{o.cards.push({id:nid(c.id),title:str(c.title)||"Card",badge:str(c.badge).slice(0,4),color:hex(c.color,PALETTE[i%PALETTE.length]),date:valid(c.date)?c.date:iso(o.startYear,1,1),y:int(c.y,0,6000,20),w:int(c.w,140,640,236),md:str(c.md),hidden:!!c.hidden,pin:bool(c.pin,false),row:str(c.row),dy:int(c.dy,-400,4000,0)});});
   arr(d.panel).forEach((c,i)=>{o.panel.push({id:nid(c.id),eyebrow:str(c.eyebrow),title:str(c.title)||"Card",badge:str(c.badge).slice(0,4),color:hex(c.color,PALETTE[i%PALETTE.length]),md:str(c.md),hidden:!!c.hidden});});
+  fixLevels(o);
   const num=(v,lo,hi,def)=>{v=+v;return isFinite(v)&&v>=lo&&v<=hi?v:def;};
   arr(d.slides).forEach((v,i)=>{o.slides.push({id:nid(v.id),title:str(v.title)||"Slide "+(i+1),note:str(v.note),from:num(v.from,0,o.years*12,0),span:num(v.span,1,o.years*12*4,o.years*12),
     row:amap[str(v.row)]||pmap[str(v.row)]||"",dy:int(v.dy,0,6000,0),collapsed:(Array.isArray(v.collapsed)?v.collapsed:[]).map(x=>pmap[str(x)]).filter(Boolean)});});
   return o;
 }
-function save(){if(VIEWONLY)return;try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
+function save(){fixLevels(S);if(VIEWONLY)return;try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
 function load(){try{const t=localStorage.getItem(KEY);return t?normalise(JSON.parse(t)):null;}catch(e){return null;}}
 function saveUi(){if(VIEWONLY)return;try{localStorage.setItem(UIKEY,JSON.stringify({mode:ui.mode,panelTab:ui.panelTab,srcScope:ui.srcScope,tipPos:ui.tipPos,json:ui.json,jsonW:ui.jsonW}));}catch(e){}}
 function snap(){hist.push(JSON.stringify(S));if(hist.length>100)hist.shift();}
@@ -219,6 +220,14 @@ function barText(a,s,e){
 }
 function markHtml(a,color,sc){
   const M=months(),tw=M*mw,txt=barText(a,a.start,a.end),est=txt.length*6.7*S.settings.fontScale/100*S.settings.dateScale/100+16,tip=' data-tip="a:'+a.id+'"';
+  if(TREE[a.id]&&TREE[a.id].par){
+    /* A parent's bar is a bracket over the rows beneath it; it is not dragged, because its dates are theirs. */
+    const sp=TREE[a.id].span;if(!sp.start&&!sp.end)return editing()?'<span class="off">Its dates come from the rows beneath it</span>':'';
+    const g=spanGeom({start:sp.start||sp.end,end:sp.end||sp.start});if(g.off==="l")return '<span class="off">◂ '+fmtMY(sp.start)+' – '+fmtMY(sp.end)+'</span>';if(g.off==="r")return '<span class="off r">'+fmtMY(sp.start)+' – '+fmtMY(sp.end)+' ▸</span>';
+    const t2=barText(Object.assign({},a,{type:"bar"}),sp.start,sp.end),flip=g.r+6+t2.length*6.7+16>tw;
+    return '<div class="sum asum'+sc+'" id="b-'+a.id+'" data-id="'+a.id+'"'+tip+' tabindex="0" role="button" aria-label="'+esc(a.name)+', '+fmtD(sp.start)+' to '+fmtD(sp.end)+'" style="left:'+g.l+'px;width:'+g.w+'px;--pc:'+color+'"></div>'+
+      (t2?'<span class="blabel" style="'+(flip?'right:'+(tw-g.l+6):'left:'+(g.r+6))+'px">'+esc(t2)+'</span>':'');
+  }
   const place=()=>editing()?'<button type="button" class="place" id="pl-'+a.id+'" data-place="'+a.id+'">No dates yet. Click on the timeline to place it, or type a date.</button>':'';
   if(a.type==="milestone"){
     if(!a.start)return place();
@@ -292,16 +301,17 @@ function render(soft){
 
   /* Where each row sits, top to bottom. A row that is not shown (hidden in View mode, or inside a collapsed
      workstream) maps to where the next shown row is, so a card pinned to it stays in a sensible place. */
+  treeBuild(edit);
   let pn=0,yy=0;const RH=st.rowH;ROWY={};ROWS=[];
   S.phases.forEach(p=>{
     const mine=S.activities.filter(a=>a.phase===p.id);
     if(p.hidden&&!edit){ROWY[p.id]=yy;mine.forEach(a=>{ROWY[a.id]=yy;});return;}
     ROWY[p.id]=yy;ROWS.push({id:p.id,y:yy});yy+=RH;
-    mine.forEach(a=>{ROWY[a.id]=yy;if(!p.collapsed&&(edit||!a.hidden)){ROWS.push({id:a.id,y:yy});yy+=RH;}});
+    mine.forEach(a=>{ROWY[a.id]=yy;if(!p.collapsed&&(edit||!a.hidden)&&!TREE[a.id].under){ROWS.push({id:a.id,y:yy});yy+=RH;}});
     if(edit&&!p.collapsed)yy+=RH;
     pn++;
     const acts=S.activities.filter(a=>a.phase===p.id&&(edit||!a.hidden));let sum="",ds="",de="";
-    const dts=[];acts.forEach(a=>{if(a.start)dts.push(a.start);if(a.end)dts.push(a.end);});dts.sort();
+    const dts=[];acts.forEach(a=>{if(TREE[a.id].par)return;if(a.start)dts.push(a.start);if(a.end)dts.push(a.end);});dts.sort();
     if(dts.length){const s=dts[0],e=dts[dts.length-1];ds=fmtS(s);de=fmtS(e);
       const g=spanGeom({start:s,end:e});if(!g.off)sum='<div class="sum" style="left:'+g.l+'px;width:'+g.w+'px"></div>';}
     h+='<section class="phase" id="s-'+p.id+'" style="--pc:'+p.color+'"><div class="row grow'+(p.hidden?' ghost':'')+isSel("p",p.id)+'" id="g-'+p.id+'" data-phase="'+p.id+'"><div class="rleft">'+
@@ -313,12 +323,14 @@ function render(soft){
       dc(COLS.s,ds,"s")+dc(COLS.e,de,"e")+
       (edit?'<button type="button" class="mini" id="pa-'+p.id+'" data-addact="'+p.id+'" title="Add an activity" aria-label="Add an activity to '+esc(p.name)+'">+</button>'+eyeI("p",p)+penBtn("p",p):'')+
       '</div><div class="track">'+sum+'</div></div>';
-    if(!p.collapsed)acts.forEach(a=>{const col=a.color||p.color,ms=a.type==="milestone";
+    if(!p.collapsed)acts.forEach(a=>{const tr=TREE[a.id];if(tr.under)return;const col=a.color||p.color,par=tr.par,ms=a.type==="milestone"&&!par,sp=par?tr.span:a;
+      /* Indent by level. A parent has an arrow to fold the rows beneath it; in a workstream with levels, other rows leave the same space. */
+      const lead=(a.level?'<span class="lvpad" style="width:'+(a.level*14)+'px"></span>':'')+(par?'<button type="button" class="caret sm" id="ac-'+a.id+'" data-acollapse="'+a.id+'" aria-expanded="'+(!a.collapsed)+'" aria-label="'+(a.collapsed?'Expand ':'Collapse ')+esc(a.name)+'">'+(a.collapsed?'▸':'▾')+'</button>':tr.tree?'<span class="lvpad" style="width:14px"></span>':'');
       const din=(w,k,cls)=>w?'<input type="date" class="dcol din '+cls+'" style="width:'+w+'px" id="d'+cls+'-'+a.id+'" data-dt="'+a.id+':'+k+'" value="'+a[k]+'" aria-label="'+(k==="start"?"Start date":"End date")+' of '+esc(a.name)+'">':'';
-      h+='<div class="row'+(a.hidden||p.hidden?' ghost':'')+'" id="r-'+a.id+'" data-id="'+a.id+'" data-phase="'+p.id+'"><div class="rleft">'+
-        (edit?'<span class="grip" title="Drag to reorder"></span>'+swatch("a",a,col)+'<input class="nm" id="n-'+a.id+'" data-nm="'+a.id+'" type="text" value="'+esc(a.name)+'" aria-label="Activity name">'+
-              din(COLS.s,"start","s")+(ms?dc(COLS.e,"◆","e"):din(COLS.e,"end","e"))+eyeI("a",a)+penBtn("a",a)+delBtn("a",a)
-             :'<span class="aname" data-info="a:'+a.id+'" title="'+esc(a.name)+'">'+esc(a.name)+'</span>'+dc(COLS.s,a.start?fmtS(a.start):"–","s")+dc(COLS.e,ms?'◆':a.end?fmtS(a.end):"–","e"))+
+      h+='<div class="row'+(a.hidden||p.hidden?' ghost':'')+(par?' par':'')+'" id="r-'+a.id+'" data-id="'+a.id+'" data-phase="'+p.id+'"><div class="rleft">'+
+        (edit?'<span class="grip" title="Drag to reorder"></span>'+swatch("a",a,col)+lead+'<input class="nm" id="n-'+a.id+'" data-nm="'+a.id+'" type="text" value="'+esc(a.name)+'" aria-label="Activity name">'+
+              (par?dc(COLS.s,sp.start?fmtS(sp.start):"–","s")+dc(COLS.e,sp.end?fmtS(sp.end):"–","e"):din(COLS.s,"start","s")+(ms?dc(COLS.e,"◆","e"):din(COLS.e,"end","e")))+eyeI("a",a)+penBtn("a",a)+delBtn("a",a)
+             :lead+'<span class="aname" data-info="a:'+a.id+'" title="'+esc(a.name)+'">'+esc(a.name)+'</span>'+dc(COLS.s,sp.start?fmtS(sp.start):"–","s")+dc(COLS.e,ms?'◆':sp.end?fmtS(sp.end):"–","e"))+
         '</div><div class="track">'+markHtml(a,col,isSel("a",a.id))+'</div></div>';});
     if(edit&&!p.collapsed)h+='<div class="row addrow" id="ar-'+p.id+'" data-phase="'+p.id+'"><div class="rleft"><span class="plus" aria-hidden="true">+</span><input class="nm add" id="an-'+p.id+'" data-addnm="'+p.id+'" type="text" placeholder="Add an activity: type a name and press Enter" aria-label="Add an activity to '+esc(p.name)+'"></div><div class="track"></div></div>';
     h+='</section>';
@@ -388,7 +400,7 @@ function moveTip(e){
   clearTimeout(tipT);tipT=0;
   if(el===tipEl)return;
   const kv=el.dataset.tip.split(":"),o=find(kv[0],kv[1]);if(!o){hideTip();return;}tipEl=el;
-  hv.innerHTML='<b>'+esc(o.name)+'</b><div class="tmeta">'+metaOf(kv[0],o)+'</div>'+(o.hover?'<div class="md">'+md(o.hover)+'</div>':'')+
+  hv.innerHTML='<b>'+esc(o.name)+'</b><div class="tmeta">'+metaOf(kv[0],kv[0]==="a"?eff(o):o)+'</div>'+(o.hover?'<div class="md">'+md(o.hover)+'</div>':'')+
     (ui.mode==="edit"?'<div class="thint">Click the item to edit it. Drag it to move it.</div>':(o.details?'<div class="thint">Click the item for details</div>':''))+'<div id="tipFoot">'+tipFoot()+'</div>';
   hv.style.borderTop="4px solid "+colourOf(kv[0],o);hv.hidden=false;
   if(ui.tipPos){placeTip(ui.tipPos.x,ui.tipPos.y);return;}
@@ -413,7 +425,7 @@ function openSheet(html,wide){hideTip();const c=$("#card");c.className="card"+(w
 function closeSheet(){$("#sheet").hidden=true;$("#sheet").classList.remove("top");$("#card").innerHTML="";}
 function openInfo(kind,id){
   const o=find(kind,id);if(!o)return;
-  openSheet('<h2 id="sheetTitle" style="--c:'+colourOf(kind,o)+'">'+esc(o.name)+'</h2><p class="meta">'+metaOf(kind,o)+'</p><div class="body md">'+(md(o.details)||md(o.hover)||'<p class="muted">No details have been added to this item yet.</p>')+
+  openSheet('<h2 id="sheetTitle" style="--c:'+colourOf(kind,o)+'">'+esc(o.name)+'</h2><p class="meta">'+metaOf(kind,kind==="a"?eff(o):o)+'</p><div class="body md">'+(md(o.details)||md(o.hover)||'<p class="muted">No details have been added to this item yet.</p>')+
     '</div><div class="acts"><button type="button" class="btn primary" data-sheet="close">Close</button></div>');
 }
 
@@ -443,7 +455,7 @@ function spanCheck(v,bar){
 }
 function itemCfg(kind,id){
   const o=find(kind,id);if(!o)return null;
-  const hide={label:o.hidden?"Show":"Hide",fn:()=>toggleHide(kind,id)},std=[hide,{label:"Duplicate",fn:()=>dupItem(kind,id)},{label:"Delete",cls:"danger",fn:()=>delItem(kind,id)}];
+  const hide={label:o.hidden?"Show":"Hide",fn:()=>toggleHide(kind,id)},std=(kind==="a"?[{label:"← Outdent",fn:()=>nest(id,-1)},{label:"Indent →",fn:()=>nest(id,1)}]:[]).concat([hide,{label:"Duplicate",fn:()=>dupItem(kind,id)},{label:"Delete",cls:"danger",fn:()=>delItem(kind,id)}]);
   const mdf=[{k:"hover",label:"Hover card (Markdown), shown when the pointer is over the item",type:"md",rows:3,value:o.hover},
              {k:"details",label:"Click dialog (Markdown), opened by a click in View mode",type:"md",rows:7,value:o.details}];
   const base={key:kind+":"+id,extra:std,apply:v=>{Object.assign(find(kind,id),v);},colour:()=>{const t=find(kind,id);return t?colourOf(kind,t):"";}};
@@ -489,7 +501,7 @@ function srcText(){
   if(ui.srcScope==="all")return JSON.stringify(S,null,2);
   const L=o=>JSON.stringify(o),rows=(list,fn)=>list.map(o=>'    '+L(fn(o))).join(",\n");
   const ws=S.phases.map(p=>'    {"id":'+L(p.id)+',"name":'+L(p.name)+',"activities":[\n'+
-    S.activities.filter(a=>a.phase===p.id).map(a=>'      '+L(a.type==="milestone"?{id:a.id,name:a.name,milestone:a.start}:{id:a.id,name:a.name,start:a.start,end:a.end})).join(",\n")+'\n    ]}').join(",\n");
+    S.activities.filter(a=>a.phase===p.id).map(a=>'      '+L(Object.assign(a.type==="milestone"?{id:a.id,name:a.name,milestone:a.start}:{id:a.id,name:a.name,start:a.start,end:a.end},a.level?{level:a.level}:{}))).join(",\n")+'\n    ]}').join(",\n");
   return '{\n  "workstreams":[\n'+ws+'\n  ],\n  "keyMilestones":[\n'+rows(S.milestones,m=>({id:m.id,name:m.name,date:m.date}))+
     '\n  ],\n  "criticalPath":[\n'+rows(S.critical,c=>({id:c.id,name:c.name,start:c.start,end:c.end}))+
     // Cards: a floating card sits at a date, and at a row if it is pinned; a panel card is on the Cards tab. "text" is Markdown.
@@ -506,7 +518,7 @@ function fromCompact(d){
     n.phases.push(Object.assign({},prev(S.phases,w.id),{id:pid,name:w.name||"Workstream "+(i+1)}));
     (Array.isArray(w.activities)?w.activities:[]).forEach(a=>{obj(a,"activity");const nm=a.name||"Untitled",ms="milestone" in a,opt=(v,what)=>v==null||v===""?"":day(v,nm,what),s=ms?opt(a.milestone,"a milestone"):opt(a.start,"a start"),e=ms?s:opt(a.end,"an end");
       if(s&&e&&e<s)throw new Error('"'+nm+'" ends before it starts.');
-      n.activities.push(Object.assign({},prev(S.activities,a.id),{id:a.id||uid(),phase:pid,name:nm,type:ms?"milestone":"bar",start:s,end:e}));});});
+      n.activities.push(Object.assign({},prev(S.activities,a.id),{id:a.id||uid(),phase:pid,name:nm,type:ms?"milestone":"bar",start:s,end:e},a.level!=null?{level:Math.max(0,Math.min(MAXLV,+a.level|0))}:{}));});});
   if(!n.phases.length)throw new Error("A roadmap needs at least one workstream.");
   if(Array.isArray(d.keyMilestones))n.milestones=d.keyMilestones.map(m=>{obj(m,"key milestone");const nm=m.name||"Milestone";return Object.assign({},prev(S.milestones,m.id),{id:m.id||uid(),name:nm,date:day(m.date,nm,"a")});});
   if(Array.isArray(d.criticalPath))n.critical=d.criticalPath.map(c=>{obj(c,"critical path stage");const nm=c.name||"Stage",s=day(c.start,nm,"a start"),e=day(c.end,nm,"an end");
@@ -560,7 +572,7 @@ function placeAct(id,i){
 function toggleHide(kind,id){const o=find(kind,id);if(o)mutate(()=>{o.hidden=!o.hidden;},true);}
 function dupItem(kind,id){
   const list=S[COLL[kind]],i=list.findIndex(x=>x.id===id);if(i<0)return;const nid=uid();
-  sel={kind:kind,id:nid};mutate(()=>{const c=Object.assign({},list[i],{id:nid});if("name" in c)c.name+=" (copy)";else c.title+=" (copy)";if(kind==="f")c.y+=24;list.splice(i+1,0,c);});
+  sel={kind:kind,id:nid};mutate(()=>{const c=Object.assign({},list[i],{id:nid});if("name" in c)c.name+=" (copy)";else c.title+=" (copy)";if(kind==="f")c.y+=24;if(kind==="a")c.collapsed=false;list.splice(kind==="a"?subEnd(i):i+1,0,c);});
 }
 function delItem(kind,id){
   if(kind==="p"&&S.phases.length<2){const e=$("#f-err");if(e){e.textContent="A roadmap needs at least one workstream.";e.hidden=false;}return;}
@@ -893,10 +905,15 @@ function rowDrag(e,row){
       target={phase:best.r.dataset.phase,ref:grp||add?null:best.r.dataset.id,before:before,end:add};
       line.hidden=false;line.style.top=((before?best.b.top:best.b.bottom)-inner.getBoundingClientRect().top-2)+"px";},
     end:()=>{if(!target){render();return;}
-      mutate(()=>{const i=S.activities.findIndex(a=>a.id===id),a=S.activities.splice(i,1)[0];a.phase=target.phase;
-        if(target.ref){const j=S.activities.findIndex(x=>x.id===target.ref);S.activities.splice(target.before?j:j+1,0,a);}
-        else if(target.end)S.activities.push(a);
-        else{const j=S.activities.findIndex(x=>x.phase===target.phase);if(j<0)S.activities.push(a);else S.activities.splice(j,0,a);}});}
+      /* The row moves with the rows beneath it, as one block, and takes the level of the row it is dropped beside. */
+      const i=S.activities.findIndex(a=>a.id===id),a0=S.activities[i],ids={};S.activities.forEach((x,j)=>{if(j===i||(j>i&&j<subEnd(i)&&x.phase===a0.phase))ids[x.id]=1;});
+      if(target.ref&&ids[target.ref]){render();return;}
+      mutate(()=>{const block=S.activities.filter(x=>ids[x.id]),ref=target.ref?find("a",target.ref):null,dl=(ref?ref.level:0)-a0.level;
+        S.activities=S.activities.filter(x=>!ids[x.id]);block.forEach(x=>{x.phase=target.phase;x.level=Math.max(0,Math.min(MAXLV,x.level+dl));});
+        let at;if(ref){const j=S.activities.findIndex(x=>x.id===target.ref);at=target.before?j:subEnd(j);}
+        else if(target.end)at=S.activities.length;
+        else{const j=S.activities.findIndex(x=>x.phase===target.phase);at=j<0?S.activities.length:j;}
+        S.activities.splice.apply(S.activities,[at,0].concat(block));});}
   });
 }
 
@@ -904,7 +921,7 @@ function rowDrag(e,row){
 function rowSpan(kind,o){
   if(kind==="c")return {a:pos(o.start),b:posEnd(o.end)};
   if(kind==="k")return {a:pos(o.date),b:pos(o.date)};
-  const list=kind==="p"?S.activities.filter(x=>x.phase===o.id):[o],d=[];
+  const list=kind==="p"?S.activities.filter(x=>x.phase===o.id&&!(TREE[x.id]&&TREE[x.id].par)):[eff(o)],d=[];
   list.forEach(x=>{if(x.start)d.push(pos(x.start));if(x.end)d.push(x.type==="milestone"?pos(x.end):posEnd(x.end));});
   if(!d.length)return null;
   let a=Math.min.apply(null,d),b=Math.max.apply(null,d);
@@ -940,10 +957,12 @@ function ctxFor(e){
   if(o&&edit){
     it.push({label:"Edit all settings",fn:()=>select(kind,id)});
     if(kind==="a"){
-      it.push({label:"Add an activity below",fn:()=>{const nid=uid();mutate(()=>{const i=S.activities.findIndex(x=>x.id===id);S.activities.splice(i+1,0,{id:nid,phase:o.phase,name:"New activity",type:"bar",start:"",end:"",color:"",hover:"",details:"",hidden:false});});const n=document.getElementById("n-"+nid);if(n){n.focus();n.select();}}});
+      it.push({label:"Add an activity below",fn:()=>{const nid=uid();mutate(()=>{const i=S.activities.findIndex(x=>x.id===id);S.activities.splice(subEnd(i),0,{id:nid,phase:o.phase,level:o.level,name:"New activity",type:"bar",start:"",end:"",color:"",hover:"",details:"",hidden:false});});const n=document.getElementById("n-"+nid);if(n){n.focus();n.select();}}});
       if(onTime&&o.type==="bar")it.push({label:"Start in "+when(),fn:()=>mutate(()=>{o.start=mStart(mi);if(o.end&&o.end<o.start)o.end=mEnd(mi);})},{label:"End in "+when(),fn:()=>mutate(()=>{o.end=mEnd(mi);if(o.start&&o.start>o.end)o.start=mStart(mi);})});
       if(onTime&&o.type==="milestone")it.push({label:"Move to "+when(),fn:()=>mutate(()=>{o.start=o.end=mStart(mi);})});
       it.push(o.type==="bar"?{label:"Make it a milestone",fn:()=>mutate(()=>{o.type="milestone";o.start=o.end=o.start||o.end;})}:{label:"Make it a bar",fn:()=>mutate(()=>{o.type="bar";if(o.start)o.end=mEndOf(o.start);})});
+      it.push({label:"Indent: put it under the row above",fn:()=>nest(id,1)});if(o.level)it.push({label:"Outdent: move it up a level",fn:()=>nest(id,-1)});
+      if(TREE[id]&&TREE[id].par)it.push({label:o.collapsed?"Expand":"Collapse",fn:()=>setView(()=>{o.collapsed=!o.collapsed;})});
       if(o.start||o.end)it.push({label:"Clear its dates",fn:()=>mutate(()=>{o.start=o.end="";})});
       const picked=sel&&sel.kind==="a"&&sel.id!==id?find("a",sel.id):null;
       if(picked&&(o.deps||[]).indexOf(picked.id)<0)it.push({label:'Depends on "'+picked.name+'"',fn:()=>addDep(picked.id,id)});
@@ -998,10 +1017,90 @@ const ACT={
   exHtml:()=>exportHtml(false),exHtmlView:()=>exportHtml(true),exPngAll:()=>exportVisual("png",true),tour:openTour,tourHide:hideTour,
   randCol:randomColours,flipTheme:flipTheme,
   json:()=>{ui.json=!ui.json;saveUi();render();},srcFormat:srcFormat,props:()=>setView(()=>{S.settings.showPanel=!S.settings.showPanel;}),
-  palette:openPalette,track:()=>trackSet(!TRK.on),present:()=>presentSet(!PRS.on),slideAdd:slideAdd,prsPrev:()=>presentStep(-1),prsNext:()=>presentStep(1),help:openGuide,exPng:()=>exportVisual("png"),exPdfA3:()=>exportVisual("pdfA3",true),exPdf:()=>exportVisual("pdf",true),deselect:()=>select(null),
+  palette:openPalette,track:()=>trackSet(!TRK.on),present:()=>presentSet(!PRS.on),tplSimple:()=>loadTemplate("simple"),tplTypical:()=>loadTemplate("typical"),tplComplex:()=>loadTemplate("complex"),slideAdd:slideAdd,prsPrev:()=>presentStep(-1),prsNext:()=>presentStep(1),help:openGuide,exPng:()=>exportVisual("png"),exPdfA3:()=>exportVisual("pdfA3",true),exPdf:()=>exportVisual("pdf",true),deselect:()=>select(null),
   clear:()=>{mutate(()=>{S.activities=[];S.milestones=[];S.critical=[];S.cards=[];S.panel=[];});toast("Cleared all content",true);},
   sample:()=>{mutate(()=>{S=normalise(sample());});toast("Loaded the sample roadmap",true);}
 };
+/* ---------- nesting: activities in levels ----------
+   Inside a workstream an activity can sit under another, up to four levels deep. The order of the rows and each row's
+   level are all that is stored: a row belongs to the nearest row above it that has a lower level. A row with rows
+   under it is a parent: it folds and opens, and its bar and dates are worked out from the rows beneath it. */
+const MAXLV=4;
+let TREE={};
+/* A row can be at most one level deeper than the row above it; the first row of a workstream is at the top level. */
+function fixLevels(d){d.phases.forEach(p=>{let prev=-1;d.activities.forEach(a=>{if(a.phase!==p.id)return;a.level=Math.max(0,Math.min(MAXLV,prev+1,a.level|0));prev=a.level;});});}
+/* For every activity: is it a parent, is it folded away under one, and the span of the rows beneath it. */
+function treeBuild(edit){
+  TREE={};
+  S.phases.forEach(p=>{const mine=S.activities.filter(a=>a.phase===p.id);let cut=99,any=false;
+    mine.forEach((a,i)=>{if(a.level<=cut)cut=99;const par=!!mine[i+1]&&mine[i+1].level>a.level,under=a.level>cut,t=TREE[a.id]={par:par,under:under,span:null};
+      if(par){any=true;const d=[];for(let j=i+1;j<mine.length&&mine[j].level>a.level;j++){const x=mine[j],leaf=!(mine[j+1]&&mine[j+1].level>x.level);if(leaf&&(edit||!x.hidden)){if(x.start)d.push(x.start);if(x.end)d.push(x.end);}}
+        d.sort();t.span={start:d[0]||"",end:d[d.length-1]||""};}
+      if(!under&&((par&&a.collapsed)||(!edit&&a.hidden)))cut=a.level;});
+    mine.forEach(a=>{TREE[a.id].tree=any;});});
+}
+/* The dates an activity shows: its own, or for a parent the span of the rows beneath it. */
+const eff=a=>{const t=TREE[a.id];return t&&t.par?Object.assign({},a,{type:"bar",start:t.span.start,end:t.span.end}):a;};
+/* Where the block that starts at S.activities[i] ends: just past the last row beneath it. */
+function subEnd(i){const a=S.activities[i];let e=i+1;for(let j=i+1;j<S.activities.length;j++){const x=S.activities[j];if(x.phase!==a.phase)continue;if(x.level>a.level)e=j+1;else break;}return e;}
+function nest(id,d){
+  const a=find("a",id);if(!a)return;const mine=S.activities.filter(x=>x.phase===a.phase),i=mine.indexOf(a);
+  if(d>0&&i===0){toast("The first activity in a workstream stays at the top level.");return;}
+  if(d>0&&a.level>mine[i-1].level){toast("It is already one level below the row above it.");return;}
+  if(d>0&&a.level>=MAXLV){toast("That is as deep as the levels go.");return;}
+  if(d<0&&a.level===0){toast("It is already at the top level.");return;}
+  mutate(()=>{const lv=a.level;a.level+=d;for(let j=i+1;j<mine.length&&mine[j].level>lv;j++)mine[j].level=Math.min(MAXLV,mine[j].level+d);
+    if(d>0)for(let j=i-1;j>=0;j--)if(mine[j].level<a.level){mine[j].collapsed=false;break;}});
+}
+/* ---------- templates: three roadmaps to start from (Templates on the toolbar) ----------
+   Dates are counted in months from January of this year, so a template is always current. An activity is
+   [level, name, start month, length in months (0 = milestone), [numbers of the activities it waits for]];
+   a parent row has only a level and a name. */
+const TEMPLATES={simple:"Simple: a website relaunch",typical:"Typical: a product launch",complex:"Complex: a transformation programme"};
+function template(kind){
+  const Y=new Date().getFullYear(),at=(o,d)=>{const y=Y+Math.floor(o/12),m=o%12+1;return iso(y,m,Math.min(d||1,dim(y,m)));},end=o=>{const y=Y+Math.floor(o/12),m=o%12+1;return iso(y,m,dim(y,m));};
+  const T={
+    simple:{title:"Website relaunch",tagline:"A simple roadmap: three workstreams on one page",years:2,settings:{showCritical:false,panelTitle:"Notes"},
+      P:[["Plan","Agree what and why","#1E88E5",[[0,"Agree goals and budget",0,2],[0,"Choose a supplier",2,1,[1]],[0,"Kick-off",3,0,[2]]]],
+         ["Build","Design, build, fill","#2E8B2E",[[0,"Design the pages",4,3,[3]],[0,"Build the site",6,4],[0,"Move the content across",8,3],[0,"Test with real users",10,2,[5]]]],
+         ["Launch","Go live and learn","#F07C1F",[[0,"Train the editors",11,1],[0,"Go live",12,0,[7]],[0,"Review after launch",13,2,[9]]]]],
+      K:[["Budget approved",2,"#C8102E"],["Go live",12,"#2E8B2E"]],C:[],
+      N:[["Tip","Start here","1","Type over any name or date in **Edit** mode. Add rows with the highlighted line at the end of each workstream."]]},
+    typical:{title:"Product launch programme",tagline:"A typical roadmap: five workstreams, one level of nesting, a critical path",years:3,settings:{panelTitle:"Principles"},
+      P:[["Discovery","Is it worth doing?","#1E88E5",[[0,"Research"],[1,"Customer interviews",0,3],[1,"Market sizing",1,3],[0,"Business case",4,2,[2,3]],[0,"Go or no-go",6,0,[4]]]],
+         ["Design","What will it be?","#7E57C2",[[0,"Product design"],[1,"Concept",7,3,[5]],[1,"Prototype",9,4],[1,"User testing",13,3,[8]],[0,"Brand and naming",7,5]]],
+         ["Build","Make it work","#2E8B2E",[[0,"Core product"],[1,"Platform",10,8],[1,"Features",13,9],[1,"Integrations",16,6],[0,"Quality"],[1,"Test automation",12,8],[1,"Beta programme",22,4,[13]],[0,"Feature complete",22,0]]],
+         ["Go to market","Tell the world","#F07C1F",[[0,"Pricing",14,4],[0,"Marketing"],[1,"Campaign plan",16,4],[1,"Launch content",20,5,[21]],[0,"Sales training",23,3],[0,"Launch",26,0,[17,22]]]],
+         ["Operate","Keep it running","#12909A",[[0,"Support set-up",20,5],[0,"Launch support",27,4,[24]],[0,"Review and next steps",31,3]]]],
+      K:[["Go or no-go",6,"#C8102E"],["Feature complete",22,"#2E8B2E"],["Launch",26,"#F07C1F"]],
+      C:[["Discover",0,5,"#3BA3C4"],["Design",6,11,"#5B3FA8"],["Build",12,21,"#2C7A3D"],["Launch",22,26,"#E0782A"],["Grow",27,35,"#4A5568"]],
+      N:[["Principle 1","Customers first","1","Every stage ends with something a customer has seen."],["Principle 2","Small steps","2","Ship the smallest thing that teaches us something."]],
+      V:[["The whole programme","Three years, every workstream folded.",0,36,0,[0,1,2,3,4]],["Discovery and design","The first year.",0,15,0,[2,3,4]],["Build to launch","Where most of the links are.",9,20,2,[0,1,4]]]},
+    complex:{title:"Digital transformation programme",tagline:"A complex roadmap: seven workstreams, three levels of nesting, linked activities",years:5,settings:{panelTitle:"Guiding principles",showDeps:false},
+      P:[["Strategy and governance","Direction and decisions","#14275A",[[0,"Vision and case"],[1,"Current state review",0,3],[1,"Target operating model",3,4,[2]],[1,"Business case approved",7,0,[3]],[0,"Governance"],[1,"Programme office",3,4],[1,"Benefits tracking",8,50],[0,"Annual planning rounds"],[1,"Year 2 plan",10,2],[1,"Year 3 plan",22,2],[1,"Year 4 plan",34,2]]],
+         ["Customer experience","Channels people use","#1E88E5",[[0,"Research and design"],[1,"Customer research",8,4,[4]],[1,"Service blueprint",12,3,[13]],[0,"Digital channels"],[1,"Website"],[2,"New design system",15,4,[14]],[2,"Rebuild public site",19,8,[17]],[2,"Self-service accounts",24,9],[1,"Mobile app"],[2,"App: first release",19,9,[17]],[2,"App: payments",28,6,[21]],[2,"App: notifications",32,5],[0,"Contact centre"],[1,"New telephony",16,6],[1,"Chat and messaging",22,7,[25]],[1,"Old phone lines switched off",29,0,[26]]]],
+         ["Data and insight","One version of the truth","#12909A",[[0,"Foundations"],[1,"Data strategy",8,3,[4]],[1,"Data platform"],[2,"Platform choice",11,3,[29]],[2,"Platform build",14,9,[31]],[2,"Migrate reporting",23,10,[32]],[0,"Insight"],[1,"Customer dashboard",24,6],[1,"Forecasting models",33,10,[33]],[1,"Self-serve analytics",38,10]]],
+         ["Core systems","Replace what is ageing","#7E57C2",[[0,"Finance system"],[1,"Requirements and tender",8,6,[4]],[1,"Configure and test",14,10,[39]],[1,"Finance go-live",24,0,[40]],[0,"Customer records"],[1,"Clean the data",10,8],[1,"New records system"],[2,"Build and integrate",23,12,[32,43]],[2,"Pilot in one region",35,5,[45]],[2,"Roll out everywhere",40,10,[46]],[0,"Retire old systems"],[1,"Archive and switch off",50,6,[41,47]]]],
+         ["Technology foundations","Cloud, security, devices","#2E8B2E",[[0,"Cloud"],[1,"Landing zone",4,5],[1,"Move applications",9,22,[51]],[1,"Close the data centre",32,4,[52]],[0,"Security"],[1,"Identity and sign-on",6,8],[1,"Security operations",12,10],[1,"Certification achieved",24,0,[56]],[0,"Workplace"],[1,"New laptops and tools",8,12],[1,"Network upgrade",14,12]]],
+         ["People and change","Bring everyone along","#F07C1F",[[0,"Change network"],[1,"Recruit change champions",5,4],[1,"Regular roadshows",9,44],[0,"Skills"],[1,"Skills assessment",8,4],[1,"Digital academy"],[2,"Design the curriculum",12,5,[65]],[2,"First cohort",17,8,[67]],[2,"Academy for all staff",25,24,[68]],[0,"New ways of working"],[1,"Pilot teams",14,8],[1,"Scale across the organisation",22,26,[71]]]],
+         ["Benefits and close","Prove it, then hand over","#4A5568",[[0,"Benefit reviews"],[1,"First benefits review",24,2],[1,"Second benefits review",38,2],[1,"Final benefits review",54,3],[0,"Handover to operations",56,3,[49,53]],[0,"Programme closed",59,0,[76,77]]]]],
+      K:[["Business case approved",7,"#C8102E"],["Finance go-live",24,"#7E57C2"],["Old phone lines off",29,"#1E88E5"],["Data centre closed",36,"#2E8B2E"],["Programme closed",59,"#4A5568"]],
+      C:[["Mobilise",0,6,"#3BA3C4"],["Foundations",7,17,"#2456A6"],["Build",18,31,"#5B3FA8"],["Roll out",32,45,"#E0782A"],["Embed and close",46,59,"#4A5568"]],
+      N:[["Principle 1","Customers decide","1","We keep what customers use and stop what they do not."],["Principle 2","Data once","2","Each fact is entered once and reused everywhere."],["Principle 3","Reversible steps","3","Every change has a tested way back."],["Principle 4","Skills stay","4","What we learn stays in the organisation."]],
+      F:[["Year one in a sentence","1","Agree the case, lay the foundations, start the first builds.",8,"p1"],["Peak of change","!","Months 18 to 32: the most go-lives at once. Protect people's time here.",20,"p4"]],
+      V:[["Five years on a page","Every workstream folded.",0,60,0,[0,1,2,3,4,5,6]],["Strategy sets the pace","Governance and the yearly planning rounds.",0,40,0,[1,2,3,4,5,6]],["Customer channels","Website, app and contact centre.",8,30,1,[0,2,3,4,5,6]],["Systems and data","What has to land before the old systems go.",4,52,2,[0,1,4,5,6]],["People and benefits","Change, skills and the close.",0,60,5,[0,1,2,3,4]]]}}[kind];
+  if(!T)return sample();
+  let n=0;const acts=[],phases=T.P.map((p,i)=>{const pid="p"+(i+1);
+    p[3].forEach(a=>{n++;const par=a.length<3,ms=!par&&a[3]===0;acts.push({id:"a"+n,phase:pid,level:a[0],name:a[1],type:ms?"milestone":"bar",start:par?"":at(a[2],ms?15:1),end:par?"":ms?at(a[2],15):end(a[2]+a[3]-1),color:"",hover:"",details:"",deps:(a[4]||[]).map(x=>"a"+x)});});
+    return {id:pid,name:p[0],sub:p[1],color:p[2]};});
+  return {version:4,title:T.title,tagline:T.tagline,startYear:Y,years:T.years,settings:T.settings,phases:phases,activities:acts,
+    milestones:T.K.map((k,i)=>({id:"k"+(i+1),name:k[0],date:at(k[1],15),color:k[2],line:true})),
+    critical:T.C.map((c,i)=>({id:"c"+(i+1),name:c[0],start:at(c[1]),end:end(c[2]),color:c[3]})),
+    panel:(T.N||[]).map((c,i)=>({id:"n"+(i+1),eyebrow:c[0],title:c[1],badge:c[2],color:PALETTE[i%PALETTE.length],md:c[3]})),
+    cards:(T.F||[]).map((c,i)=>({id:"f"+(i+1),title:c[0],badge:c[1],md:c[2],date:at(c[3]),color:PALETTE[(i+3)%PALETTE.length],pin:true,row:c[4],dy:34,w:240})),
+    slides:(T.V||[]).map((v,i)=>({id:"v"+(i+1),title:v[0],note:v[1],from:v[2],span:v[3],row:"p"+(v[4]+1),dy:0,collapsed:v[5].map(x=>"p"+(x+1))}))};
+}
+function loadTemplate(kind){sel=null;ui.zoom="fit";mutate(()=>{S=normalise(template(kind));});$("#chart").scrollLeft=0;$("#chart").scrollTop=0;toast('Loaded the template "'+S.title+'". Undo brings your roadmap back.',true);}
 /* ---------- slides: saved views, and presenting them ----------
    A slide is a saved view of the roadmap: where the timeline starts, how many months are across the screen, the row at
    the top, and which workstreams are folded, with a title and an optional description. Slides are made in Edit mode,
@@ -1080,10 +1179,11 @@ function slidesHtml(edit){
    you: the lines only warn. */
 let depHover="";
 function depEnds(a){
+  a=eff(a);if(TREE[a.id]&&TREE[a.id].par&&!a.start&&!a.end)return null;
   if(a.type==="milestone"){if(!a.start)return null;const p=pos(a.start);if(p<0||p>months())return null;return {l:p*mw-7,r:p*mw+7};}
   const g=geomA(a);return g&&!g.off?{l:g.l,r:g.r}:null;
 }
-const depLate=(from,to)=>!!(to.start&&from.end&&to.start<from.end);
+const depLate=(from,to)=>{from=eff(from);to=eff(to);return !!(to.start&&from.end&&to.start<from.end);};
 function depsHtml(height){
   const RH=S.settings.rowH,drawn={},edit=editing();ROWS.forEach(r=>{drawn[r.id]=1;});let h="";
   S.activities.forEach(b=>{if(!b.deps||!b.deps.length||!drawn[b.id])return;const B=depEnds(b);if(!B)return;
@@ -1193,6 +1293,7 @@ function palCommands(q){
   [[24,"Compact"],[30,"Standard"],[38,"Comfortable"],[48,"Tall"],[60,"Extra tall"]].forEach(r=>add("Appearance","Row height: "+r[1],pick("t-rowH",String(r[0])),{own:true,deep:true,note:st.rowH===r[0]?"Current":"",kw:"rows spacing padding thicker"}));
   [[40,"Thin"],[60,"Standard"],[80,"Thick"]].forEach(r=>add("Appearance","Bar thickness: "+r[1],pick("t-barFill",String(r[0])),{own:true,deep:true,note:st.barFill===r[0]?"Current":"",kw:"bars padding"}));
   [["tab","Label tab"],["strip","Solid strip"],["glass","Glass strip"],["underline","Underline"],["twotone","Two-tone"],["classic","Classic, two lines"]].forEach(r=>add("Appearance","Header style: "+r[1],pick("t-bannerStyle",r[0]),{own:true,deep:true,note:st.bannerStyle===r[0]?"Current":"",kw:"banner title"}));
+  Object.keys(TEMPLATES).forEach(k=>add("Files","Template. "+TEMPLATES[k],()=>loadTemplate(k),{own:true,kw:"start new example roadmap replace "+k}));
   add("Files","Import a roadmap or activity list",ACT.import,{own:true,kw:"open load json csv file"});
   add("Files","Export the roadmap file (.json)",ACT.exJson,{own:true,kw:"save download backup"});
   if(!EMBED){add("Files","Export a standalone page (.html)",ACT.exHtml,{kw:"save download share"});add("Files","Export a standalone page, view only (.html)",ACT.exHtmlView,{kw:"save download share locked"});}
@@ -1291,6 +1392,7 @@ document.addEventListener("click",e=>{
   if(t.id==="toastUndo"){$("#toast").hidden=true;undo();return;}
   if(t.id==="sheet"){closeSheet();return;}
   if((el=t.closest("[data-eye]"))){const k=el.dataset.eye;setView(()=>{S.settings[k]=!S.settings[k];});return;}
+  if((el=t.closest("[data-acollapse]"))){const a=find("a",el.dataset.acollapse);if(a)setView(()=>{a.collapsed=!a.collapsed;});return;}
   if((el=t.closest("[data-collapse]"))){const p=find("p",el.dataset.collapse);setView(()=>{p.collapsed=!p.collapsed;});return;}
   if(ui.mode!=="edit"&&(el=t.closest("[data-slide]"))){slideShow(+el.dataset.slide);return;}
   /* Tracking the pointer: a click anywhere on a row folds or opens its workstream. A click on a bar or milestone still shows its details. */
@@ -1375,6 +1477,9 @@ document.addEventListener("keydown",e=>{
   /* Ctrl+K (Cmd+K on a Mac) or Ctrl+Space opens the command palette from anywhere; the same keys close it. */
   if((e.ctrlKey||e.metaKey)&&!e.altKey&&!e.shiftKey&&(e.key.toLowerCase()==="k"||e.code==="Space")){e.preventDefault();if($("#pal").hidden)openPalette();else closePalette();return;}
   if(e.key==="Escape"&&!$("#pal").hidden){closePalette();return;}
+  /* Ctrl+] indents the activity being typed in, or the selected one, under the row above; Ctrl+[ moves it back up a level. */
+  if((e.ctrlKey||e.metaKey)&&(e.key==="]"||e.key==="[")&&ui.mode==="edit"){const id=e.target.dataset&&e.target.dataset.nm?e.target.dataset.nm:sel&&sel.kind==="a"?sel.id:"";
+    if(id){e.preventDefault();if(e.target.dataset&&e.target.dataset.nm)e.target.blur();nest(id,e.key==="]"?1:-1);const n=document.getElementById("n-"+id);if(n&&!(sel&&sel.id===id))n.focus();return;}}
   if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==="s"&&e.target.id==="src"){e.preventDefault();srcFormat();return;}
   if(e.key==="Escape"){if(!$("#sheet").hidden)closeSheet();else if(!$("#ctx").hidden)closeMenus();else if(PRS.on)presentSet(false);else if(TRK.on)trackSet(false);else if(sel){sel=null;render();}closeMenus();return;}
   if(PRS.on&&$("#sheet").hidden&&$("#pal").hidden&&!e.target.isContentEditable&&!e.ctrlKey&&!e.metaKey&&!e.altKey&&!/^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName)){

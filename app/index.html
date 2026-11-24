@@ -42,6 +42,16 @@
       <button type="button" class="btn" id="propBtn" data-act="props" aria-pressed="false">Properties</button>
       <button type="button" class="btn" id="tourBtn" data-act="tour" hidden>▶ Tour</button>
       <span class="tsep"></span>
+      <div class="menuwrap" id="tplWrap">
+        <button type="button" class="btn" id="tplBtn" data-menu="tplMenu" aria-haspopup="true" title="Start from a ready-made roadmap">Templates ▾</button>
+        <div class="menu wide" id="tplMenu" hidden>
+          <button type="button" data-act="tplSimple"><b>Simple</b><small>A website relaunch: three workstreams, ten activities</small></button>
+          <button type="button" data-act="tplTypical"><b>Typical</b><small>A product launch: five workstreams, one level of nesting, a critical path</small></button>
+          <button type="button" data-act="tplComplex"><b>Complex</b><small>A transformation programme: seven workstreams, three levels, linked activities, slides</small></button>
+          <button type="button" data-act="sample"><b>Sample</b><small>Project Wombat, the roadmap the app starts with</small></button>
+          <p class="mnote">A template replaces the roadmap on screen. Undo brings yours back.</p>
+        </div>
+      </div>
       <button type="button" class="btn" data-act="import">Import</button>
       <div class="menuwrap">
         <button type="button" class="btn primary" id="exBtn" data-menu="exMenu" aria-haspopup="true">Export ▾</button>

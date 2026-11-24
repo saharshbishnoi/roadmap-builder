@@ -161,6 +161,14 @@ choose "Fit the timeline to this row" to scale and scroll the timeline so that r
   dotted handle to reorder rows or move a row to another workstream.
 - Right-click a row, bar, milestone, stage, card or the empty timeline for a menu that fits what
   is under the pointer.
+- **Levels.** Activities can be nested inside a workstream, up to four levels deep. Click in a
+  name and press Ctrl+] to put the row under the row above it, Ctrl+[ to move it back up; Indent
+  and Outdent are also on the pencil's settings and in the right-click menu. A row moves with
+  the rows beneath it, when indented and when dragged. A row with rows beneath it is a parent:
+  its small arrow folds them away (in View mode too), and it shows a bracket and dates worked
+  out from the rows beneath it rather than dates of its own. In the roadmap file each activity
+  has a `level`; a row belongs to the nearest row above it with a lower level. The CSV activity
+  list does not carry levels.
 - **Dependencies.** Point at a bar and drag from the dot at its end to the row that has to wait
   for it; a line with an arrow joins the two. With one bar selected, right-clicking another also
   offers "Depends on". Lines are quiet: they show for the bar under the pointer and for the
@@ -244,6 +252,21 @@ where it reads "As at" the day of the export. Drag its edge to resize it.
 card's text and the chart follows. Copy a line to add one, delete a line to remove one. Switch Show to Whole roadmap
 to edit the complete file. Lines are numbered and a mistake is reported with its line. Ctrl+S,
 the Format button, or leaving the editor applies the text and lays it out again, one item per line.
+
+## Templates
+
+Templates, on the toolbar beside Import, starts from a ready-made roadmap. Dates are counted from
+January of the current year, so a template is always current.
+
+| Template | What it shows |
+|---|---|
+| Simple | A website relaunch: three workstreams, ten activities, two key milestones, a few links |
+| Typical | A product launch: five workstreams, one level of nesting, a critical path, links and three slides |
+| Complex | A transformation programme: seven workstreams, three levels of nesting, 78 activities, 35 links, floating cards and five slides |
+| Sample | Project Wombat, the roadmap the app starts with |
+
+A template replaces the roadmap on screen. Undo brings yours back; export it first if you want
+to keep a copy. The templates are also in Commands (Ctrl+K).
 
 ## Files in and out
 

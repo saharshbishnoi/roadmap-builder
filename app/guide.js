@@ -20,6 +20,7 @@ window.GUIDE=[
     "Every eye stays in the same place. A solid eye means shown; a faint outline means hidden. Hidden rows, columns and cards stay on screen in Edit mode, dimmed, so they can still be changed; they disappear in View mode and in exports.",
     "To add an activity, type a name in the highlighted Add an activity row at the end of a workstream and press Enter. Keep typing to add more. The last row adds a workstream.",
     "A new row has no dates. Type them, or click on its timeline to place it. With only a start date the bar fades out; with only an end date it fades in.",
+    "Activities can sit in levels. Click in a name and press Ctrl+] to put that row under the row above it, and Ctrl+[ to move it back up; the pencil and the right-click menu have Indent and Outdent too. There are up to four levels inside a workstream. A row with rows beneath it is a parent: its arrow folds them away, and its bar and dates are worked out from them, so they are not typed.",
     "The chips above the table choose what is written beside each bar: Activity, Start and End. A filled chip is on.",
     "The eyes in the header show or hide the Start and End columns, the critical path and the milestone lines."]},
   {id:"settings",title:"Properties",clip:"guide/03-settings",steps:[
@@ -43,6 +44,7 @@ window.GUIDE=[
     "Change a name or a date and the chart follows. Copy a line to add an activity, delete a line to remove one.",
     "Lines are numbered, and a mistake is reported with its line. Press Ctrl+S, select Format, or click away from the editor to lay the text out neatly again, one item per line.",
     "Floating cards and panel cards are listed there too, one line each: change a title, a date or the Markdown text, copy a line to add a card, delete a line to remove one.",
+    "Templates, on the toolbar, starts you from a ready-made roadmap: Simple (a website relaunch), Typical (a product launch, with one level of nesting and a critical path) or Complex (a transformation programme, with three levels, linked activities and slides). A template replaces the roadmap on screen; Undo brings yours back.",
     "Export, then Roadmap file (.json), saves everything. Import loads a .json roadmap file or a .csv activity list.",
     "Export, then Standalone page (.html), makes one file with the app and this roadmap inside. Send it to anyone; it opens in their browser with nothing to install.",
     "Standalone page, view only, makes the same single file but locked to View mode. It opens exactly as the roadmap looks when you export it: the same zoom, place on the timeline, collapsed workstreams, theme and panel.",

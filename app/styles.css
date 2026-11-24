@@ -689,3 +689,16 @@ body.edit #hover #tipFoot{display:none}
 #prsTag .prsx{font-weight:500;opacity:.9}
 body.exporting #prsBar,body.exporting #prsTag{display:none}
 body.viewonly #pt-slides:not(.has){display:none}
+
+/* ---- nesting: indent by level, a small arrow on a parent row, a bracket for its bar ---- */
+.lvpad{flex:none;height:1px}
+.caret.sm{width:14px;font-size:calc(10px * var(--fz));color:var(--muted)}
+.row.par .aname,.row.par .nm{font-weight:600}
+.asum{cursor:pointer;opacity:.9}
+.asum.sel{outline-offset:3px}
+/* ---- Templates menu ---- */
+#tplMenu{min-width:330px}
+#tplMenu button{display:flex;flex-direction:column;align-items:flex-start;gap:2px;text-align:left;white-space:normal}
+#tplMenu button small{color:var(--muted);font-size:calc(11.5px * var(--fz));line-height:1.3}
+#tplMenu .mnote{margin:4px 6px 2px;padding-top:6px;border-top:1px solid var(--line);color:var(--muted);font-size:calc(11.5px * var(--fz))}
+body.viewonly #tplWrap{display:none}
