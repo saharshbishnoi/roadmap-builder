@@ -65,18 +65,21 @@ of Chrome or Edge) to run in its own window, offline. It is also the only place 
 appears (a five-minute narrated tour, see `film/README.md`), behind a "Watch the tour" bar. GitHub
 refuses files over 100 MB, so the site plays the film's 1080p copy; the 4K master stays in `film/out`.
 
-**Releases** are made by the pipeline: pushing a version tag (for example `v1.4.1`) runs
-`.github/workflows/release.yml`, which does the release build, records the product film, and creates
-the GitHub Release with everything attached: `roadmap-builder.zip` (the whole app with its guide
-videos; unzip it and open `index.html`, no server needed), the film in 4K and 1080p with its
-subtitles and chapter list, the guide videos on their own, and checksums. The release text comes
+**Releases** are made by the pipeline: pushing a version tag (for example `v1.4.4`) runs
+`.github/workflows/release.yml`, which does the release build, records the product film, makes the
+quality report, and creates the GitHub Release with everything attached: `roadmap-builder.zip` (the
+whole app with its guide videos; unzip it and open `index.html`, no server needed), the film in 4K
+and 1080p with its subtitles and chapter list, the guide videos on their own,
+`roadmap-builder-quality-report.zip`, and checksums. If the quality report fails, the release goes
+out without it. The release text comes
 from `docs/releases/<tag>.md` when that file exists. The newest zip is always at
 `https://github.com/saharshbishnoi/roadmap-builder/releases/latest/download/roadmap-builder.zip`.
 On GitHub's machines a run takes about an hour and a quarter.
 
-**The same package** can be gathered on your own machine by `./package-release.sh v1.3.0`
-into `dist/release-v1.3.0/`: the zip, the guide videos on their own, the product film (4K and 1080p),
-its subtitles and chapter list, checksums, and the notes from `docs/releases/`. `BUILD=1` runs the
+**The same package** can be gathered on your own machine by `./package-release.sh v1.4.4`
+into `dist/release-v1.4.4/`: the zip, the guide videos on their own, the product film (4K and 1080p),
+its subtitles and chapter list, checksums, and the notes from `docs/releases/` (the quality report is
+made separately, below). `BUILD=1` runs the
 release build first and `FILM=1` re-records the film.
 
 To make the same site folder and zip on your own machine without publishing:
@@ -105,6 +108,24 @@ image, ffmpeg and the voice model). Nothing is fetched at runtime.
 
 What is said and shown in each video is in `release/videos.mjs`; the steps under each video are in
 `app/guide.js`. Change both whenever the app changes.
+
+### Quality report
+
+```
+./quality/run.sh
+```
+
+Makes one page of figures in `dist/quality/index.html`: known vulnerabilities (CVEs) with an inventory
+of what is packaged, static analysis of the JavaScript, CSS, HTML, shell scripts, Dockerfiles and
+Python, and how much of the app the browser tests run. It reports only: a finding never fails a build
+or a release. Everything it needs is in `quality/`; see [quality/README.md](quality/README.md).
+
+### Changing the app
+
+[docs/DEVELOPMENT.md](docs/DEVELOPMENT.md) has the ground rules, where things are, how to check a
+change and how to connect the app to other things. [docs/TESTING.md](docs/TESTING.md) covers the
+browser tests: how to run them, how to add one, and what is not tested yet. Release notes for each
+version are in [docs/releases/](docs/releases/).
 
 ## Using it
 
@@ -197,13 +218,15 @@ app/guide.js         the steps shown in the Guide dialog (edit them here)
 app/sw.js            offline support for the installed web app
 app/manifest.webmanifest, app/icon.svg   what makes the app installable
 app/guide/           guide videos, subtitles and posters: made by a release build, not in git
-docs/                requirements, ideas, planned editions and the design language
+docs/                requirements, ideas and planned editions, design language, development,
+                     testing, the brief for the videos, and release notes (docs/releases/)
 .github/workflows/   the pipeline that builds a tagged release and attaches the zip, film and videos
 publish-pages.sh     builds the site and pushes it to the gh-pages branch for GitHub Pages
 package-release.sh   gathers the zip, guide videos, film and notes for a release into dist/
 film/                the product film: scenes, recorder and its own container (see film/README.md)
 release/             tests, the video builder and the narration script, used only by a release build
 quality/             the quality report: vulnerabilities, static analysis and test coverage (see quality/README.md)
+desktop/             a Tauri desktop shell: written, never built, not part of any release
 app/vendor/          marked, DOMPurify, html-to-image, jsPDF: fetched by the build (see THIRD-PARTY.txt)
 assets/              the list of libraries and fonts the build fetches
 app/fonts/           sans-serif fonts (SIL Open Font License): fetched by the build
