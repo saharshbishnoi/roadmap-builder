@@ -33,6 +33,7 @@ What the app is required to do, and where each thing is found. This list used to
 | Slides made by the presenter, in Edit mode only | The Slides tab of the right panel: Save this view as a slide. Each slide is a card with a title and an optional description; reorder, replace its view, or delete |
 | A presentation mode that glides between the saved views, forwards and back, over a set number of seconds | The screen on the toolbar, or Present on the Slides tab. Arrow keys, Space or a click on a card. Glide between slides sets the seconds |
 | A very small progress accent while presenting | A thin bar across the top of the window, one piece per slide, with a fill that glides in step with the roadmap: done and left |
+| The slides as a handout | Export, Slides as a PDF: one A4 page per slide, with the slide's number, title and description as a caption under the roadmap |
 | Plans nested in several levels | Activities sit in up to four levels inside a workstream: Ctrl+] and Ctrl+[, or Indent and Outdent. A parent folds, and takes its bar and dates from the rows beneath it |
 | Templates to start from: simple, typical and complex | Templates, on the toolbar: a website relaunch, a product launch and a transformation programme. Undo brings the previous roadmap back |
 | Text that reads naturally, not squeezed | Open Sans for headings and text, with no letter-spacing. Other fonts under Text in Properties |

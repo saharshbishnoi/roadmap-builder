@@ -1011,6 +1011,34 @@ test("templates: simple, typical and complex roadmaps load from the toolbar, and
   expect((await sum()).title).toBe("Product launch programme");
 });
 
+test("the slides export as a PDF with one page per slide, and the view is put back afterwards", async ({ page }) => {
+  await open(page);
+  await page.click('[data-act="zin"]');
+  await settle(page);
+  await page.evaluate(() => { document.querySelector("#chart").scrollLeft = 120; });
+  const snap = () => page.evaluate(() => ({ left: Math.round(document.querySelector("#chart").scrollLeft), year: Math.round(document.querySelector("#inner .year").getBoundingClientRect().width), folds: window.__roadmap.state.phases.map(p => !!p.collapsed), mode: document.body.className.replace(/\s*(moving|gliding)/g, "") }));
+  const before = await snap(), n = (await state(page)).slides.length;
+  expect(n).toBe(4);
+  await page.click("#pt-slides");
+  const [dl] = await Promise.all([page.waitForEvent("download"), page.click("#slPdf")]);
+  expect(dl.suggestedFilename()).toBe("project-wombat-slides.pdf");
+  const chunks = []; for await (const c of await dl.createReadStream()) chunks.push(c);
+  const pdf = Buffer.concat(chunks), text = pdf.toString("latin1");
+  expect(text.slice(0, 5)).toBe("%PDF-");
+  expect((text.match(/\/Type\s*\/Page[^s]/g) || []).length, "one page per slide").toBe(n);
+  expect(text).toMatch(/\/MediaBox\s*\[\s*0\s+0\s+841\.\d+\s+595\.\d+/);   // A4 landscape
+  expect(pdf.length).toBeGreaterThan(100000);
+  // Nothing is left behind: the caption is gone and the zoom, place and folding are as they were.
+  await expect(page.locator("#xcap")).toHaveCount(0);
+  await expect(page.locator("body")).not.toHaveClass(/exporting/);
+  expect(await snap()).toEqual(before);
+  // With no slides there is nothing to export, and the app says so.
+  await page.click("#modeEdit");
+  for (let i = 0; i < n; i++) await page.locator("#tabSlides .del").first().click();
+  await page.evaluate(() => document.querySelector('#exMenu [data-act="exSlides"]').click());
+  await expect(page.locator("#toast")).toContainText("no slides to export");
+});
+
 test("the Cards heading is renamed in Properties, and the tab follows", async ({ page }) => {
   await open(page, "edit");
   await expect(page.locator("#pt-cards")).toHaveText("Guiding principles");

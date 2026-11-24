@@ -850,6 +850,41 @@ async function exportVisual(kind,whole){
     document.body.classList.remove("exporting");freeze=false;exporting=false;ui.mode=prevMode;render();chart.scrollLeft=x0;}
 }
 
+/* The slides as a PDF: one A4 landscape page per slide. Each page shows that slide's stretch of the timeline with its
+   workstreams folded as saved, and under it the slide's number, title and description as a caption. The page is drawn
+   by the browser, so it uses the roadmap's own fonts. Every row that is not folded away is shown, so a page is never
+   cut off at the bottom the way a screen is. */
+async function exportSlides(){
+  if(!window.htmlToImage||!window.jspdf){toast("The export library did not load. Reload the page and try again.");return;}
+  if(!S.slides.length){toast("There are no slides to export. Switch to Edit, open the Slides tab and save a view.");return;}
+  toast("Preparing "+S.slides.length+(S.slides.length===1?" page…":" pages…"));
+  const prevMode=ui.mode,chart=$("#chart"),x0=chart.scrollLeft,y0=chart.scrollTop,mw0=mw,zoom0=ui.zoom,folds=S.phases.map(p=>!!p.collapsed),cap=document.createElement("div");hideTip();
+  cap.id="xcap";
+  try{
+    trackSet(false);presentSet(false);ui.mode="view";exporting=true;freeze=true;document.body.classList.add("exporting","xslides");$("#capture").appendChild(cap);
+    if(document.fonts&&document.fonts.ready)await document.fonts.ready;
+    const J=window.jspdf.jsPDF,pdf=new J({orientation:"landscape",unit:"mm",format:"a4",compress:true}),PW=297,PH=210,m=9,n=S.slides.length;
+    for(let i=0;i<n;i++){
+      const v=S.slides[i],want={};v.collapsed.forEach(id=>{want[id]=1;});S.phases.forEach(p=>{p.collapsed=!!want[p.id];});
+      render();                                             // sets the width of the name and date columns for an export
+      const from=Math.max(0,Math.min(months()-1,v.from)),span=Math.max(1,Math.min(months()-from,v.span));
+      ui.zoom="manual";mw=Math.min(200,Math.max(3,(1500-LW)/span));XFROM=from;render();
+      chart.classList.add("xwin");chart.style.setProperty("--xoff",(from*mw)+"px");chart.style.width=Math.ceil(LW+span*mw+2)+"px";
+      cap.innerHTML='<span class="xn">'+(i+1)+' / '+n+'</span><div class="xt"><b>'+esc(v.title)+'</b>'+(v.note?'<p>'+esc(v.note)+'</p>':'')+'</div>';
+      await frame();
+      const node=$("#capture"),w=Math.ceil(node.scrollWidth),h=Math.ceil(node.scrollHeight),ratio=Math.max(1,Math.min(2,Math.sqrt(9e6/(w*h))));
+      const canvas=await window.htmlToImage.toCanvas(node,{width:w,height:h,pixelRatio:ratio,backgroundColor:getComputedStyle(document.body).backgroundColor});
+      const s=Math.min((PW-2*m)/w,(PH-2*m)/h);
+      if(i)pdf.addPage("a4","landscape");
+      pdf.addImage(canvas,"PNG",(PW-w*s)/2,m,w*s,h*s,undefined,"FAST");
+    }
+    await saveFile(slug()+"-slides.pdf",pdf.output("blob"));
+  }catch(e){toast("The export failed. "+(e&&e.message?e.message:"Try again with fewer rows open."));}
+  finally{cap.remove();XFROM=null;chart.classList.remove("xwin");chart.style.removeProperty("--xoff");chart.style.removeProperty("width");
+    S.phases.forEach((p,i)=>{p.collapsed=folds[i];});mw=mw0;ui.zoom=zoom0;
+    document.body.classList.remove("exporting","xslides");freeze=false;exporting=false;ui.mode=prevMode;render();chart.scrollLeft=x0;chart.scrollTop=y0;}
+}
+
 /* ---------- dragging (edit mode) ---------- */
 function drag(e,el,h){
   if(e.button!==undefined&&e.button!==0)return;
@@ -1017,7 +1052,7 @@ const ACT={
   exHtml:()=>exportHtml(false),exHtmlView:()=>exportHtml(true),exPngAll:()=>exportVisual("png",true),tour:openTour,tourHide:hideTour,
   randCol:randomColours,flipTheme:flipTheme,
   json:()=>{ui.json=!ui.json;saveUi();render();},srcFormat:srcFormat,props:()=>setView(()=>{S.settings.showPanel=!S.settings.showPanel;}),
-  palette:openPalette,track:()=>trackSet(!TRK.on),present:()=>presentSet(!PRS.on),tplSimple:()=>loadTemplate("simple"),tplTypical:()=>loadTemplate("typical"),tplComplex:()=>loadTemplate("complex"),slideAdd:slideAdd,prsPrev:()=>presentStep(-1),prsNext:()=>presentStep(1),help:openGuide,exPng:()=>exportVisual("png"),exPdfA3:()=>exportVisual("pdfA3",true),exPdf:()=>exportVisual("pdf",true),deselect:()=>select(null),
+  palette:openPalette,track:()=>trackSet(!TRK.on),present:()=>presentSet(!PRS.on),exSlides:exportSlides,tplSimple:()=>loadTemplate("simple"),tplTypical:()=>loadTemplate("typical"),tplComplex:()=>loadTemplate("complex"),slideAdd:slideAdd,prsPrev:()=>presentStep(-1),prsNext:()=>presentStep(1),help:openGuide,exPng:()=>exportVisual("png"),exPdfA3:()=>exportVisual("pdfA3",true),exPdf:()=>exportVisual("pdf",true),deselect:()=>select(null),
   clear:()=>{mutate(()=>{S.activities=[];S.milestones=[];S.critical=[];S.cards=[];S.panel=[];});toast("Cleared all content",true);},
   sample:()=>{mutate(()=>{S=normalise(sample());});toast("Loaded the sample roadmap",true);}
 };
@@ -1161,9 +1196,9 @@ function slidesHtml(edit){
   const st=S.settings,list=S.slides;
   let h='<h2>Slides</h2>';
   if(edit)h+='<p class="phint">A slide is a saved view: the zoom, the place on the timeline and which workstreams are folded. Set the roadmap up as you want it shown, then save it.</p>'+
-    '<div class="pbtns"><button type="button" class="btn primary" id="slAdd" data-act="slideAdd">+ Save this view as a slide</button></div>'+
+    '<div class="pbtns"><button type="button" class="btn primary" id="slAdd" data-act="slideAdd">+ Save this view as a slide</button>'+(list.length?'<button type="button" class="btn" id="slPdf" data-act="exSlides" title="One page per slide, with its description as a caption">Export as PDF</button>':'')+'</div>'+
     '<div class="pgrid"><label for="t-slideSecs">Glide between slides</label><select id="t-slideSecs" data-set="slideSecs">'+[0,0.5,1,1.5,2,3,5].map(n=>'<option value="'+n+'"'+(st.slideSecs===n?' selected':'')+'>'+(n?n+(n===1?" second":" seconds"):"No glide")+'</option>').join("")+'</select></div>';
-  else if(list.length)h+='<div class="pbtns"><button type="button" class="btn primary" id="slGo" data-act="present">'+(PRS.on?'■ Stop presenting':'▶ Present')+'</button></div>';
+  else if(list.length)h+='<div class="pbtns"><button type="button" class="btn primary" id="slGo" data-act="present">'+(PRS.on?'■ Stop presenting':'▶ Present')+'</button><button type="button" class="btn" id="slPdf" data-act="exSlides" title="One page per slide, with its description as a caption">Export as PDF</button></div>';
   h+=list.map((v,i)=>'<article class="scard'+(PRS.at===i&&(PRS.on||!edit)?' now':'')+isSel("v",v.id)+'" id="sc-'+v.id+'" data-slide="'+i+'"'+(edit?'':' tabindex="0" role="button" aria-label="Show slide '+(i+1)+': '+esc(v.title)+'"')+'>'+
       (edit?'<div class="cctl"><button type="button" class="mini" id="su-'+v.id+'" data-smove="-1" data-id="'+v.id+'" aria-label="Move slide up"'+(i?'':' disabled')+'>▲</button><button type="button" class="mini" id="sd-'+v.id+'" data-smove="1" data-id="'+v.id+'" aria-label="Move slide down"'+(i<list.length-1?'':' disabled')+'>▼</button>'+
         '<button type="button" class="btn sm" id="sg-'+v.id+'" data-sgo="'+i+'" title="Show this slide\'s view">Show</button><button type="button" class="btn sm" id="sv-'+v.id+'" data-sset="'+v.id+'" title="Replace this slide\'s view with the view on screen now">Use this view</button>'+delBtn("v",v)+'</div>':'')+
@@ -1302,6 +1337,7 @@ function palCommands(q){
   add("Files","Export an image of the whole timeline (.png)",ACT.exPngAll,{kw:"save download picture"});
   add("Files","Export a PDF, A3 landscape",ACT.exPdfA3,{kw:"save download print"});
   add("Files","Export a PDF, exact size",ACT.exPdf,{kw:"save download print"});
+  add("Files","Export the slides as a PDF",exportSlides,{note:S.slides.length?S.slides.length+(S.slides.length===1?" page":" pages"):"No slides yet",kw:"save download print presentation deck handout pages"});
   if(!EMBED)add("Help","Open the Guide",openGuide,{kw:"help steps videos how"});
   if(!$("#tourBtn").hidden)add("Help","Watch the tour",openTour,{kw:"film video help"});
   add("Help","Load the sample roadmap",ACT.sample,{e:true,deep:true,kw:"example demo reset"});

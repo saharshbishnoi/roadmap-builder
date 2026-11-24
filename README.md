@@ -221,6 +221,13 @@ presenting in the right-click menu ends it. A slide stores months, not pixels, s
 stretch of the timeline on any screen. Slides are kept in the roadmap file, so a standalone page,
 including a view-only one, can be presented too. Folding done by a slide stays as it is afterwards.
 
+**Slides as a PDF.** Export, then "Slides as a PDF, one page each" (also "Export as PDF" on the
+Slides tab, and in Commands) makes a handout: one A4 landscape page per slide, in order. Each page
+shows the slide's stretch of the timeline with its workstreams folded as saved, and under it the
+slide's number, title and description. Every row that is not folded away is shown, scaled to fit
+the page, so a slide with many rows open comes out small. Floating cards and the panel cards are
+left off. Your zoom, place and folding are put back afterwards.
+
 **Commands.** Ctrl+K (Cmd+K on a Mac) or Ctrl+Space, or the Ctrl K button on the toolbar, opens a
 search box over everything the app can do, in groups: View, Add, Edit, Show or hide, Files and Help.
 Type a few letters, move with the arrow keys and press Enter. Switches say whether they are Shown
@@ -280,6 +287,7 @@ to keep a copy. The templates are also in Commands (Ctrl+K).
 | Image, whole timeline (.png) | The whole roadmap at full width |
 | PDF, A3 landscape | The roadmap fitted to one A3 page |
 | PDF, exact size | One page the same size as the roadmap |
+| Slides as a PDF | One A4 landscape page per slide: that slide's stretch of the timeline, folded as saved, with the slide's number, title and description as a caption underneath |
 
 Import takes a `.json` roadmap file or a `.csv` with `Name` and `Start` columns (optional `Type`,
 `Workstream`, `End`). You can also drop a file onto the page. Importing replaces the current
