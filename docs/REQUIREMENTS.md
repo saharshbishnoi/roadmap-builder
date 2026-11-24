@@ -27,6 +27,7 @@ What the app is required to do, and where each thing is found. This list used to
 | Visibility controls stay where they are | Every eye keeps its place: solid when shown, a faint outline when hidden. In Edit mode a hidden row, date column or set of floating cards stays on screen, dimmed, and can still be changed |
 | Rows can be made taller, shorter, thicker or thinner | Properties, Display: Row height (Compact to Extra tall) and Bar thickness (Thin, Standard, Thick) |
 | The version in use is visible | At the end of the toolbar, beside Guide |
+| Common functions and actions from the keyboard | Ctrl+K or Ctrl+Space, or Ctrl K on the toolbar: a search box over grouped commands (View, Add, Edit, Show or hide, Files, Help), settings and the names on the roadmap |
 | Text that reads naturally, not squeezed | Open Sans for headings and text, with no letter-spacing. Other fonts under Text in Properties |
 | A modern header that takes little space, in a choice of looks | Properties, Header, Style: Label tab, Solid strip, Glass strip, Underline, Two-tone (one 28-pixel line, square corners) or Classic |
 | Add rows by typing, like a list | Add an activity row at the end of each workstream, and Add a workstream at the bottom |

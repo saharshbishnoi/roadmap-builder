@@ -10,7 +10,8 @@ window.GUIDE=[
     "Drag the year scale left or right to squeeze or stretch the timeline. Double-click it to fit the window. A faint line follows the pointer and shows the date under it.",
     "Right-click a row and choose Fit the timeline to this row: the timeline is scaled and scrolled so that row's dates fill the middle 80% of the screen.",
     "Drag the right edge of the Workstream / activity heading to make that column wider or narrower. Right-click a row, bar, milestone, card or the empty timeline for a menu of what you can do there.",
-    "At the end of the toolbar, Dark or Light switches the theme, and Guide opens these steps in a large dialog. The videos shown match the theme you are in. The version of the app is shown beside Guide."]},
+    "At the end of the toolbar, Dark or Light switches the theme, and Guide opens these steps in a large dialog. The videos shown match the theme you are in. The version of the app is shown beside Guide.",
+    "Press Ctrl+K or Ctrl+Space, or select Ctrl K on the toolbar, to open Commands: one list of what the app can do, grouped under View, Add, Edit, Show or hide, Files and Help. Type to search, use the arrow keys to move and Enter to run. Typing also finds row heights, header styles and the names on your roadmap; choosing a name brings that item into view."]},
   {id:"rows",title:"Add and edit rows",clip:"guide/02-rows",steps:[
     "Switch to Edit. Type straight into a name or a date. Each row has a colour square, an eye to hide it, a pencil for all settings and a cross to delete.",
     "Every eye stays in the same place. A solid eye means shown; a faint outline means hidden. Hidden rows, columns and cards stay on screen in Edit mode, dimmed, so they can still be changed; they disappear in View mode and in exports.",

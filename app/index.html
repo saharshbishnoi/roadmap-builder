@@ -55,6 +55,7 @@
         </div>
       </div>
       <span class="tsep"></span>
+      <button type="button" class="btn kbd" id="palBtn" data-act="palette" aria-haspopup="dialog" title="Commands: search everything the app can do. Ctrl+K or Ctrl+Space">Ctrl K</button>
       <button type="button" class="btn" id="themeBtn" data-act="flipTheme" aria-label="Switch between light and dark">Dark</button>
       <button type="button" class="btn" id="helpBtn" data-act="help" aria-haspopup="dialog">Guide</button>
       <span class="ver" id="ver"></span>
@@ -171,6 +172,11 @@
 <div id="hover" hidden></div>
 <div id="xline" hidden><span></span></div>
 <div class="menu" id="ctx" role="menu" aria-label="Actions for this item" hidden></div>
+<div class="pal" id="pal" hidden><div class="palbox" role="dialog" aria-modal="true" aria-label="Commands">
+  <div class="palhead"><input type="text" id="palIn" role="combobox" aria-expanded="true" aria-controls="palList" aria-autocomplete="list" autocomplete="off" spellcheck="false" placeholder="Search commands, or type a name on the roadmap" aria-label="Search commands"><kbd>Esc</kbd></div>
+  <div class="pallist" id="palList" role="listbox" aria-label="Commands"></div>
+  <div class="palfoot"><span><kbd>↑</kbd><kbd>↓</kbd> move</span><span><kbd>Enter</kbd> run</span><span><kbd>Ctrl</kbd><kbd>K</kbd> or <kbd>Ctrl</kbd><kbd>Space</kbd> open and close</span></div>
+</div></div>
 <div id="toast" role="status" hidden></div>
 
 <script src="vendor/marked.min.js"></script>

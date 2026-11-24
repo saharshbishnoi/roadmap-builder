@@ -177,6 +177,14 @@ Compact fits more rows in the same space; Tall with Thick bars gives a simple vi
 Floating cards keep their place against the rows. Any height from 22 to 72 pixels (`rowH`) and any
 thickness from 30 to 90 percent (`barFill`) can be typed in the JSON editor, under Whole roadmap.
 
+**Commands.** Ctrl+K (Cmd+K on a Mac) or Ctrl+Space, or the Ctrl K button on the toolbar, opens a
+search box over everything the app can do, in groups: View, Add, Edit, Show or hide, Files and Help.
+Type a few letters, move with the arrow keys and press Enter. Switches say whether they are Shown
+or Hidden, and a command that changes the roadmap says it switches to Edit. Typing also finds the
+less common settings (row height, bar thickness, header style) and the workstreams, activities,
+milestones, stages and floating cards on the roadmap; choosing one brings it into view and opens
+it. Esc, or the same keys, closes the box.
+
 **Version.** The version of the app is shown at the end of the toolbar, beside Guide. It is set in
 `app/app.js` (`VERSION`); the release pipeline refuses a tag that does not match it.
 

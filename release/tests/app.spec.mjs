@@ -676,6 +676,60 @@ test("the header style is chosen in Properties: every style but Classic is one s
   expect((await state(page)).settings.bannerStyle).toBe("classic");
 });
 
+test("Ctrl+K and Ctrl+Space open a command palette with grouped, searchable commands", async ({ page }) => {
+  await open(page);
+  const pal = page.locator("#pal"), rows = page.locator("#palList .pali"), groups = () => page.locator("#palList .palg").allTextContents();
+  await expect(pal).toBeHidden();
+  await page.keyboard.press("Control+k");
+  await expect(pal).toBeVisible();
+  await expect(page.locator("#palIn")).toBeFocused();
+  expect(await groups()).toEqual(["View", "Add", "Edit", "Show or hide", "Files", "Help"]);
+  await expect(rows.first()).toHaveClass(/on/);
+  // The same key closes it, and so does Escape; Ctrl+Space opens it too.
+  await page.keyboard.press("Control+k");
+  await expect(pal).toBeHidden();
+  await page.keyboard.press("Control+Space");
+  await expect(pal).toBeVisible();
+  await page.keyboard.press("Escape");
+  await expect(pal).toBeHidden();
+  // Typing narrows the list, including the less common settings, and Enter runs the highlighted command.
+  await page.click("#palBtn");
+  await page.keyboard.type("row tall");
+  await expect(rows).toHaveText(["Row height: Tall", "Row height: Extra tall"]);
+  await page.keyboard.press("ArrowDown");
+  await expect(rows.nth(1)).toHaveClass(/on/);
+  await page.keyboard.press("ArrowUp");
+  await page.keyboard.press("Enter");
+  await expect(pal).toBeHidden();
+  expect((await state(page)).settings.rowH).toBe(48);
+  // A switch shows whether it is on, and choosing it flips it.
+  await page.keyboard.press("Control+k");
+  await page.keyboard.type("hide critical");
+  await expect(rows).toHaveText(["Critical pathShown"]);
+  await expect(rows.first().locator(".paln")).toHaveText("Shown");
+  await page.keyboard.press("Enter");
+  expect((await state(page)).settings.showCritical).toBe(false);
+  // A command that changes the roadmap says it switches to Edit, and does.
+  await page.keyboard.press("Control+k");
+  await page.keyboard.type("add a workstream");
+  await expect(rows.first().locator(".paln")).toHaveText("Switches to Edit");
+  const n = (await state(page)).phases.length;
+  await page.keyboard.press("Enter");
+  await expect(page.locator("#modeEdit")).toHaveClass(/on/);
+  expect((await state(page)).phases.length).toBe(n + 1);
+  // Names on the roadmap are found too; choosing one selects it.
+  await page.keyboard.press("Control+k");
+  await page.keyboard.type("invisible fence");
+  await expect(page.locator("#palList .palg")).toHaveText(["On the roadmap"]);
+  await rows.first().click();
+  await expect(pal).toBeHidden();
+  await expect(page.locator("#istrip input[type=text]").first()).toHaveValue("Paint the invisible fence");
+  // Nothing found is said plainly.
+  await page.keyboard.press("Control+k");
+  await page.keyboard.type("zzzz");
+  await expect(page.locator("#palList .pale")).toContainText("Nothing matches");
+});
+
 test("the Cards heading is renamed in Properties, and the tab follows", async ({ page }) => {
   await open(page, "edit");
   await expect(page.locator("#pt-cards")).toHaveText("Guiding principles");

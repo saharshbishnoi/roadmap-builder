@@ -974,10 +974,95 @@ const ACT={
   exHtml:()=>exportHtml(false),exHtmlView:()=>exportHtml(true),exPngAll:()=>exportVisual("png",true),tour:openTour,tourHide:hideTour,
   randCol:randomColours,flipTheme:flipTheme,
   json:()=>{ui.json=!ui.json;saveUi();render();},srcFormat:srcFormat,props:()=>setView(()=>{S.settings.showPanel=!S.settings.showPanel;}),
-  help:openGuide,exPng:()=>exportVisual("png"),exPdfA3:()=>exportVisual("pdfA3",true),exPdf:()=>exportVisual("pdf",true),deselect:()=>select(null),
+  palette:openPalette,help:openGuide,exPng:()=>exportVisual("png"),exPdfA3:()=>exportVisual("pdfA3",true),exPdf:()=>exportVisual("pdf",true),deselect:()=>select(null),
   clear:()=>{mutate(()=>{S.activities=[];S.milestones=[];S.critical=[];S.cards=[];S.panel=[];});toast("Cleared all content",true);},
   sample:()=>{mutate(()=>{S=normalise(sample());});toast("Loaded the sample roadmap",true);}
 };
+/* ---------- command palette (Ctrl+K or Ctrl+Space) ----------
+   One searchable list of what the app can do, in groups. With nothing typed it lists the common commands; typing also
+   searches the less common ones (row heights, header styles) and the items on the roadmap. */
+let palList=[],palAt=0;
+function palCommands(q){
+  const st=S.settings,edit=ui.mode==="edit",out=[];
+  /* o: e = changes the roadmap (switches to Edit first; not offered on a view-only page), deep = only when searching */
+  const add=(group,label,fn,o)=>{o=o||{};if(VIEWONLY&&(o.e||o.own))return;if(o.deep&&!q)return;out.push({group:group,label:label,fn:fn,edit:!!o.e,note:o.note||"",kw:o.kw||""});};
+  const pick=(id,v)=>()=>{const s=$("#"+id);s.value=v;s.dispatchEvent(new Event("change",{bubbles:true}));};
+  const flag=(group,label,k,o)=>add(group,label,()=>setView(()=>{st[k]=!st[k];}),Object.assign({note:st[k]?"Shown":"Hidden",kw:"show hide toggle"},o||{}));
+  add("View",edit?"Switch to View mode":"Switch to Edit mode",()=>setMode(edit?"view":"edit"),{own:true,kw:"mode read present change"});
+  add("View","Fit the timeline to the window",ACT.zfit,{kw:"zoom reset"});
+  add("View","Zoom in",ACT.zin);add("View","Zoom out",ACT.zout);
+  add("View","Go to today",ACT.today,{kw:"scroll now"});
+  add("View",isDark()?"Switch to the light theme":"Switch to the dark theme",flipTheme,{kw:"dark light colour mode"});
+  add("View","Expand every workstream",()=>setView(()=>{S.phases.forEach(p=>{p.collapsed=false;});}),{kw:"open rows"});
+  add("View","Collapse every workstream",()=>setView(()=>{S.phases.forEach(p=>{p.collapsed=true;});}),{kw:"close rows summary"});
+  add("View",st.showPanel?"Hide the Properties panel":"Show the Properties panel",ACT.props,{own:true,kw:"settings side cards"});
+  add("View",ui.json?"Close the JSON editor":"Open the JSON editor",ACT.json,{e:true,kw:"source text code"});
+  add("Add","Add a workstream",ACT.addPhase,{e:true,kw:"new phase group"});
+  add("Add","Add a key milestone",ACT.addKm,{e:true,kw:"new date marker"});
+  add("Add","Add a critical path stage",ACT.addCp,{e:true,kw:"new"});
+  add("Add","Add a floating card",ACT.addCard,{e:true,kw:"new note"});
+  add("Add","Add a panel card",ACT.addPanel,{e:true,kw:"new note"});
+  add("Edit","Undo the last change",undo,{e:true,note:hist.length?"Ctrl+Z":"Nothing to undo"});
+  add("Edit","Randomise colours",randomColours,{e:true,kw:"palette colour ideas"});
+  flag("Show or hide","Critical path","showCritical");flag("Show or hide","Milestone lines","showLines");flag("Show or hide","Today line","showToday");
+  flag("Show or hide","Start date column","colStart");flag("Show or hide","End date column","colEnd");flag("Show or hide","Floating cards","showCards");
+  flag("Show or hide","Activity names beside bars","barName",{kw:"labels show hide toggle"});flag("Show or hide","Start dates beside bars","barStart",{kw:"labels show hide toggle"});flag("Show or hide","End dates beside bars","barEnd",{kw:"labels show hide toggle"});
+  [[24,"Compact"],[30,"Standard"],[38,"Comfortable"],[48,"Tall"],[60,"Extra tall"]].forEach(r=>add("Appearance","Row height: "+r[1],pick("t-rowH",String(r[0])),{own:true,deep:true,note:st.rowH===r[0]?"Current":"",kw:"rows spacing padding thicker"}));
+  [[40,"Thin"],[60,"Standard"],[80,"Thick"]].forEach(r=>add("Appearance","Bar thickness: "+r[1],pick("t-barFill",String(r[0])),{own:true,deep:true,note:st.barFill===r[0]?"Current":"",kw:"bars padding"}));
+  [["tab","Label tab"],["strip","Solid strip"],["glass","Glass strip"],["underline","Underline"],["twotone","Two-tone"],["classic","Classic, two lines"]].forEach(r=>add("Appearance","Header style: "+r[1],pick("t-bannerStyle",r[0]),{own:true,deep:true,note:st.bannerStyle===r[0]?"Current":"",kw:"banner title"}));
+  add("Files","Import a roadmap or activity list",ACT.import,{own:true,kw:"open load json csv file"});
+  add("Files","Export the roadmap file (.json)",ACT.exJson,{own:true,kw:"save download backup"});
+  if(!EMBED){add("Files","Export a standalone page (.html)",ACT.exHtml,{kw:"save download share"});add("Files","Export a standalone page, view only (.html)",ACT.exHtmlView,{kw:"save download share locked"});}
+  add("Files","Export the activity list (.csv)",ACT.exCsv,{kw:"save download spreadsheet excel"});
+  add("Files","Export an image of this view (.png)",ACT.exPng,{kw:"save download picture screenshot"});
+  add("Files","Export an image of the whole timeline (.png)",ACT.exPngAll,{kw:"save download picture"});
+  add("Files","Export a PDF, A3 landscape",ACT.exPdfA3,{kw:"save download print"});
+  add("Files","Export a PDF, exact size",ACT.exPdf,{kw:"save download print"});
+  if(!EMBED)add("Help","Open the Guide",openGuide,{kw:"help steps videos how"});
+  if(!$("#tourBtn").hidden)add("Help","Watch the tour",openTour,{kw:"film video help"});
+  add("Help","Load the sample roadmap",ACT.sample,{e:true,deep:true,kw:"example demo reset"});
+  if(!q)return out;
+  const words=q.toLowerCase().split(/\s+/).filter(Boolean),hit=t=>{t=t.toLowerCase();return words.every(w=>t.indexOf(w)>=0);};
+  const res=out.filter(c=>hit(c.group+" "+c.label+" "+c.kw));
+  /* Things on the roadmap: choosing one brings it into view and opens it. */
+  const items=[],go=(kind,o,what)=>{if(items.length<8&&(edit||!o.hidden)&&hit(o.name||o.title||""))items.push({group:"On the roadmap",label:o.name||o.title,note:what,fn:()=>palGo(kind,o.id)});};
+  S.phases.forEach(p=>go("p",p,"Workstream"));S.activities.forEach(a=>go("a",a,a.type==="milestone"?"Milestone":"Activity"));
+  S.milestones.forEach(m=>go("k",m,"Key milestone"));S.critical.forEach(c=>go("c",c,"Critical path stage"));S.cards.forEach(c=>go("f",c,"Floating card"));
+  return res.concat(items);
+}
+function palGo(kind,id){
+  const o=find(kind,id);if(!o)return;
+  if(kind==="a"){const p=find("p",o.phase);if(p&&p.collapsed)setView(()=>{p.collapsed=false;});}
+  if(kind==="f"&&!S.settings.showCards)setView(()=>{S.settings.showCards=true;});
+  if("apck".indexOf(kind)>=0&&rowSpan(kind,o))fitRow(kind,id);
+  const el=document.getElementById(kind==="p"?"g-"+id:kind==="a"?"r-"+id:kind==="f"?"fc-"+id:"");
+  if(el&&el.scrollIntoView)el.scrollIntoView({block:"center",inline:"nearest"});
+  if(kind==="p"){if(ui.mode==="edit")editItem(kind,id);return;}
+  if(ui.mode==="edit")editItem(kind,id);else if(kind!=="f")openInfo(kind,id);
+}
+function palDraw(){
+  const q=$("#palIn").value.trim();palList=palCommands(q);palAt=Math.min(palAt,Math.max(0,palList.length-1));
+  let h="",g="";
+  palList.forEach((c,i)=>{if(c.group!==g){g=c.group;h+='<div class="palg" role="presentation">'+esc(g)+'</div>';}
+    h+='<button type="button" class="pali'+(i===palAt?' on':'')+'" id="pal-'+i+'" role="option" aria-selected="'+(i===palAt)+'" data-pal="'+i+'" tabindex="-1"><span class="pall">'+esc(c.label)+'</span>'+
+      (c.edit&&ui.mode!=="edit"?'<span class="paln">Switches to Edit</span>':'')+(c.note?'<span class="paln">'+esc(c.note)+'</span>':'')+'</button>';});
+  $("#palList").innerHTML=h||'<p class="pale">Nothing matches "'+esc(q)+'". Try another word, such as export, add, hide or zoom.</p>';
+  $("#palIn").setAttribute("aria-activedescendant",palList.length?"pal-"+palAt:"");
+  const on=$("#pal-"+palAt);if(on)on.scrollIntoView({block:"nearest"});
+}
+function openPalette(){if(exporting)return;closeMenus();const p=$("#pal");p.hidden=false;$("#palIn").value="";palAt=0;palDraw();$("#palList").scrollTop=0;$("#palIn").focus();}
+function closePalette(){$("#pal").hidden=true;}
+function palRun(i){const c=palList[i];if(!c)return;closePalette();if(c.edit&&ui.mode!=="edit")setMode("edit");c.fn();}
+$("#palIn").addEventListener("input",()=>{palAt=0;palDraw();});
+$("#pal").addEventListener("keydown",e=>{
+  const n=palList.length,move=d=>{e.preventDefault();if(n){palAt=(palAt+d+n)%n;palDraw();}};
+  if(e.key==="ArrowDown")move(1);else if(e.key==="ArrowUp")move(-1);
+  else if(e.key==="Home"&&!$("#palIn").value){e.preventDefault();palAt=0;palDraw();}else if(e.key==="End"&&!$("#palIn").value){e.preventDefault();palAt=Math.max(0,n-1);palDraw();}
+  else if(e.key==="Enter"){e.preventDefault();palRun(palAt);}
+  else if(e.key==="Tab"){e.preventDefault();}
+});
+$("#pal").addEventListener("pointermove",e=>{const el=e.target.closest("[data-pal]");if(el&&+el.dataset.pal!==palAt){palAt=+el.dataset.pal;document.querySelectorAll(".pali").forEach((b,i)=>{b.classList.toggle("on",i===palAt);b.setAttribute("aria-selected",String(i===palAt));});}});
+$("#pal").addEventListener("click",e=>{const el=e.target.closest("[data-pal]");if(el){e.stopPropagation();palRun(+el.dataset.pal);}else if(e.target.id==="pal")closePalette();});
 /* Drag the right edge of the left header to resize the workstream / activity column (both modes). */
 function setNameW(w,done){S.settings.nameW=w?Math.min(800,Math.max(150,Math.round(w))):0;if(done)save();render(true);}
 $("#chart").addEventListener("dblclick",e=>{if(e.target.closest(".colrz"))setNameW(0,true);else if(e.target.closest(".years,.quarters")){ui.zoom="fit";render();}});
@@ -1097,6 +1182,9 @@ resizer($("#rzPanel"),()=>S.settings.panelW,(w,done)=>{S.settings.panelW=Math.mi
 resizer($("#rzJson"),()=>ui.jsonW,(w,done)=>{ui.jsonW=Math.min(900,Math.max(280,Math.round(w)));$("#work").style.setProperty("--jsonw",ui.jsonW+"px");if(done)saveUi();},1,440);
 $("#src").addEventListener("scroll",()=>{$("#srcNum").scrollTop=$("#src").scrollTop;});
 document.addEventListener("keydown",e=>{
+  /* Ctrl+K (Cmd+K on a Mac) or Ctrl+Space opens the command palette from anywhere; the same keys close it. */
+  if((e.ctrlKey||e.metaKey)&&!e.altKey&&!e.shiftKey&&(e.key.toLowerCase()==="k"||e.code==="Space")){e.preventDefault();if($("#pal").hidden)openPalette();else closePalette();return;}
+  if(e.key==="Escape"&&!$("#pal").hidden){closePalette();return;}
   if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==="s"&&e.target.id==="src"){e.preventDefault();srcFormat();return;}
   if(e.key==="Escape"){if(!$("#sheet").hidden)closeSheet();else if(sel){sel=null;render();}closeMenus();return;}
   if(e.key==="Enter"&&e.target.matches&&e.target.matches(".nm.add")){e.preventDefault();addRow(e.target);return;}
