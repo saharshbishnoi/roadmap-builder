@@ -35,7 +35,7 @@ RELEASE=1 docker compose up -d --build
 The same command with `RELEASE=1` also:
 
 1. runs every browser test in `release/tests` (Playwright, headless Chromium); the build stops if one fails;
-2. renders the guide videos from the app as it is now: five chapters, each in a light and a dark
+2. renders the guide videos from the app as it is now: seven chapters, each in a light and a dark
    version, in 4K (3840 x 2160). It drives the real app, renders it frame by frame, narrates each
    scene with a natural female voice and writes subtitles and poster images.
 
@@ -62,7 +62,7 @@ either way. To take the site down, delete the branch or switch Pages off.
 
 The hosted site can be shared as a link and installed from the browser (Install, in the address bar
 of Chrome or Edge) to run in its own window, offline. It is also the only place the **product film**
-appears (a five-minute narrated tour, see `film/README.md`), behind a "Watch the tour" bar. GitHub
+appears (a narrated tour in eight chapters, see `film/README.md`), behind a "Watch the tour" bar. GitHub
 refuses files over 100 MB, so the site plays the film's 1080p copy; the 4K master stays in `film/out`.
 
 **Releases** are made by the pipeline: pushing a version tag (for example `v1.4.4`) runs
@@ -74,7 +74,7 @@ and 1080p with its subtitles and chapter list, the guide videos on their own,
 out without it. The release text comes
 from `docs/releases/<tag>.md` when that file exists. The newest zip is always at
 `https://github.com/saharshbishnoi/roadmap-builder/releases/latest/download/roadmap-builder.zip`.
-On GitHub's machines a run takes about an hour and a quarter.
+On GitHub's machines a run takes between one and two hours.
 
 **The same package** can be gathered on your own machine by `./package-release.sh v1.4.4`
 into `dist/release-v1.4.4/`: the zip, the guide videos on their own, the product film (4K and 1080p),
@@ -235,6 +235,11 @@ or Hidden, and a command that changes the roadmap says it switches to Edit. Typi
 less common settings (row height, bar thickness, header style) and the workstreams, activities,
 milestones, stages and floating cards on the roadmap; choosing one brings it into view and opens
 it. Esc, or the same keys, closes the box.
+
+**Narrow windows.** When the toolbar does not fit, it is not squeezed and does not scroll: the
+buttons that do not fit move, least used first, into a drop-down behind a "…" button, and move back
+when there is room. View and Edit, Templates, Export, the theme switch, Guide and the version always
+stay on the bar.
 
 **Version.** The version of the app is shown at the end of the toolbar, beside Guide. It is set in
 `app/app.js` (`VERSION`); the release pipeline refuses a tag that does not match it.

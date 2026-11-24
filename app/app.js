@@ -353,7 +353,7 @@ function render(soft){
   setHtml(inner,h,!exporting&&(soft||!!inner.firstChild));
 
   if(PRS.at>=S.slides.length)PRS.at=S.slides.length-1;if(PRS.on&&!S.slides.length)PRS.on=false;
-  renderPanel(soft);renderJson();presentDraw();
+  renderPanel(soft);renderJson();presentDraw();fitTools();
   $("#jsonBtn").classList.toggle("on",ui.json);$("#jsonBtn").setAttribute("aria-pressed",String(ui.json));
   $("#propBtn").classList.toggle("on",st.showPanel);$("#propBtn").setAttribute("aria-pressed",String(st.showPanel));
   $("#helpBtn").hidden=!!EMBED;$("#ver").textContent="v"+VERSION;$("#ver").title="Roadmap Builder version "+VERSION;
@@ -1293,6 +1293,21 @@ $("#chart").addEventListener("wheel",e=>{
   const dy=Math.max(-160,Math.min(160,e.deltaY*(e.deltaMode===1?32:1)));   // a mouse wheel notch or a trackpad's small steps
   TRK.zoom=Math.min(200,Math.max(3,(TRK.zoom==null?mw:TRK.zoom)*Math.exp(-dy/420)));
 },{passive:false});
+/* ---------- the toolbar on a narrow window ----------
+   When the buttons do not fit, the ones named below move, in this order, into a drop-down behind a "…" button, and
+   move back when there is room. They are the same buttons, so they keep working and keep their state. Mode, the
+   Templates and Export menus, the theme switch, Guide and the version always stay on the bar. */
+const SPILL=["#palBtn",'.tools [data-act="import"]','.tools [data-act="today"]',"#jsonBtn","#undo",'.tools [data-act="zout"]','.tools [data-act="zfit"]','.tools [data-act="zin"]',"#trackBtn","#presentBtn","#propBtn"];
+let spilled=[];
+function fitTools(){
+  const bar=$(".tools"),menu=$("#moreMenu"),wrap=$("#moreWrap");if(!bar||exporting)return;
+  spilled.forEach(x=>{x.mark.replaceWith(x.el);});spilled=[];wrap.hidden=true;
+  for(let i=0;i<SPILL.length&&bar.scrollWidth>bar.clientWidth+1;i++){
+    const el=document.querySelector(SPILL[i]);if(!el||!el.offsetParent)continue;
+    const mark=document.createComment("spill");el.replaceWith(mark);menu.appendChild(el);spilled.push({el:el,mark:mark});wrap.hidden=false;
+  }
+  if(wrap.hidden)menu.hidden=true;
+}
 /* ---------- command palette (Ctrl+K or Ctrl+Space) ----------
    One searchable list of what the app can do, in groups. With nothing typed it lists the common commands; typing also
    searches the less common ones (row heights, header styles) and the items on the roadmap. */
@@ -1557,6 +1572,7 @@ window.addEventListener("dragenter",e=>{if(hasFiles(e)){dragDepth++;document.bod
 window.addEventListener("dragleave",()=>{dragDepth=Math.max(0,dragDepth-1);if(!dragDepth)document.body.classList.remove("dropping");});
 window.addEventListener("dragover",e=>{if(hasFiles(e))e.preventDefault();});
 window.addEventListener("drop",e=>{if(!e.dataTransfer||!e.dataTransfer.files||!e.dataTransfer.files.length)return;e.preventDefault();dragDepth=0;document.body.classList.remove("dropping");importFile(e.dataTransfer.files[0]);});
+window.addEventListener("resize",fitTools);if(document.fonts&&document.fonts.ready)document.fonts.ready.then(fitTools);
 if(window.ResizeObserver){let raf=0;new ResizeObserver(()=>{if(ui.zoom!=="fit"||!S||freeze)return;cancelAnimationFrame(raf);raf=requestAnimationFrame(()=>{if(!freeze&&Math.abs(fitMw()-mw)>0.01)render();});}).observe($("#chart"));}
 
 /* ---------- boot ---------- */

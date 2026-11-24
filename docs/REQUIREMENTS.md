@@ -27,6 +27,7 @@ What the app is required to do, and where each thing is found. This list used to
 | Visibility controls stay where they are | Every eye keeps its place: solid when shown, a faint outline when hidden. In Edit mode a hidden row, date column or set of floating cards stays on screen, dimmed, and can still be changed |
 | Rows can be made taller, shorter, thicker or thinner | Properties, Display: Row height (Compact to Extra tall) and Bar thickness (Thin, Standard, Thick) |
 | The version in use is visible | At the end of the toolbar, beside Guide |
+| The toolbar never scrolls or squeezes | On a narrow window the buttons that do not fit move behind a "…" button, least used first, and come back when there is room |
 | Common functions and actions from the keyboard | Ctrl+K or Ctrl+Space, or Ctrl K on the toolbar: a search box over grouped commands (View, Add, Edit, Show or hide, Files, Help), settings and the names on the roadmap |
 | A way to present by steering with the pointer | The target on the toolbar: the timeline glides towards the edge the pointer is near, the wheel zooms, a click on a row folds its workstream. Esc or the right-click menu ends it |
 | Dependencies between activities, kept light | Edit mode: drag from the dot at the end of a bar to the row that waits for it. Lines show on hover and for the selected bar; the Links eye shows all. A line turns red when the dates clash; nothing is moved automatically |

@@ -18,11 +18,12 @@ Address: https://saharshbishnoi.github.io/roadmap-builder/
 
 **There are two sets of videos.**
 
-1. **The product film**: one narrated tour for the headline of the hosted site. Six chapters, in this
-   order: Read the roadmap; Edit in place; Properties; Cards and display; JSON live editor; Share it.
-2. **The guide videos**: five short chapters shown in the app's Guide dialog, each recorded twice, once
+1. **The product film**: one narrated tour for the headline of the hosted site. Eight chapters, in this
+   order: Read the roadmap; Edit in place; Properties; Cards and display; JSON live editor; Levels,
+   links and templates; Present; Share it.
+2. **The guide videos**: seven short chapters shown in the app's Guide dialog, each recorded twice, once
    in the light theme and once in the dark: Read the roadmap; Add and edit rows; Properties; Cards and
-   display; JSON and files.
+   display; JSON and files; Levels, links and templates; Present.
 
 **Before you start**, compare both scripts with the app. Every feature added since the last recording
 gets a step in the chapter where it belongs, in both sets. Every step that names a control that has
@@ -114,7 +115,7 @@ Skip this only when told the script is already approved.
 
 - The film in 4K with chapter markers, a 1080p copy, the subtitles as a separate `.srt`, and a list of
   chapters with their start times.
-- Ten guide videos (five chapters, light and dark) with a poster image each and one subtitle file per
+- Fourteen guide videos (seven chapters, light and dark) with a poster image each and one subtitle file per
   chapter.
 - The updated scene files and release notes naming what changed in the videos.
 - Then, when asked: publish the site with `./publish-pages.sh`, and push a version tag so the pipeline

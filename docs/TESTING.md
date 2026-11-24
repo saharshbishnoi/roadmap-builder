@@ -7,7 +7,7 @@ the Playwright documentation are given where they help.
 
 | Kind | Where | Tool | When it runs |
 |---|---|---|---|
-| Browser tests of the app | `release/tests/app.spec.mjs` (50 tests) | [Playwright Test](https://playwright.dev/docs/intro), headless Chromium | Every release build and every tagged release; on demand locally |
+| Browser tests of the app | `release/tests/app.spec.mjs` (51 tests) | [Playwright Test](https://playwright.dev/docs/intro), headless Chromium | Every release build and every tagged release; on demand locally |
 | Guide videos as a check | `release/videos.mjs` | [Playwright library](https://playwright.dev/docs/library) | Every release build. It drives the real app through every chapter and stops if a control is missing |
 | Product film as a check | `film/scenes.mjs`, `film/record.mjs` | [Puppeteer](https://pptr.dev/) | When the film is recorded. It stops at the scene and step that failed, saves a screenshot in `film/out/failures`, and lists page errors in `film/out/report.json` |
 | Build checks | `assets/standalone.mjs`, `Dockerfile` | Node, sha256sum | Every build: the standalone template checks itself, and the voice model is checked against pinned checksums |
@@ -98,7 +98,7 @@ Helpers at the top of `app.spec.mjs`:
 | Files | CSV round trip; an older roadmap file brought up to date; image of this view and of the whole timeline |
 | Standalone pages | One self-contained file that opens from a folder; view-only opens exactly as exported and cannot be edited |
 | Layout | The schedule fills the window and scrolls inside itself; side panels are full height |
-| Guide and hosting | Guide opens as a large dialog at the top with five chapters, and plays the videos of the app's theme where they exist; installable (manifest, icon, offline helper); works from a folder; the film headline stays hidden where the film is not published |
+| Guide and hosting | Guide opens as a large dialog at the top with seven chapters, and plays the videos of the app's theme where they exist; installable (manifest, icon, offline helper); works from a folder; the film headline stays hidden where the film is not published |
 
 ## 5. Writing a test
 

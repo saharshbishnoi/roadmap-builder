@@ -711,3 +711,21 @@ body.viewonly #tplWrap{display:none}
 #xcap p{margin:4px 0 0;font:400 15px/1.4 var(--body);color:var(--muted);max-width:110ch}
 body.xslides #xpanel{display:none!important}
 body.xslides .fcards{display:none}
+/* ---- a narrower window: the toolbar tightens up before it has to scroll. The Ctrl K hint goes first; the keys still work. ---- */
+@media (max-width:1500px){
+  .tools{gap:4px;padding-left:6px;padding-right:6px}
+  .tools .btn:not(.sq):not(.kbd),.tools .segb{padding-left:9px;padding-right:9px}
+  .tools .tsep{margin:2px 0}
+}
+/* What does not fit moves behind the "…" button, as a list. Icon-only buttons are spelled out there. */
+#moreMenu{min-width:190px}
+#moreMenu .btn{display:flex;align-items:center;gap:8px;width:100%;min-width:0;height:auto;border:0;border-bottom:0;border-radius:4px;background:transparent;color:var(--ink);text-align:left;padding:7px 10px;margin:0;font:500 calc(13px * var(--fz))/1.2 var(--body)}
+#moreMenu .btn:hover:not(:disabled){background:color-mix(in srgb,var(--accent) 14%,transparent)}
+#moreMenu .btn:disabled{opacity:.45;cursor:default}
+#moreMenu .btn.on{box-shadow:inset 3px 0 0 var(--accent)}
+#moreMenu .btn.sq::after,#moreMenu .btn.kbd::before{content:attr(aria-label)}
+#moreMenu .btn.kbd{flex-direction:row;justify-content:space-between;color:var(--muted)}
+#moreMenu .btn.kbd::before{content:"Commands";color:var(--ink)}
+#moreMenu .btn.sq{justify-content:flex-start}
+/* Nothing on the toolbar is squeezed: what does not fit is moved behind "…" instead. */
+.tools>*{flex-shrink:0}

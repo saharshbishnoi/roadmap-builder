@@ -1,6 +1,6 @@
 # The Roadmap Builder product film
 
-A narrated tour of the real app, recorded by a script so it can be made again with one command.
+A narrated tour of the real app, recorded by a script so it can be made again with one command. It has eight chapters: Read the roadmap; Edit in place; Properties; Cards and display; JSON live editor; Levels, links and templates; Present; Share it.
 Everything runs in a container: the browser, ffmpeg, fonts, the recorder and the voice model. The only
 thing needed on the machine is Docker.
 

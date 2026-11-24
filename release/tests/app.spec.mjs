@@ -348,7 +348,7 @@ test("Guide opens a large dialog at the top, with the steps for every chapter an
   await page.click("#helpBtn");
   const g = page.locator("#card.guide");
   await expect(g.locator("h2")).toContainText("Guide");
-  await expect(g.locator(".gstep")).toHaveCount(5);
+  await expect(g.locator(".gstep")).toHaveCount(7);
   await expect(g.locator(".gstep ol li").first()).toBeVisible();
   await expect(g.locator("#helpTake")).toContainText("Download the offline copy");
   // The dialog pops in with a short animation, so wait for it to come to rest before measuring.
@@ -357,8 +357,8 @@ test("Guide opens a large dialog at the top, with the steps for every chapter an
   // The videos are rendered later in the release build; where they exist each chapter has one, in the app's theme.
   const has = await g.locator(".gstep video").count();
   if (has) {
-    await expect(g.locator(".gstep video")).toHaveCount(5);
-    await expect(g.locator('.gstep video track[kind="subtitles"]')).toHaveCount(5);
+    await expect(g.locator(".gstep video")).toHaveCount(7);
+    await expect(g.locator('.gstep video track[kind="subtitles"]')).toHaveCount(7);
     expect(await g.locator(".gstep video source").first().getAttribute("src")).toContain("-light.mp4");
   }
   await page.keyboard.press("Escape");
@@ -401,7 +401,7 @@ test("the app works when opened straight from a folder", async ({ page }) => {
   await page.keyboard.press("Enter");
   expect((await state(page)).activities).toHaveLength(37);
   await page.click("#helpBtn");
-  await expect(page.locator("#card.guide .gstep")).toHaveCount(5);
+  await expect(page.locator("#card.guide .gstep")).toHaveCount(7);
   await expect(page.locator("#helpTake")).toContainText("Download the offline copy");
 });
 
@@ -1037,6 +1037,39 @@ test("the slides export as a PDF with one page per slide, and the view is put ba
   for (let i = 0; i < n; i++) await page.locator("#tabSlides .del").first().click();
   await page.evaluate(() => document.querySelector('#exMenu [data-act="exSlides"]').click());
   await expect(page.locator("#toast")).toContainText("no slides to export");
+});
+
+test("on a narrow window the toolbar moves what does not fit behind a … button instead of scrolling", async ({ page }) => {
+  await page.setViewportSize({ width: 1600, height: 800 });
+  await open(page, "edit");
+  const fits = () => page.evaluate(() => { const t = document.querySelector(".tools"); return t.scrollWidth <= t.clientWidth + 1; });
+  const inMenu = () => page.locator("#moreMenu > *").evaluateAll(l => l.map(e => e.id || e.dataset.act));
+  // Wide: everything is on the bar and there is no … button.
+  await expect(page.locator("#moreWrap")).toBeHidden();
+  expect(await inMenu()).toEqual([]);
+  expect(await fits()).toBe(true);
+  // Narrow: nothing scrolls; the least used buttons are behind …, and the essentials stay on the bar.
+  await page.setViewportSize({ width: 860, height: 800 });
+  await expect(page.locator("#moreBtn")).toBeVisible();
+  expect(await fits()).toBe(true);
+  const moved = await inMenu();
+  expect(moved.slice(0, 2)).toEqual(["palBtn", "import"]);
+  for (const id of ["#modeView", "#modeEdit", "#tplBtn", "#exBtn", "#themeBtn", "#helpBtn", "#ver"]) expect(await page.locator(id).evaluate(e => !e.closest("#moreMenu")), id).toBe(true);
+  // They still work from there, and keep their state.
+  await page.click("#moreBtn");
+  await expect(page.locator("#moreMenu")).toBeVisible();
+  await page.locator("#moreMenu #palBtn").click();
+  await expect(page.locator("#pal")).toBeVisible();
+  await page.keyboard.press("Escape");
+  await expect(page.locator("#moreMenu")).toBeHidden();
+  // Narrower still moves more; wide again puts everything back in its place.
+  await page.setViewportSize({ width: 640, height: 800 });
+  expect(await fits()).toBe(true);
+  expect((await inMenu()).length).toBeGreaterThan(moved.length);
+  await page.setViewportSize({ width: 1600, height: 800 });
+  await expect(page.locator("#moreWrap")).toBeHidden();
+  expect(await inMenu()).toEqual([]);
+  expect(await page.evaluate(() => [...document.querySelectorAll(".tools button")].filter(b => !b.closest(".menu") && b.offsetParent).slice(-3).map(b => b.id))).toEqual(["palBtn", "themeBtn", "helpBtn"]);
 });
 
 test("the Cards heading is renamed in Properties, and the tab follows", async ({ page }) => {

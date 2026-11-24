@@ -137,7 +137,7 @@ Ranked roughly by value.
 
 ### Guide videos
 
-- **A single overview film** of about two minutes, in addition to the five chapters.
+- **A single overview film** of about two minutes, in addition to the guide chapters.
 - **Soft background music and chapter transitions.** Needs a licensed or generated track.
 - **Other languages**: translated narration and subtitles from the same script.
 

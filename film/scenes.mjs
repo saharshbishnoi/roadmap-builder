@@ -20,11 +20,11 @@ export const FILM = {
 
   opening: {
     id: "00-opening", title: "Opening",
-    cards: [{ heading: "Roadmap Builder", line: TAGLINE }, { heading: "The full tour", line: "Six chapters, one sample programme." }],
+    cards: [{ heading: "Roadmap Builder", line: TAGLINE }, { heading: "The full tour", line: "Eight chapters, one sample programme." }],
     steps: [],
     lines: [
       "Welcome to Roadmap Builder. It gives you a whole programme in one intuitive, interactive view, and it all runs in an ordinary browser.",
-      "Over the next few minutes we will take the full tour, in six short chapters, using a made-up programme so you can see how it fits together."
+      "Over the next few minutes we will take the full tour, in eight short chapters, using a made-up programme so you can see how it fits together."
     ]
   },
 
@@ -40,7 +40,8 @@ export const FILM = {
         async f => { await f.scroll("#chart", -460, 1100); await f.sweep("#r-a8 .track", 0.1, 0.7, 2400); await f.waitFor("#xline"); },
         async f => { await f.click("#ct-p1"); await f.pause(500); },
         async f => { await f.click("#ct-p1"); await f.drag(".years", 170, 0, { fx: 0.3 }); await f.pause(400); },
-        async f => { await f.click("#r-a11 .aname", { button: "right" }); await f.menu("Fit the timeline to this row"); await f.pause(600); }
+        async f => { await f.click("#r-a11 .aname", { button: "right" }); await f.menu("Fit the timeline to this row"); await f.pause(600); },
+        async f => { await f.key("Control+k"); await f.waitFor("#palList .pali"); await f.pause(500); await f.type("today", 110); await f.pause(700); await f.key("Enter"); await f.pause(400); }
       ],
       lines: [
         "Let's begin with the simplest thing you can do with a roadmap, which is to read it.",
@@ -52,7 +53,8 @@ export const FILM = {
         "Back at the top, move across the timeline. A faint line follows your pointer and tells you the exact date underneath it.",
         "When you only care about the big picture, collapse a workstream. Its activities fold away into one summary bar.",
         "Open it again, and try dragging the year scale itself. The timeline stretches under your hand, so you can zoom in on a busy period.",
-        "And if you want one row to fill the screen, right-click it and choose fit. The timeline scales so that row sits neatly in the middle."
+        "And if you want one row to fill the screen, right-click it and choose fit. The timeline scales so that row sits neatly in the middle.",
+        "There is a shortcut to everything, too. Press Control K, type a word or two, and pick from the list. Here it takes us straight back to today."
       ] },
 
     { id: "02-edit", title: "Edit in place", mode: "view", props: false,
@@ -76,7 +78,7 @@ export const FILM = {
         "New activities start without dates, because you often know the work before you know the timing. When you are ready, click the row's timeline and the bar lands there.",
         "Sometimes you only know when something begins. Give it a start date and nothing else, and its bar fades out, an honest way of saying the end is still open.",
         "These chips decide what is written beside each bar. Turn on Activity, and every bar is labelled with its name.",
-        "And if a row is not ready to be seen, click its eye. It dims here so you can still find it, and it disappears from View and from anything you export."
+        "And if a row is not ready to be seen, click its eye. The row dims here so you can still find it, the eye stays exactly where it was, and the row disappears from View and from anything you export."
       ] },
 
     { id: "03-item", title: "Properties", mode: "edit", columns: false,
@@ -119,6 +121,8 @@ export const FILM = {
         async f => { await f.click("#modeEdit"); await f.click("#pt-cards"); await f.click("#ce-n-n1-title"); await f.key("Control+A"); await f.type("Tea, always"); await f.key("Enter"); },
         async f => { await f.click("#pe-n2"); await f.waitFor("#tabCards #istrip"); await f.click("#f-md"); await f.key("Control+End"); await f.type(" Then **admired again**."); },
         async f => { await f.click("#dx-done"); await f.click("#pt-props"); await f.click("#r-panelTitle"); await f.key("Control+A"); await f.type("House rules"); await f.pause(400); },
+        async f => { await f.hover("#t-rowH"); await f.ring(); await f.set("#t-rowH", "24"); await f.pause(900); await f.set("#t-rowH", "38"); await f.set("#t-barFill", "80"); await f.pause(900); await f.set("#t-rowH", "30"); await f.set("#t-barFill", "60"); },
+        async f => { await f.hover("#t-bannerStyle"); await f.ring(); await f.set("#t-bannerStyle", "strip"); await f.pause(800); await f.set("#t-bannerStyle", "glass"); await f.pause(800); await f.set("#t-bannerStyle", "twotone"); await f.pause(800); await f.set("#t-bannerStyle", "tab"); },
         async f => { await f.click("#t-roundCards"); await f.pause(400); },
         async f => { await f.hover("#t-theme"); await f.ring(); await f.set("#t-theme", "dark"); await f.pause(500); },
         async f => { await f.click("#randCol"); await f.pause(700); },
@@ -131,6 +135,8 @@ export const FILM = {
         "Back in Edit, there is a second kind of card on the right, good for principles or key messages. Click a title and simply retype it.",
         "The pencil opens the rest of the card. The text uses the same simple formatting as before, and the card updates as you type.",
         "The heading of this group is yours to name as well. Rename it in Properties, and the tab at the top changes with it.",
+        "Rows can be shorter or taller. Compact fits more on the screen, and a taller row with thicker bars makes a simple view for a few big items.",
+        "The header comes in several styles. Each one is a single slim line, so the roadmap keeps the space.",
         "Now for the look. Tick rounded cards, and every corner softens. It is a small change that shifts the whole feel.",
         "Prefer a dark screen? Switch the theme, and the entire roadmap follows.",
         "And when you are not sure what colours to use, let the app suggest some. Randomise colours gives every workstream a fresh, matched colour.",
@@ -161,7 +167,57 @@ export const FILM = {
         "Cards are in here too. Retype a title in the text, and the card on the chart changes to match."
       ] },
 
-    { id: "06-share", title: "Share it", mode: "view", props: false,
+    { id: "06-plan", title: "Levels, links and templates", mode: "edit", props: false,
+      cards: [{ heading: "Levels, links and templates", line: "Structure for bigger plans." }],
+      steps: [
+        async f => { await f.click("#n-a2", { fx: 0.9 }); await f.key("Control+]"); await f.pause(500); await f.click("#n-a3", { fx: 0.9 }); await f.key("Control+]"); await f.pause(500); },
+        async f => { await f.click("#ac-a1"); await f.pause(900); await f.click("#ac-a1"); await f.pause(300); },
+        async f => { await f.hover("#b-a8"); await f.pause(700); },
+        async f => { await f.click("#ey-showDeps"); await f.pause(500); },
+        async f => { await f.hover("#b-a8"); await f.pause(200);
+          const v = await f.eval(() => { const d = document.querySelector("#b-a8 .lk").getBoundingClientRect(), r = document.querySelector("#r-a5 .track").getBoundingClientRect(); return [r.left + r.width * 0.62 - d.left, r.top + r.height / 2 - d.top]; });
+          await f.drag("#b-a8 .lk", v[0], v[1], { ms: 1400 }); await f.pause(500); },
+        async f => { await f.drag("#b-a5", -190, 0); await f.pause(700); },
+        async f => { await f.click("#undo"); await f.pause(400); },
+        async f => { await f.click("#tplBtn"); await f.waitFor("#tplMenu"); await f.pause(900); await f.click('[data-act="tplComplex"]'); await f.waitFor("#inner .row.par"); await f.pause(700); }
+      ],
+      lines: [
+        "Real programmes have structure. Work sits inside other work, and some things have to wait for others. Roadmap Builder handles both.",
+        "To put one activity under another, click its name and press Control and the right square bracket. The row above becomes a parent, and its bar now spans the rows beneath it.",
+        "A parent has a small arrow of its own. Fold its rows away when you want the summary, and open them again when you want the detail. You can go four levels deep.",
+        "Now for what waits for what. Point at a bar, and a line shows what it is linked to. The lines stay hidden until you ask, so a busy roadmap stays readable.",
+        "When you do want the whole picture, the Links eye above the table shows every line at once.",
+        "To add a link, drag from the dot at the end of a bar to the row that has to wait for it. An arrow joins the two.",
+        "Now watch what happens if that activity is moved so it starts too early. The line turns red. Nothing else is moved for you. It is a warning, not a rule.",
+        "Undo puts it back, and the warning clears.",
+        "And you do not have to start from an empty page. Templates offers a simple, a typical, and a complex roadmap. This is the complex one, with three levels of nesting and linked activities throughout."
+      ] },
+
+    { id: "07-present", title: "Present", mode: "view",
+      cards: [{ heading: "Present", line: "Steer with the pointer, or step through slides." }],
+      steps: [
+        async f => { await f.click('[data-act="zin"]'); await f.click('[data-act="zin"]'); await f.click("#trackBtn"); await f.hover("#chart", { fx: 0.6, fy: 0.6 }); await f.pause(400); },
+        async f => { await f.hover("#chart", { fx: 0.985, fy: 0.6 }); await f.pause(2300); await f.hover("#chart", { fx: 0.6, fy: 0.6 }); await f.pause(900); },
+        async f => { await f.key("Escape"); await f.click("#modeEdit"); await f.click("#pt-slides"); await f.waitFor("#tabSlides .scard"); await f.pause(500); },
+        async f => { await f.click("#slAdd"); await f.type("Where we are today"); await f.key("Enter"); await f.pause(500); },
+        async f => { await f.click("#modeView"); await f.click("#presentBtn"); await f.waitFor("#prsBar"); await f.pause(2300); },
+        async f => { await f.key("ArrowRight"); await f.pause(2400); await f.key("ArrowRight"); await f.pause(2300); },
+        async f => { await f.key("ArrowLeft"); await f.pause(2200); },
+        async f => { await f.key("Escape"); await f.click("#exBtn"); await f.click('[data-act="exSlides"]'); await f.waitFor("#toast", { text: ".pdf", frames: 1500 }); }
+      ],
+      lines: [
+        "A roadmap earns its keep in a meeting. So here are two ways to present one.",
+        "The first is to steer with the pointer. Select the target on the toolbar. While the pointer is in the middle of the chart, nothing moves.",
+        "Move towards an edge, and the timeline glides that way, faster the closer you get. Come back to the middle, and it eases to a stop.",
+        "The second way is to prepare slides. Press Escape, switch to Edit, and open the Slides tab. Each card here is a saved view of the roadmap.",
+        "Set the roadmap up the way you want it seen, then save that view as a slide and give it a title. A description is optional.",
+        "Back in View, select the screen on the toolbar. The presentation starts at the first slide, and a thin bar across the very top shows how far through you are.",
+        "The right arrow moves on, and the roadmap glides smoothly from one saved view to the next, folding and opening workstreams as it goes.",
+        "The left arrow goes back, and the bar at the top follows.",
+        "When the meeting is over, export the slides as a PDF. You get one page for each slide, with its description as a caption underneath."
+      ] },
+
+    { id: "08-share", title: "Share it", mode: "view", props: false,
       cards: [{ heading: "Share it", line: "A file, a picture, or one page." }],
       steps: [
         async f => { await f.click("#exBtn"); await f.waitFor("#exMenu"); },
