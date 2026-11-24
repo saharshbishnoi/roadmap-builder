@@ -333,7 +333,8 @@ test("an older roadmap file is brought up to date on import", async ({ page }) =
     activities: [{ phase: "p", name: "A", start: "2026-01-01", end: "2026-03-31" }, { phase: "p", name: "No dates" }] };
   await page.evaluate(d => window.__roadmap.importText("old.json", JSON.stringify(d)), old);
   const s = await state(page);
-  expect(s.version).toBe(3);
+  expect(s.version).toBe(4);
+  expect([s.settings.fontHead, s.settings.fontBody]).toEqual(["opensans", "opensans"]);
   expect(s.settings.upper).toBe(false);
   expect(s.settings.barStart).toBe(false);
   expect(s.activities.map(a => a.start)).toEqual(["2026-01-01", ""]);
@@ -427,8 +428,8 @@ test("Export > Standalone page makes one self-contained file that opens from a f
   await expect(copy.locator("#title")).toContainText("Project Wombat");
   await expect(copy.locator(".aname", { hasText: "Only in the export" })).toBeVisible();
   await expect(copy.locator("#modeView")).toHaveClass(/on/);
-  await expect(copy.locator(".gname").first()).toHaveCSS("font-family", /Barlow/);
-  expect(await copy.evaluate(() => document.fonts.check('600 14px "Barlow"'))).toBe(true);
+  await expect(copy.locator(".gname").first()).toHaveCSS("font-family", /Open Sans/);
+  expect(await copy.evaluate(() => document.fonts.check('600 14px "Open Sans"'))).toBe(true);
   await copy.click("#exBtn");
   await expect(copy.locator('[data-act="exHtml"]')).toBeHidden();
   await expect(copy.locator("#helpBtn")).toBeHidden();
@@ -654,6 +655,25 @@ test("the header is a slim bar whose size and font are set in Properties, with a
   await expect(page.locator("#todaychip")).toBeHidden();
   const s = await state(page);
   expect([s.settings.bannerScale, s.settings.bannerFont, s.settings.showChip, s.settings.chipExport]).toEqual([150, "inter", false, true]);
+});
+
+test("the header style is chosen in Properties: every style but Classic is one slim, square line", async ({ page }) => {
+  await open(page);
+  const box = () => page.locator(".banner").boundingBox();
+  const look = () => page.evaluate(() => { const b = getComputedStyle(document.querySelector(".banner")), t = document.querySelector("#title").getBoundingClientRect(), g = document.querySelector("#tagline").getBoundingClientRect();
+    return { radius: b.borderTopLeftRadius, oneLine: Math.abs((t.top + t.height / 2) - (g.top + g.height / 2)) < 3 && g.left >= t.right }; });
+  expect((await state(page)).settings.bannerStyle).toBe("tab");
+  await expect(page.locator("#title")).toHaveCSS("font-family", /Open Sans/);
+  for (const style of ["tab", "strip", "glass", "underline", "twotone"]) {
+    await page.selectOption("#t-bannerStyle", style);
+    await expect(page.locator("body")).toHaveClass(new RegExp("bn-" + style));
+    expect((await box()).height, style).toBeLessThanOrEqual(32);
+    expect(await look(), style).toEqual({ radius: "0px", oneLine: true });
+  }
+  await page.selectOption("#t-bannerStyle", "classic");
+  expect((await box()).height).toBeGreaterThan(40);
+  expect((await look()).oneLine).toBe(false);
+  expect((await state(page)).settings.bannerStyle).toBe("classic");
 });
 
 test("the Cards heading is renamed in Properties, and the tab follows", async ({ page }) => {

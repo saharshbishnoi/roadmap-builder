@@ -42,7 +42,7 @@ The README covers running and using the app. This file is for whoever changes it
 
 ### How the app is put together
 
-- **State.** `S` is the roadmap (version 3): phases, activities, milestones, critical path, floating
+- **State.** `S` is the roadmap (version 4): phases, activities, milestones, critical path, floating
   cards, panel cards and settings. It is kept in the browser's local storage under `roadmap-app-v2`;
   `ui` is kept under `roadmap-app-ui`. `normalise()` accepts any older or partial roadmap and returns a
   complete one; put new settings there with a default so old files keep opening.

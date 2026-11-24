@@ -167,7 +167,7 @@ choose "Fit the timeline to this row" to scale and scroll the timeline so that r
 
 **Properties panel** (right): the selected item, Add (workstream, key milestone, critical path
 stage, floating card, panel card), Text (fonts, text size, and separate sizes for labels and for
-dates), Display (theme, row height, bar thickness, floating cards, rounded cards, 3D effect), Header (size and font of the
+dates), Display (theme, row height, bar thickness, floating cards, rounded cards, 3D effect), Header (style, size and font of the
 heading, its colours, the name of the Cards tab, and the date chip), Timeline (start year, years
 shown, today line colour) and, on its Cards tab, the panel cards.
 
@@ -180,11 +180,19 @@ thickness from 30 to 90 percent (`barFill`) can be typed in the JSON editor, und
 **Version.** The version of the app is shown at the end of the toolbar, beside Guide. It is set in
 `app/app.js` (`VERSION`); the release pipeline refuses a tag that does not match it.
 
+**Fonts.** Open Sans is used for headings and text to begin with, without letter-spacing. Barlow,
+Barlow Condensed, Inter, IBM Plex Sans and Source Sans 3 come with the app too. A roadmap saved by
+an earlier version that still used the old default, Barlow, opens in Open Sans; choose Barlow under
+Text to go back.
+
 **Colour ideas.** Under Display, Randomise colours gives the header, the highlight and every
 workstream a fresh, matched set of colours built around one random hue, chosen to read on both
 themes. Press it again for another idea, use Light / dark to check each one, and Undo to go back.
 
-**Header.** A slim bar with a short heading and a small tagline, both typed in place in Edit mode.
+**Header.** One slim line, 28 pixels tall with square corners, holding a short heading and a small
+tagline, both typed in place in Edit mode. Style, under Header in Properties, chooses its look:
+Label tab (the heading on a block of the header colour, with a thin rule), Solid strip, Glass strip,
+Underline, Two-tone, or Classic (the taller bar with the tagline under the heading).
 The date chip sits on the right; it can be switched off, or kept on screen but left out of exports,
 where it reads "As at" the day of the export. Drag its edge to resize it.
 

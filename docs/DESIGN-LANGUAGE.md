@@ -42,12 +42,14 @@ Rules:
 
 ## Type
 
-- **Families:** Barlow for headings and text by default. Barlow Condensed, Inter, IBM Plex Sans and
-  Source Sans 3 are offered; all are sans serif. The guide videos use Inter for title cards.
-- **Sizes** (multiplied by the text-size setting, 90% to 120%): body 13px, table names 13px,
-  workstream names 14px bold, card titles 17px bold, small labels 11px, banner title 24–38px.
+- **Families:** Open Sans for headings and text by default. Barlow, Barlow Condensed, Inter, IBM Plex
+  Sans and Source Sans 3 are offered; all are sans serif. The guide videos use Inter for title cards.
+- **Sizes** (multiplied by the text-size setting, 90% to 120%): body 13px, table names 12.5px,
+  workstream names 13.5px bold, card titles 17px bold, small labels 11px, header title 14px (21px in
+  the Classic header style).
 - **Case:** sentence case everywhere. Headings are not capitalised unless the reader turns
-  Capitals on. Wide letter-spacing (0.05–0.12em) is used only on small headings.
+  Capitals on. There is no letter-spacing in sentence case; with Capitals on, headings are
+  spaced by 0.05em.
 - **Numbers:** tabular figures, so dates line up in columns.
 
 ## Shape, depth and space

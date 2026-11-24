@@ -32,6 +32,7 @@ All four files are used unmodified, and each keeps the licence header its author
 |---|---|---|---|
 | Barlow and Barlow Condensed | 5.3.0 | SIL Open Font License 1.1 | © 2017 The Barlow Project Authors |
 | Inter | 5.3.0 | SIL Open Font License 1.1 | © 2016 The Inter Project Authors |
+| Open Sans | 5.2.7 | SIL Open Font License 1.1 | © 2020 The Open Sans Project Authors |
 | IBM Plex Sans | 5.3.0 | SIL Open Font License 1.1 | © 2019 IBM Corp. |
 | Source Sans 3 | 5.3.1 | SIL Open Font License 1.1 | Adobe (as stated in the font files; see the packaged licence text) |
 

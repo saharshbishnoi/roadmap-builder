@@ -13,8 +13,10 @@ const TAIL=EMBED&&EMBED.id?":"+String(EMBED.id).replace(/[^\w-]/g,""):"";
 const KEY="roadmap-app-v2"+TAIL,UIKEY="roadmap-app-ui"+TAIL;
 const VIEWONLY=!!(EMBED&&EMBED.viewOnly);   // a page exported as "view only"
 const COLL={a:"activities",k:"milestones",c:"critical",p:"phases",f:"cards",n:"panel"};
+/* How the header is drawn (Properties, Header, Style). All but "classic" are one line, 28px tall, with square corners. */
+const BANNERS=["tab","strip","glass","underline","twotone","classic"];
 const MONTHS=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
-const FONTS={barlow:["Barlow",'"Barlow","Segoe UI",system-ui,Arial,sans-serif'],barlowc:["Barlow Condensed",'"Barlow Condensed","Arial Narrow",Arial,sans-serif'],inter:["Inter",'"Inter","Segoe UI",system-ui,Arial,sans-serif'],
+const FONTS={opensans:["Open Sans",'"Open Sans","Segoe UI",system-ui,Arial,sans-serif'],barlow:["Barlow",'"Barlow","Segoe UI",system-ui,Arial,sans-serif'],barlowc:["Barlow Condensed",'"Barlow Condensed","Arial Narrow",Arial,sans-serif'],inter:["Inter",'"Inter","Segoe UI",system-ui,Arial,sans-serif'],
   plex:["IBM Plex Sans",'"IBM Plex Sans","Segoe UI",system-ui,Arial,sans-serif'],source:["Source Sans 3",'"Source Sans 3","Segoe UI",system-ui,Arial,sans-serif'],
   system:["System default",'system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif'],arial:["Arial",'Arial,Helvetica,sans-serif'],segoe:["Segoe UI",'"Segoe UI",Tahoma,Arial,sans-serif'],
   verdana:["Verdana",'Verdana,Geneva,sans-serif'],calibri:["Calibri",'Calibri,Carlito,Arial,sans-serif']};
@@ -75,7 +77,7 @@ function sample(){
   acts[6].details="### Biscuit shortlist\n\n1. Custard cream\n2. Bourbon\n3. A digestive, if we must";
   const K=[["Kettle switched on",3,"#C8102E"],["First wombat sighted",22,"#7E57C2"],["Custard reaches elsewhere",37,"#F07C1F"],["Trombones tuned",50,"#D49B00"],["Pigeons home",67,"#12909A"],["Everyone has a nap",95,"#4A5568"]];
   const C=[["Kettle on",2,9,"#3BA3C4"],["Biscuits",10,16,"#2456A6"],["Sprockets",17,24,"#E0782A"],["Custard",25,30,"#5B3FA8"],["Honk",31,36,"#B5232F"],["Pigeons",37,43,"#2C7A3D"],["Nap time",44,95,"#4A5568"]];
-  return {version:3,title:"Project Wombat",tagline:"Wibble Modernisation Programme",startYear:Y,years:8,settings:{panelTitle:"Guiding principles"},
+  return {version:4,title:"Project Wombat",tagline:"Wibble Modernisation Programme",startYear:Y,years:8,settings:{panelTitle:"Guiding principles"},
     phases:P.map(p=>({id:p[0],name:p[1],sub:p[2],color:p[3]})),activities:acts,
     milestones:K.map((k,i)=>({id:"k"+(i+1),name:k[0],date:at(k[1]),color:k[2],line:true,hover:"",details:i===0?"The kettle is the **single point of failure** for the whole programme.":""})),
     critical:C.map((c,i)=>({id:"c"+(i+1),name:c[0],start:at(c[1]),end:end(c[2]),color:c[3],hover:"",details:""})),
@@ -96,10 +98,12 @@ function normalise(d){
   const int=(v,lo,hi,def)=>{v=Math.round(+v);return v>=lo&&v<=hi?v:def;},fontName=v=>{v=str(v).trim();return /^[\w .-]{1,40}$/.test(v)?v:"";};
   const seen=new Set(),nid=v=>{v=str(v);if(!/^[\w-]{1,40}$/.test(v)||seen.has(v))v=uid();seen.add(v);return v;};
   const arr=v=>Array.isArray(v)?v.filter(x=>x&&typeof x==="object"):[];
-  const old=!(+d.version>=3),o={version:3,title:str(d.title)||"Untitled programme",tagline:str(d.tagline),startYear:int(d.startYear,1990,2100,new Date().getFullYear()),years:int(d.years,1,15,8),
+  /* Open Sans is the default. A roadmap saved before version 4 that still has the old default, Barlow, moves to it. */
+  const font=k=>FONTS[k]&&!(v3&&k==="barlow")?k:"opensans";
+  const old=!(+d.version>=3),v3=!(+d.version>=4),o={version:4,title:str(d.title)||"Untitled programme",tagline:str(d.tagline),startYear:int(d.startYear,1990,2100,new Date().getFullYear()),years:int(d.years,1,15,8),
     settings:{theme:["auto","light","dark"].indexOf(st.theme)>=0?st.theme:"auto",banner:hex(st.banner,"#14275A"),bannerInk:hex(st.bannerInk,"#FFFFFF"),accent:hex(st.accent,"#2F6FED"),today:hex(st.today,"#E11D48"),
       showToday:bool(st.showToday,true),showCritical:bool(st.showCritical,true),showLines:bool(st.showLines,true),colStart:bool(st.colStart,true),colEnd:bool(st.colEnd,true),barName:bool(st.barName,false),barStart:bool(st.barStart,bool(st.showLabels,true)),barEnd:bool(st.barEnd,bool(st.showLabels,true)),showCards:bool(st.showCards,true),showPanel:bool(st.showPanel,true),float3d:bool(st.float3d,true),roundCards:bool(st.roundCards,false),
-      panelTitle:str(st.panelTitle)||"Notes",lblCritical:str(st.lblCritical)||LBL.lblCritical,lblMilestones:str(st.lblMilestones)||LBL.lblMilestones,lblActivity:str(st.lblActivity)||LBL.lblActivity,lblStart:str(st.lblStart)||LBL.lblStart,lblEnd:str(st.lblEnd)||LBL.lblEnd,panelW:int(st.panelW,240,720,340),nameW:int(st.nameW,150,800,0),fontHead:FONTS[st.fontHead]?st.fontHead:"barlow",fontBody:FONTS[st.fontBody]?st.fontBody:"barlow",
+      panelTitle:str(st.panelTitle)||"Notes",lblCritical:str(st.lblCritical)||LBL.lblCritical,lblMilestones:str(st.lblMilestones)||LBL.lblMilestones,lblActivity:str(st.lblActivity)||LBL.lblActivity,lblStart:str(st.lblStart)||LBL.lblStart,lblEnd:str(st.lblEnd)||LBL.lblEnd,panelW:int(st.panelW,240,720,340),nameW:int(st.nameW,150,800,0),fontHead:font(st.fontHead),fontBody:font(st.fontBody),bannerStyle:BANNERS.indexOf(st.bannerStyle)>=0?st.bannerStyle:"tab",
       fontHeadCustom:fontName(st.fontHeadCustom),fontBodyCustom:fontName(st.fontBodyCustom),fontScale:[90,100,110,120].indexOf(+st.fontScale)>=0?+st.fontScale:100,labelScale:int(st.labelScale,80,130,100),bannerScale:int(st.bannerScale,60,200,100),bannerFont:FONTS[st.bannerFont]?st.bannerFont:"",showChip:bool(st.showChip,true),chipExport:bool(st.chipExport,true),dateScale:int(st.dateScale,80,130,100),rowH:int(st.rowH,22,72,30),barFill:int(st.barFill,30,90,60),upper:old?false:bool(st.upper,false)},
     phases:[],activities:[],milestones:[],critical:[],cards:[],panel:[]};
   const pmap={};
@@ -154,9 +158,9 @@ function fitMw(){const c=$("#chart");return Math.max(8,Math.floor(((c.clientWidt
 function applyTheme(){
   const r=document.documentElement,t=S.settings.theme;
   if(t==="light"||t==="dark")r.setAttribute("data-theme",t);else if(hostTheme)r.setAttribute("data-theme",hostTheme);else r.removeAttribute("data-theme");
-  const st=S.settings,stack=(k,c)=>(c?'"'+c+'",':"")+(FONTS[k]||FONTS.barlow)[1];
+  const st=S.settings,stack=(k,c)=>(c?'"'+c+'",':"")+(FONTS[k]||FONTS.opensans)[1];
   r.style.setProperty("--display",stack(st.fontHead,st.fontHeadCustom));r.style.setProperty("--body",stack(st.fontBody,st.fontBodyCustom));
-  r.style.setProperty("--fz",String(st.fontScale/100));r.style.setProperty("--lz",String(st.labelScale/100));r.style.setProperty("--bz",String(st.bannerScale/100));r.style.setProperty("--bfont",st.bannerFont?FONTS[st.bannerFont][1]:stack(st.fontHead,st.fontHeadCustom));r.style.setProperty("--dz",String(st.dateScale/100));r.style.setProperty("--tt",st.upper?"uppercase":"none");
+  r.style.setProperty("--fz",String(st.fontScale/100));r.style.setProperty("--lz",String(st.labelScale/100));r.style.setProperty("--bz",String(st.bannerScale/100));r.style.setProperty("--bfont",st.bannerFont?FONTS[st.bannerFont][1]:stack(st.fontHead,st.fontHeadCustom));r.style.setProperty("--dz",String(st.dateScale/100));r.style.setProperty("--tt",st.upper?"uppercase":"none");r.style.setProperty("--trk",st.upper?".05em":"0");
   r.style.setProperty("--rowh",st.rowH+"px");r.style.setProperty("--barh",Math.max(6,Math.round(st.rowH*st.barFill/100))+"px");
   r.style.setProperty("--banner",S.settings.banner);r.style.setProperty("--banner-ink",S.settings.bannerInk);r.style.setProperty("--accent",S.settings.accent);r.style.setProperty("--today",S.settings.today);
 }
@@ -205,7 +209,7 @@ function barText(a,s,e){
   return (st.barName?a.name+(d.length?" · ":""):"")+d.join(" – ");
 }
 function markHtml(a,color,sc){
-  const M=months(),tw=M*mw,txt=barText(a,a.start,a.end),est=txt.length*6.3*S.settings.fontScale/100*S.settings.dateScale/100+16,tip=' data-tip="a:'+a.id+'"';
+  const M=months(),tw=M*mw,txt=barText(a,a.start,a.end),est=txt.length*6.7*S.settings.fontScale/100*S.settings.dateScale/100+16,tip=' data-tip="a:'+a.id+'"';
   const place=()=>editing()?'<button type="button" class="place" id="pl-'+a.id+'" data-place="'+a.id+'">No dates yet. Click on the timeline to place it, or type a date.</button>':'';
   if(a.type==="milestone"){
     if(!a.start)return place();
@@ -240,6 +244,7 @@ function render(soft){
   const on=(k,id)=>!!dock&&sel.kind===k&&sel.id===id;
   applyTheme();
   document.body.classList.toggle("edit",edit);document.body.classList.toggle("float3d",st.float3d);document.body.classList.toggle("round",st.roundCards);
+  BANNERS.forEach(b=>document.body.classList.toggle("bn-"+b,st.bannerStyle===b));
   const jsonOn=edit&&!exporting&&ui.json,propsOn=st.showPanel&&!exporting;
   $("#jsonPanel").hidden=!jsonOn;$("#rzJson").hidden=!jsonOn;$("#panel").hidden=!propsOn;$("#rzPanel").hidden=!propsOn;
   $("#work").style.setProperty("--panelw",st.panelW+"px");$("#work").style.setProperty("--jsonw",ui.jsonW+"px");
@@ -774,7 +779,7 @@ function importFile(f){if(!f)return;const r=new FileReader();r.onload=()=>import
    build (assets/standalone.mjs) and is only loaded when this export is used. */
 function exportHtml(viewOnly){
   const build=()=>{
-    const T=window.STANDALONE_TEMPLATE,st=S.settings,used=["Barlow",FONTS[st.fontHead][0],FONTS[st.fontBody][0]];
+    const T=window.STANDALONE_TEMPLATE,st=S.settings,used=["Open Sans",FONTS[st.fontHead][0],FONTS[st.fontBody][0]];
     const fonts=Object.keys(T.fonts).filter(f=>used.indexOf(f)>=0).map(f=>T.fonts[f]).join("");
     const pack={id:uid()+uid(),exported:todayIso(),roadmap:S};
     if(viewOnly){
@@ -960,7 +965,7 @@ document.addEventListener("contextmenu",e=>{
 /* ---------- events ---------- */
 function closeMenus(except){document.querySelectorAll(".menu").forEach(m=>{if(m!==except)m.hidden=true;});}
 function setMode(m){ui.mode=VIEWONLY?"view":m;saveUi();closeSheet();render();}
-(function(){const o=Object.keys(FONTS).map(k=>'<option value="'+k+'">'+FONTS[k][0]+(/^(barlow|barlowc|inter|plex|source)$/.test(k)?'':' (if installed)')+'</option>').join("");$("#t-fontHead").innerHTML=o;$("#t-fontBody").innerHTML=o;$("#t-bannerFont").innerHTML='<option value="">Same as headings</option>'+o;})();
+(function(){const o=Object.keys(FONTS).map(k=>'<option value="'+k+'">'+FONTS[k][0]+(/^(opensans|barlow|barlowc|inter|plex|source)$/.test(k)?'':' (if installed)')+'</option>').join("");$("#t-fontHead").innerHTML=o;$("#t-fontBody").innerHTML=o;$("#t-bannerFont").innerHTML='<option value="">Same as headings</option>'+o;})();
 const ACT={
   undo:undo,addPhase:()=>addThing("p"),addKm:()=>addThing("k"),addCp:()=>addThing("c"),addCard:()=>addThing("f"),addPanel:()=>addThing("n"),
   zin:()=>{ui.zoom="manual";mw=Math.min(60,mw*1.25);render();},zout:()=>{ui.zoom="manual";mw=Math.max(4,mw/1.25);render();},zfit:()=>{ui.zoom="fit";render();},

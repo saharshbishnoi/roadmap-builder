@@ -1,3 +1,7 @@
+@font-face{font-family:"Open Sans";font-weight:400;font-style:normal;font-display:swap;src:url(fonts/open-sans-latin-400-normal.woff2) format("woff2")}
+@font-face{font-family:"Open Sans";font-weight:500;font-style:normal;font-display:swap;src:url(fonts/open-sans-latin-500-normal.woff2) format("woff2")}
+@font-face{font-family:"Open Sans";font-weight:600;font-style:normal;font-display:swap;src:url(fonts/open-sans-latin-600-normal.woff2) format("woff2")}
+@font-face{font-family:"Open Sans";font-weight:700;font-style:normal;font-display:swap;src:url(fonts/open-sans-latin-700-normal.woff2) format("woff2")}
 @font-face{font-family:"Barlow";font-weight:400;font-style:normal;font-display:swap;src:url(fonts/barlow-latin-400-normal.woff2) format("woff2")}
 @font-face{font-family:"Barlow";font-weight:500;font-style:normal;font-display:swap;src:url(fonts/barlow-latin-500-normal.woff2) format("woff2")}
 @font-face{font-family:"Barlow";font-weight:600;font-style:normal;font-display:swap;src:url(fonts/barlow-latin-600-normal.woff2) format("woff2")}
@@ -26,8 +30,8 @@
   --paper:#E9EDF4; --surface:#FFFFFF; --ink:#172033; --muted:#5A6577; --line:#D3D9E4; --grid:rgba(23,32,51,.10);
   --banner:#14275A; --banner-ink:#FFFFFF; --accent:#2F6FED; --today:#E11D48;
   --shadow:20,30,60;
-  --display:"Barlow","Segoe UI",system-ui,Arial,sans-serif;
-  --body:"Barlow","Segoe UI",system-ui,Arial,sans-serif;
+  --display:"Open Sans","Segoe UI",system-ui,Arial,sans-serif;
+  --body:"Open Sans","Segoe UI",system-ui,Arial,sans-serif; --trk:0;
   --fz:1; --tt:none;
   color-scheme:light;
 }
@@ -75,10 +79,10 @@ body.edit .vo{display:none!important}
 /* banner */
 #capture{display:flex;flex-direction:column;gap:12px;background:var(--paper)}
 .banner{background:var(--banner);color:var(--banner-ink);padding:14px 18px;display:flex;flex-wrap:wrap;gap:8px 24px;align-items:flex-end;justify-content:space-between}
-.banner h1{margin:0;font:700 clamp(24px,3.2vw,38px)/1.02 var(--display);letter-spacing:.02em;text-transform:var(--tt);text-wrap:balance;min-width:4ch;border-radius:2px}
-.banner .sub{margin:4px 0 0;font:600 calc(15px * var(--fz))/1.2 var(--display);letter-spacing:.12em;text-transform:var(--tt);opacity:.72}
+.banner h1{margin:0;font:700 clamp(24px,3.2vw,38px)/1.02 var(--display);letter-spacing:var(--trk);text-transform:var(--tt);text-wrap:balance;min-width:4ch;border-radius:2px}
+.banner .sub{margin:4px 0 0;font:600 calc(15px * var(--fz))/1.2 var(--display);letter-spacing:var(--trk);text-transform:var(--tt);opacity:.72}
 .bside{display:flex;flex-direction:column;gap:6px;align-items:flex-end}
-.banner .tag{font:600 calc(15px * var(--fz))/1.2 var(--display);letter-spacing:.1em;text-transform:var(--tt);opacity:.8;text-align:right;min-width:4ch;border-radius:2px}
+.banner .tag{font:600 calc(15px * var(--fz))/1.2 var(--display);letter-spacing:var(--trk);text-transform:var(--tt);opacity:.8;text-align:right;min-width:4ch;border-radius:2px}
 .todaychip{font-size:calc(12px * var(--fz));font-weight:600;border:1px solid currentColor;border-radius:999px;padding:2px 10px;opacity:.9}
 .banner [contenteditable="true"]:hover{box-shadow:0 0 0 1px currentColor}
 .banner [contenteditable="true"]:focus{outline:2px solid currentColor;outline-offset:2px}
@@ -109,9 +113,9 @@ body.edit .vo{display:none!important}
 .inner{position:relative;width:max-content;min-width:100%;padding-bottom:26px}
 .hrow{display:flex}
 .corner{position:sticky;left:0;z-index:5;flex:none;width:var(--leftw);background:var(--surface);display:flex;flex-direction:column;justify-content:flex-end}
-.lane-l{display:flex;align-items:center;justify-content:flex-end;gap:4px;padding:0 8px;font:600 calc(12px * var(--fz))/1 var(--display);letter-spacing:.1em;text-transform:var(--tt);color:var(--muted)}
+.lane-l{display:flex;align-items:center;justify-content:flex-end;gap:4px;padding:0 8px;font:600 calc(12px * var(--fz))/1 var(--display);letter-spacing:var(--trk);text-transform:var(--tt);color:var(--muted)}
 .lane-l.cpl{height:32px}.lane-l.kml{height:46px;flex-wrap:wrap;align-content:center;row-gap:0;overflow:hidden}
-.chead{position:relative;height:42px;display:flex;align-items:center;background:var(--banner);color:var(--banner-ink);font:600 calc(12px * var(--fz))/1 var(--display);letter-spacing:.1em;text-transform:var(--tt)}
+.chead{position:relative;height:42px;display:flex;align-items:center;background:var(--banner);color:var(--banner-ink);font:600 calc(12px * var(--fz))/1 var(--display);letter-spacing:var(--trk);text-transform:var(--tt)}
 .chead .c-name{flex:1;min-width:0;padding:0 12px}
 .dcol{flex:none;text-align:right;padding-right:8px;font-size:calc(11px * var(--fz));color:var(--muted);white-space:nowrap;overflow:hidden}
 .dcol.min{width:26px;padding:0}
@@ -122,7 +126,7 @@ body.edit .vo{display:none!important}
 .bsp{flex:none;width:78px}
 .htrack{flex:none;width:var(--tw);position:relative}
 .cprow{height:32px;position:relative}
-.cp{position:absolute;top:5px;height:22px;border-radius:11px;background:var(--c);color:var(--ci);font:600 calc(12.5px * var(--fz))/22px var(--display);letter-spacing:.03em;text-align:center;padding:0 6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;box-shadow:inset 0 -2px 0 rgba(0,0,0,.18);cursor:pointer}
+.cp{position:absolute;top:5px;height:22px;border-radius:11px;background:var(--c);color:var(--ci);font:600 calc(12.5px * var(--fz))/22px var(--display);letter-spacing:var(--trk);text-align:center;padding:0 6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;box-shadow:inset 0 -2px 0 rgba(0,0,0,.18);cursor:pointer}
 .kmrow{height:46px;position:relative}
 .km{position:absolute;bottom:2px;width:14px;height:14px;margin-left:-7px;cursor:pointer}
 .km::before{content:"";position:absolute;left:2px;top:2px;width:10px;height:10px;background:var(--c);transform:rotate(45deg)}
@@ -146,13 +150,13 @@ body.edit .vo{display:none!important}
 .caret{flex:none;width:22px;height:min(24px,calc(var(--rowh,30px) - 2px));border:0;background:transparent;cursor:pointer;color:var(--ink);padding:0;font-size:calc(11px * var(--fz));border-radius:3px}
 .caret:hover{background:var(--surface)}
 .chip{flex:none;min-width:20px;height:20px;border-radius:4px;display:flex;align-items:center;justify-content:center;font:700 calc(13px * var(--fz))/1 var(--display);background:var(--pc)}
-.gname{font:700 calc(14px * var(--fz))/1.1 var(--display);letter-spacing:.05em;text-transform:var(--tt);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.gname{font:700 calc(14px * var(--fz))/1.1 var(--display);letter-spacing:var(--trk);text-transform:var(--tt);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .gsub{flex:1;min-width:0;font-size:calc(11px * var(--fz));color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .aname{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:0 5px;cursor:pointer}
 .grip{flex:none;width:16px;height:100%;cursor:grab;touch-action:none;background:radial-gradient(circle,var(--muted) 1.1px,transparent 1.4px) 50% 50%/6px 6px;background-clip:content-box;padding:calc((var(--rowh,30px) - 14px)/2) 2px;opacity:.6;margin-left:-18px}
 .grip:hover{opacity:1}
 .nm{flex:1;min-width:0;background:transparent;border:1px solid transparent;border-radius:3px;padding:3px 5px;text-overflow:ellipsis}
-.nm.g{font:700 calc(14px * var(--fz))/1.1 var(--display);letter-spacing:.05em;text-transform:var(--tt)}
+.nm.g{font:700 calc(14px * var(--fz))/1.1 var(--display);letter-spacing:var(--trk);text-transform:var(--tt)}
 .nm:hover{border-color:var(--line)}
 .nm:focus{background:var(--surface);border-color:var(--accent);outline:none}
 .mini{flex:none;width:22px;height:22px;border:0;background:transparent;border-radius:3px;cursor:pointer;color:var(--muted);font-weight:700;padding:0}
@@ -188,13 +192,13 @@ body:not(.float3d) .fx3d{box-shadow:0 1px 3px rgba(var(--shadow),.18)}
 .fcard{position:absolute;background:var(--surface);border:2px solid var(--c);border-radius:0;padding:12px 14px 10px}
 .fhead{display:flex;gap:10px;align-items:center;margin-bottom:6px}
 .badge{flex:none;min-width:34px;height:34px;padding:0 6px;border-radius:0;background:var(--c);color:var(--ci);display:flex;align-items:center;justify-content:center;font:700 calc(20px * var(--fz))/1 var(--display);box-shadow:0 3px 6px rgba(var(--shadow),.28)}
-.fcard h3,.pcard h3{margin:0;font:700 calc(17px * var(--fz))/1.08 var(--display);letter-spacing:.04em;text-transform:var(--tt);color:color-mix(in srgb,var(--c) 78%,var(--ink));overflow-wrap:anywhere}
+.fcard h3,.pcard h3{margin:0;font:700 calc(17px * var(--fz))/1.08 var(--display);letter-spacing:var(--trk);text-transform:var(--tt);color:color-mix(in srgb,var(--c) 78%,var(--ink));overflow-wrap:anywhere}
 .fres{position:absolute;right:-5px;top:8px;bottom:8px;width:10px;cursor:ew-resize;touch-action:none}
 .panel{flex:none;width:var(--panelw,320px);display:flex;flex-direction:column;gap:14px}
 .panel .tabs{position:static;border:1px solid var(--line)}
 .gintro{margin:0;color:var(--muted)}
 .gstep{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:12px;display:flex;flex-direction:column;gap:8px}
-.gstep h3,.rgroup h3{margin:0;font:700 calc(14px * var(--fz))/1.15 var(--display);letter-spacing:.05em;text-transform:var(--tt)}
+.gstep h3,.rgroup h3{margin:0;font:700 calc(14px * var(--fz))/1.15 var(--display);letter-spacing:var(--trk);text-transform:var(--tt)}
 .gstep video{display:block;width:100%;aspect-ratio:16/9;background:#0b1020;border:1px solid var(--line);border-radius:6px}
 .gstep ol{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:3px}
 .gstep .gact{display:flex;justify-content:space-between;align-items:center;gap:8px;color:var(--muted);font-size:calc(11.5px * var(--fz))}
@@ -206,18 +210,18 @@ body:not(.float3d) .fx3d{box-shadow:0 1px 3px rgba(var(--shadow),.18)}
 .rgroup small{display:block;color:var(--muted);font-size:calc(11.5px * var(--fz))}
 .card.wide{width:min(1180px,100%)}
 .card.wide video{display:block;width:100%;background:#0b1020}
-.panel h2{margin:0;font:600 calc(14px * var(--fz))/1 var(--display);letter-spacing:.12em;text-transform:var(--tt);background:var(--banner);color:var(--banner-ink);padding:10px 12px}
+.panel h2{margin:0;font:600 calc(14px * var(--fz))/1 var(--display);letter-spacing:var(--trk);text-transform:var(--tt);background:var(--banner);color:var(--banner-ink);padding:10px 12px}
 .pcard{background:var(--surface);border-radius:0;border-left:5px solid var(--c);padding:10px 12px;display:flex;flex-wrap:wrap;gap:10px;align-items:flex-start;position:relative}
 .tile{flex:none;width:38px;height:38px;border-radius:0;background:var(--c);color:var(--ci);display:flex;align-items:center;justify-content:center;font:700 calc(19px * var(--fz))/1 var(--display);box-shadow:0 3px 6px rgba(var(--shadow),.28);transform:translateZ(18px)}
 .ptxt{min-width:0;flex:1}
-.eyebrow{font:600 calc(11px * var(--fz))/1.2 var(--display);letter-spacing:.14em;text-transform:var(--tt);color:color-mix(in srgb,var(--c) 78%,var(--ink))}
+.eyebrow{font:600 calc(11px * var(--fz))/1.2 var(--display);letter-spacing:var(--trk);text-transform:var(--tt);color:color-mix(in srgb,var(--c) 78%,var(--ink))}
 
 /* markdown */
 .md{font-size:calc(12.5px * var(--fz));line-height:1.4;overflow-wrap:anywhere}
 .md>:first-child{margin-top:0}.md>:last-child{margin-bottom:0}
 .md p,.md ul,.md ol,.md blockquote,.md pre,.md table{margin:0 0 6px}
 .md ul,.md ol{padding-left:18px}
-.md h1,.md h2,.md h3,.md h4{margin:8px 0 4px;font:700 calc(14px * var(--fz))/1.15 var(--display);letter-spacing:.06em;text-transform:var(--tt);background:none;color:inherit;padding:0}
+.md h1,.md h2,.md h3,.md h4{margin:8px 0 4px;font:700 calc(14px * var(--fz))/1.15 var(--display);letter-spacing:var(--trk);text-transform:var(--tt);background:none;color:inherit;padding:0}
 .md code{font:calc(12px * var(--fz)) ui-monospace,Consolas,monospace;background:var(--paper);padding:1px 4px;border-radius:3px}
 .md pre{background:var(--paper);padding:8px;border-radius:4px;overflow:auto}
 .md pre code{padding:0;background:none}
@@ -237,7 +241,7 @@ body:not(.float3d) .fx3d{box-shadow:0 1px 3px rgba(var(--shadow),.18)}
 #hover .thint{color:var(--muted);font-size:calc(11px * var(--fz));margin-top:6px;border-top:1px solid var(--line);padding-top:5px}
 .sheet{position:fixed;inset:0;z-index:50;background:rgba(8,12,22,.55);display:flex;align-items:center;justify-content:center;padding:16px}
 .card{background:var(--surface);border-radius:0;width:min(520px,100%);max-height:100%;overflow:auto;display:flex;flex-direction:column;box-shadow:0 2px 6px rgba(0,0,0,.2),0 30px 60px -12px rgba(0,0,0,.55)}
-.card>h2{margin:0;background:var(--banner);color:var(--banner-ink);font:600 calc(16px * var(--fz))/1.1 var(--display);letter-spacing:.1em;text-transform:var(--tt);padding:13px 16px;border-top:5px solid var(--c,var(--banner))}
+.card>h2{margin:0;background:var(--banner);color:var(--banner-ink);font:600 calc(16px * var(--fz))/1.1 var(--display);letter-spacing:var(--trk);text-transform:var(--tt);padding:13px 16px;border-top:5px solid var(--c,var(--banner))}
 .card .meta{padding:10px 16px 0;color:var(--muted)}
 .card .body{padding:12px 16px 4px}
 .form{display:grid;grid-template-columns:1fr 1fr;gap:10px 12px;padding:14px 16px}
@@ -277,7 +281,7 @@ body.exporting .fx3d{transform:none!important}
 
 /* always-visible display and add bars (these replace the old Visualisation, Add and Settings menus) */
 .vbar{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center;background:var(--surface);border:1px solid var(--line);padding:6px 10px}
-.vbar .vcap{font:700 calc(12px * var(--fz))/1 var(--display);letter-spacing:.08em;text-transform:var(--tt);color:var(--muted)}
+.vbar .vcap{font:700 calc(12px * var(--fz))/1 var(--display);letter-spacing:var(--trk);text-transform:var(--tt);color:var(--muted)}
 .vbar label{display:flex;gap:6px;align-items:center;font-weight:600;font-size:calc(12px * var(--fz));white-space:nowrap;cursor:pointer}
 .vbar select,.vbar input[type=text]{background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:4px;padding:4px 6px;max-width:150px;font-weight:400}
 .vbar input[type=text]{width:140px;margin-left:-8px}
@@ -285,7 +289,7 @@ body.exporting .fx3d{transform:none!important}
 .btn.sm{padding:3px 8px;font-size:calc(12px * var(--fz))}
 
 /* banner: timeline and colours edited in place */
-.yrs{margin-left:12px;letter-spacing:.04em;text-transform:none;font-weight:500}
+.yrs{margin-left:12px;letter-spacing:var(--trk);text-transform:none;font-weight:500}
 .banner input[type=number]{width:5.4em;background:transparent;color:inherit;border:1px solid currentColor;border-radius:3px;padding:1px 4px;font:inherit;letter-spacing:0}
 .todayrow{display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:flex-end}
 .bcol{display:flex;gap:10px;align-items:center;font-size:calc(12px * var(--fz));font-weight:600}
@@ -464,7 +468,7 @@ html:has(body.rb),body.rb{height:100%;overflow:hidden}
 .side.right{width:var(--panelw,340px)}
 .side.left{width:var(--jsonw,440px);display:flex;flex-direction:column;gap:8px;padding:0 12px 10px}
 .side .tabs{position:sticky;top:0;z-index:3}
-.shead{display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:var(--surface);padding:10px 0 6px;font:700 calc(13px * var(--fz))/1.2 var(--display);letter-spacing:.06em;text-transform:var(--tt)}
+.shead{display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;background:var(--surface);padding:10px 0 6px;font:700 calc(13px * var(--fz))/1.2 var(--display);letter-spacing:var(--trk);text-transform:var(--tt)}
 .srcwrap{flex:1;min-height:200px;display:flex;border:1px solid var(--line);border-radius:4px;overflow:hidden;background:var(--surface)}
 .srcwrap:focus-within{border-color:var(--accent)}
 .srcnum{flex:none;min-width:40px;padding:8px 8px 8px 6px;text-align:right;color:var(--muted);background:var(--paper);border-right:1px solid var(--line);font:calc(12px * var(--fz))/1.45 ui-monospace,Consolas,monospace;overflow:hidden;user-select:none}
@@ -474,7 +478,7 @@ html:has(body.rb),body.rb{height:100%;overflow:hidden}
 .phint{margin:0;color:var(--muted);font-size:calc(12px * var(--fz))}
 .pbody{padding:0 0 16px}
 .psec{padding:12px 14px;border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:8px}
-.psec>h3{margin:0;font:700 calc(12px * var(--fz))/1.2 var(--display);letter-spacing:.1em;text-transform:var(--tt);color:var(--muted)}
+.psec>h3{margin:0;font:700 calc(12px * var(--fz))/1.2 var(--display);letter-spacing:var(--trk);text-transform:var(--tt);color:var(--muted)}
 .pbtns{display:flex;flex-wrap:wrap;gap:6px}
 .pgrid{display:grid;grid-template-columns:auto 1fr;gap:6px 10px;align-items:center}
 .pgrid label{color:var(--muted);font-weight:500;font-size:calc(12px * var(--fz));white-space:nowrap}
@@ -489,7 +493,7 @@ html:has(body.rb),body.rb{height:100%;overflow:hidden}
 .istrip.inpanel .form .f.w{grid-column:1/-1}
 .pcards{display:flex;flex-direction:column;gap:12px;padding:12px}
 .pcards>.istrip.inpanel{border:1px solid var(--line);border-left:5px solid var(--c)}
-.pcards>h2{margin:0;font:600 calc(14px * var(--fz))/1 var(--display);letter-spacing:.12em;text-transform:var(--tt);background:var(--banner);color:var(--banner-ink);padding:10px 12px}
+.pcards>h2{margin:0;font:600 calc(14px * var(--fz))/1 var(--display);letter-spacing:var(--trk);text-transform:var(--tt);background:var(--banner);color:var(--banner-ink);padding:10px 12px}
 
 /* text sizes set in Properties: labels (names and headings on the chart) and dates */
 .aname,.nm{font-size:calc(13px * var(--fz) * var(--lz))}
@@ -554,10 +558,35 @@ body.exporting .chart.xwin .inner{margin-left:calc(-1 * var(--xoff));min-width:0
 /* ===== Header: a slim bar with a short heading, a small tagline and the date chip on the right. Its size and font are set in Properties. ===== */
 .banner{padding:calc(7px * var(--bz)) 16px;gap:4px 20px;align-items:center;flex-wrap:nowrap}
 .btitle{min-width:0;display:flex;flex-direction:column;gap:calc(2px * var(--bz))}
-.banner h1{font:700 calc(21px * var(--bz))/1.12 var(--bfont);letter-spacing:.01em;text-wrap:nowrap;overflow:hidden;text-overflow:ellipsis}
-.banner .tag{font:500 calc(11.5px * var(--bz))/1.2 var(--bfont);letter-spacing:.06em;opacity:.78;text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.banner h1{font:700 calc(21px * var(--bz))/1.12 var(--bfont);letter-spacing:var(--trk);text-wrap:nowrap;overflow:hidden;text-overflow:ellipsis}
+.banner .tag{font:500 calc(11.5px * var(--bz))/1.2 var(--bfont);letter-spacing:var(--trk);opacity:.78;text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .banner h1:focus,.banner .tag:focus{text-overflow:clip}
 .bside{flex:none;flex-direction:row;align-items:center;gap:6px}
 .todaychip{font-size:calc(11px * var(--fz));padding:2px 9px;white-space:nowrap}
 .pgrid input[type=number]{min-width:0;width:100%;background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:4px;padding:5px 6px}
 .side .tabs .tab{overflow:hidden;text-overflow:ellipsis}
+
+/* ---- type: Open Sans is wider than Barlow, so names and years are set a touch smaller and headings carry no tracking ---- */
+.aname,.nm{font-size:calc(12.5px * var(--fz) * var(--lz))}
+.gname,.nm.g{font-size:calc(13.5px * var(--fz) * var(--lz))}
+.year{font-size:calc(13.5px * var(--fz))}
+
+/* ---- header styles (Properties, Header, Style). One line, square corners, 28px at Standard size. "classic" keeps the two-line bar. ---- */
+body:not(.bn-classic) .banner{--bh:calc(28px * var(--bz));height:var(--bh);padding:0 12px;border-radius:0;gap:4px 16px}
+body:not(.bn-classic) .btitle{flex-direction:row;align-items:center;gap:10px}
+body:not(.bn-classic) .banner h1{font:700 calc(14px * var(--bz))/var(--bh) var(--bfont);letter-spacing:var(--trk)}
+body:not(.bn-classic) .banner .tag{font:400 calc(12px * var(--bz))/var(--bh) var(--bfont);letter-spacing:var(--trk);opacity:.78}
+body:not(.bn-classic) .todaychip{border:0;border-radius:0;padding:0;background:none;font-weight:500;font-size:calc(11.5px * var(--fz));opacity:.82}
+/* Solid strip: the banner colour edge to edge */
+body.bn-strip .banner .tag{line-height:1.2;padding-left:10px;border-left:1px solid color-mix(in srgb,currentColor 35%,transparent)}
+/* Glass strip: the banner colour as a translucent pane with a bright top edge */
+body.bn-glass .banner{background:linear-gradient(180deg,color-mix(in srgb,var(--banner) 74%,transparent),color-mix(in srgb,var(--banner) 92%,transparent));-webkit-backdrop-filter:blur(14px) saturate(1.5);backdrop-filter:blur(14px) saturate(1.5);
+  border:1px solid color-mix(in srgb,var(--banner-ink) 18%,transparent);box-shadow:inset 0 1px 0 color-mix(in srgb,#fff 38%,transparent),inset 0 -1px 0 rgba(0,0,0,.28),0 8px 18px -12px rgba(var(--shadow),.6)}
+/* Underline, Label tab and Two-tone: the page shows through; the banner colour is a rule or a block behind the title */
+body.bn-underline .banner,body.bn-tab .banner{background:transparent;color:var(--ink);padding:0 2px;border-bottom:2px solid var(--banner);box-sizing:content-box}
+body.bn-underline .banner h1{font-size:calc(15px * var(--bz))}
+body.bn-tab .banner,body.bn-twotone .banner{padding-left:0}
+body.bn-tab .banner h1,body.bn-twotone .banner h1{background:var(--banner);color:var(--banner-ink);padding:0 14px;flex:none;max-width:70%}
+body.bn-twotone .banner{background:color-mix(in srgb,var(--banner) 9%,var(--surface));color:var(--ink);border:1px solid color-mix(in srgb,var(--banner) 22%,var(--surface));padding-right:12px}
+body.bn-twotone .banner .tag{color:color-mix(in srgb,var(--banner) 35%,var(--ink));font-weight:500;opacity:1}
+body.bn-underline .banner .tag,body.bn-tab .banner .tag,body.bn-underline .todaychip,body.bn-tab .todaychip,body.bn-twotone .todaychip{color:var(--muted);opacity:1}

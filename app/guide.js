@@ -22,7 +22,7 @@ window.GUIDE=[
     "The Properties panel on the right runs the full height of the window. Use Properties in the toolbar to show or hide it.",
     "In Edit mode, click a bar, milestone or stage, or the pencil on a row, to edit all of its settings at the top of the panel. The chart updates as you type, and each burst of typing is one Undo step.",
     "Write the hover card and the click dialog in Markdown. The preview sits under each box.",
-    "Under Text, set the fonts, the overall text size, and the size of labels and of dates separately.",
+    "Under Text, set the fonts, the overall text size, and the size of labels and of dates separately. Open Sans is the font to begin with.",
     "Drag a bar to move it, drag either end to resize it, and drag the dotted handle to reorder rows."]},
   {id:"cards",title:"Cards and display",clip:"guide/04-cards",steps:[
     "Add a floating card or a panel card from Add, in the Properties panel. Edit a card title in place; the pencil opens the rest in the panel.",
@@ -31,7 +31,7 @@ window.GUIDE=[
     "Panel cards are on the Cards tab of the right panel. Lane headings, column headings and the Cards heading are edited in place.",
     "Under Display, Randomise colours gives the header and every workstream a fresh, matched set of colours; press it again for another idea, and use Light / dark to check each one in both themes. Undo brings the old colours back.",
     "Under Display, Row height makes every row shorter or taller, from Compact to Extra tall, and Bar thickness sets how much of the row the bar fills. Use Compact to fit more on a page, or Tall with Thick bars for a simple view with a few rows.",
-    "Under Display, set the theme and rounded or square cards. Under Header, set the size and font of the heading, its colours, the name of the Cards tab, and whether the date chip on the right is shown and kept in exports. Under Timeline, set the start year and the number of years."]},
+    "Under Display, set the theme and rounded or square cards. Under Header, Style chooses how the heading is drawn: Label tab, Solid strip, Glass strip, Underline or Two-tone are one slim line with square corners; Classic is the taller bar with the tagline underneath. Also set the size and font of the heading, its colours, the name of the Cards tab, and whether the date chip on the right is shown and kept in exports. Under Timeline, set the start year and the number of years."]},
   {id:"json",title:"JSON and files",clip:"guide/05-json",steps:[
     "In Edit mode, select JSON in the toolbar. The editor opens as a full-height panel on the left, with one line per activity and its start and end.",
     "Change a name or a date and the chart follows. Copy a line to add an activity, delete a line to remove one.",
